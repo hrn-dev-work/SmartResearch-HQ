@@ -1,13 +1,9 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
-
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.config import get_settings
 from app.core.status import JobStatus
-from app.db.models import AmazonCandidate, JobItem, ResearchJob, ReviewDecision
+from app.db.models import JobItem, ResearchJob, ReviewDecision
 from app.schemas.research import (
     AmazonCandidateResponse,
     CreateResearchResponse,
@@ -21,6 +17,9 @@ from app.schemas.research import (
 )
 from app.services.production.pipeline import create_job_record, run_job_pipeline
 from app.services.spreadsheet.exporter import SpreadsheetConfigError, build_export_row, export_rows
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 
 def _resolve_amazon_fields(item: JobItem, decision: ReviewDecision) -> tuple[str, str]:
@@ -213,7 +212,7 @@ class ProductionResearchService:
         )
         items = list(result.scalars().all())
         settings = get_settings()
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         pending_rows: list[dict] = []
         pending_decisions: list[ReviewDecision] = []

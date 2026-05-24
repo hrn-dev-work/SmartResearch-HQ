@@ -3,11 +3,10 @@
 from urllib.parse import urlparse
 from uuid import UUID
 
-from arq.connections import RedisSettings
-
 from app.config import get_settings
 from app.db.session import SessionLocal
 from app.services.production.pipeline import run_job_pipeline
+from arq.connections import RedisSettings
 
 MAX_RETRIES = 3
 

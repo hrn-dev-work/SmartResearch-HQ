@@ -1,9 +1,8 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field, HttpUrl
-
 from app.core.status import JobStatus
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class CreateResearchRequest(BaseModel):

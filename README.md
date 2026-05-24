@@ -14,6 +14,69 @@
 - **Infra**: PostgreSQL 16, Redis 7 (docker compose — production 検証用)
 - **Phase 2+**: Playwright, Amazon PA-API タイトル検索, Google Sheets（Gemini は任意）
 
+## 開発環境
+
+### 前提
+
+| 項目 | バージョン / 備考 |
+|------|-------------------|
+| OS | **WSL Ubuntu**（Windows 上）。Git Bash + UNC パスは venv 破損の原因になるため使わない |
+| Python | **3.12**（`python3.12-venv` パッケージが必要な場合あり） |
+| Node.js | **20 LTS**（CI と同じ。`npm ci` / `npm run dev`） |
+| エディタ | **Cursor** または VS Code。リポジトリを WSL 側 `~/workspace/SmartResearch-HQ` で開く |
+| Docker | 任意。`production` 検証（Postgres / Redis）時のみ |
+
+### 初回セットアップ
+
+```bash
+# WSL Ubuntu
+sudo apt update
+sudo apt install -y python3.12-venv git
+
+# Node 20（未インストール時 — nvm 例）
+# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+# nvm install 20
+
+cd ~/workspace/SmartResearch-HQ
+bash scripts/bootstrap-local.sh   # .env / backend venv / frontend npm ci
+```
+
+### Cursor / VS Code 拡張機能
+
+ワークスペースを開くと **推奨拡張のインストール** を促されます（`.vscode/extensions.json`）。
+
+| 拡張 | 用途 |
+|------|------|
+| **Ruff** | Python lint / format（保存時に自動修正） |
+| **Python** + **Pylance** | 型補完・venv 連携 |
+| **ESLint** | TypeScript / React の lint |
+| **Tailwind CSS IntelliSense** | Tailwind クラス補完 |
+| **Docker** | `docker-compose.yml` 編集・コンテナ操作 |
+| **GitHub Actions** | CI ワークフローのシンタックスハイライト |
+| **EditorConfig** | インデント・改行コードの統一 |
+
+手動で入れる場合: Cursor の拡張機能タブで上記名を検索するか、コマンドパレット → **Extensions: Show Recommended Extensions**。
+
+保存時の format / lint は `.vscode/settings.json` で有効（Python → Ruff、TS/TSX → ESLint）。
+
+### 品質チェック（push 前）
+
+```bash
+# GitHub CI と同内容（backend: Ruff + pytest / frontend: ESLint + build）
+bash scripts/ci-check.sh
+```
+
+CI の概要: [docs/git-workflow.md §5.1](docs/git-workflow.md)（個人用メモ: `docs/ci-cd-guide.md` は gitignore）
+
+### 任意ツール
+
+| ツール | 用途 |
+|--------|------|
+| [GitHub CLI (`gh`)](https://cli.github.com/) | PR 作成・CI 状態確認 |
+| Docker Compose | Phase 2 production 検証 |
+
+---
+
 ## クイックスタート（portfolio / Mock）
 
 **Postgres / Redis は不要**です。

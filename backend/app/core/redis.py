@@ -1,8 +1,7 @@
 """Redis connectivity helpers (production / ARQ)."""
 
-from redis.asyncio import Redis
-
 from app.config import get_settings
+from redis.asyncio import Redis
 
 
 async def ping_redis() -> bool:

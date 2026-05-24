@@ -1,12 +1,8 @@
 """Production job pipeline: scrape → match → persist."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
-
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.config import MatchingProvider, get_settings
 from app.core.status import JobStatus
@@ -14,6 +10,9 @@ from app.db.models import AmazonCandidate, JobItem, ResearchJob, Seller
 from app.services.matching import get_candidate_matcher
 from app.services.matching.amazon_search import AmazonSearchConfigError
 from app.services.scraper.shopee_crawler import ScrapeBlockedError, fetch_sold_items
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 
 async def _set_job_status(
@@ -29,10 +28,10 @@ async def _set_job_status(
     job.progress_pct = progress_pct
     job.error_code = error_code
     job.error_message = error_message
-    job.updated_at = datetime.now(timezone.utc)
+    job.updated_at = datetime.now(UTC)
     if status in (JobStatus.AWAITING_REVIEW, JobStatus.SCRAPE_FAILED, JobStatus.AI_FAILED):
         if status == JobStatus.AWAITING_REVIEW:
-            job.completed_at = datetime.now(timezone.utc)
+            job.completed_at = datetime.now(UTC)
     await session.flush()
 
 
