@@ -59,7 +59,7 @@ arq app.workers.settings.WorkerSettings
 | 3.1 | ダッシュボード UI | `frontend/src/app/page.tsx` | ✅ 先行完了 |
 | 3.2 | レビュー UI | `frontend/src/app/review/[jobId]/` | ✅ 先行完了 |
 | 3.3 | API クライアント + 型 | `frontend/src/lib/api.ts` | ✅ 先行完了 |
-| 3.4 | ジョブ進捗ポーリング/SSE | hooks + API | 未着手 |
+| 3.4 | ジョブ進捗ポーリング/SSE | hooks + API | ✅ MVP ポーリング |
 | 3.5 | FastAPI ↔ Redis 本接続 | docker-compose 起動検証 | 未着手 |
 | 3.6 | 手動 ASIN 入力 UI | レビュー画面 §design 3.3 | 未着手（Phase 2 API 後） |
 
