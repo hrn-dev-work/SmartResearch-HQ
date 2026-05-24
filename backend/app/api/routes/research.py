@@ -66,7 +66,13 @@ async def export_research_job(
     service: ResearchService = Depends(get_research_service),
 ) -> ExportJobResponse:
     if isinstance(service, ProductionResearchService):
-        result = await service.export_job(job_id)
+        try:
+            result = await service.export_job(job_id)
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail={"error": {"code": "SPREADSHEET_CONFIG", "message": str(exc)}},
+            ) from exc
     else:
         result = service.export_job(job_id)
     if result is None:
