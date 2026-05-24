@@ -37,21 +37,37 @@ if gh pr view --head "$BRANCH" >/dev/null 2>&1; then
   gh pr view --head "$BRANCH" --web
 else
   gh pr create --base "$BASE" --title "chore: Git ブランチ運用・GitHub テンプレ・エージェント設定を追加" --body "$(cat <<'EOF'
-## Summary / 概要
+## Summary
+
+- Add git-workflow docs, commit-pr-style skill, CI, and GitHub templates
+- Track .cursor rules needed for GitHub workflow
+
+## 概要
 
 - Git ブランチ運用規約（docs/git-workflow.md）と commit-pr-style スキルを追加
 - PR / Issue テンプレ、ラベル定義（.github/）、git-start-branch.sh を追加
 - .gitignore を更新し、GitHub 運用に必要な .cursor / AGENTS.md を追跡対象に
-- EN: Add git workflow docs, commit-pr-style skill, and GitHub templates
 
-## Test plan / テスト手順
+## Test plan
 
+- [ ] `bash scripts/ci-check.sh` passes
+- [ ] CI `backend` / `frontend` green
+
+## テスト手順
+
+- [ ] `bash scripts/ci-check.sh` が通る
+- [ ] CI `backend` / `frontend` green
 - [x] 作業ブランチ `chore/git-workflow-setup` から PR 作成
 - [ ] squash マージ後、以降は feat/* ブランチから作業
 
 ## Related
 
 - Branch: `chore/git-workflow-setup`
+- WBS: —（開発基盤）
+
+## 関連
+
+- ブランチ: `chore/git-workflow-setup`
 - WBS: —（開発基盤）
 EOF
 )"

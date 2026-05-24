@@ -154,12 +154,20 @@ EOF
 )"
 git push -u origin HEAD
 gh pr create --repo hrn-dev-work/SmartResearch-HQ --title "feat(spreadsheet): Sheets export サービスの骨組みを追加 (WBS 2.3)" --body "$(cat <<'EOF'
-## Summary / 概要
+## Summary
+
+- Add Sheets export service skeleton (WBS 2.3)
+
+## 概要
 
 - Sheets export サービスの骨組みを追加（WBS 2.3）
-- EN: Add Sheets export service skeleton (WBS 2.3)
 
-## Test plan / テスト手順
+## Test plan
+
+- [ ] `bash scripts/ci-check.sh` passes
+- [ ] CI `backend` / `frontend` green
+
+## テスト手順
 
 - [ ] `bash scripts/ci-check.sh` が通る
 - [ ] CI `backend` / `frontend` green
@@ -168,6 +176,12 @@ gh pr create --repo hrn-dev-work/SmartResearch-HQ --title "feat(spreadsheet): Sh
 
 - Issue: Closes #42
 - Branch: `feat/wbs-2-3-sheets-export`
+- WBS: 2.3 — Google Sheets export
+
+## 関連
+
+- イシュー: Closes #42
+- ブランチ: `feat/wbs-2-3-sheets-export`
 - WBS: 2.3 — Google Sheets 連携
 EOF
 )"

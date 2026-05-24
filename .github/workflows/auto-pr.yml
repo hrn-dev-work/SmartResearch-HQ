@@ -70,16 +70,28 @@ jobs:
               .join('\n');
 
             const body = [
-              '## Summary / 概要',
+              '## Summary',
+              '',
+              `- Auto-created on push to \`${branch}\`. Add summary before merge.`,
+              '',
+              '## 概要',
               '',
               `- \`${branch}\` への push 後に自動作成。マージ前に変更内容を追記すること。`,
-              `- EN: Auto-created on push to \`${branch}\`. Add summary before merge.`,
               '',
-              '## Commits / コミット',
+              '## Commits',
               '',
               commitLines,
               '',
-              '## Test plan / テスト手順',
+              '## コミット',
+              '',
+              commitLines,
+              '',
+              '## Test plan',
+              '',
+              '- [ ] `bash scripts/ci-check.sh` passes',
+              '- [ ] CI `backend` / `frontend` green',
+              '',
+              '## テスト手順',
               '',
               '- [ ] `bash scripts/ci-check.sh` が通る',
               '- [ ] CI `backend` / `frontend` が green',
@@ -87,6 +99,10 @@ jobs:
               '## Related',
               '',
               `- Branch: \`${branch}\``,
+              '',
+              '## 関連',
+              '',
+              `- ブランチ: \`${branch}\``,
             ].join('\n');
 
             const { data: pr } = await github.rest.pulls.create({
