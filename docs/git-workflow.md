@@ -63,7 +63,7 @@ git checkout -b chore/git-workflow-setup
 git add .
 git commit -m "chore: Git ブランチ運用規約と GitHub テンプレを追加"
 git push -u origin HEAD
-gh pr create --base main --fill
+gh pr create --base main --title "..." --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
 ```
 
 ---
@@ -71,9 +71,10 @@ gh pr create --base main --fill
 ## 1. ブランチ構成
 
 ```
-main                              # 既定・安定版（直接コミットしない）
-├── phase1                        # マイルストーン（Phase 1 完了時点、必要なら短命）
-├── phase2                        # マイルストーン（Phase 2 作業中）
+main                              # 既定・マージ先（phase1 より進む）
+phase1                            # Phase 1 完了スナップショット（固定・main と同期しない）
+├── phase2                        # マイルストーン（Phase 2 → main へ PR）
+├── phase3                        # マイルストーン（Phase 3 → main へ PR）
 ├── feat/wbs-2-3-sheets-export    # 機能・WBS タスク
 ├── fix/review-empty-candidates   # バグ修正
 └── docs/wbs-phase2-update        # ドキュメントのみ
@@ -82,6 +83,8 @@ main                              # 既定・安定版（直接コミットし�
 | ブランチ | 用途 | 寿命 |
 |----------|------|------|
 | `main` | マージ先・デプロイ/デモの基準 | 常設 |
+| `phase1` | **Phase 1 完了時点の固定スナップショット**（`c81f5ad` 付近） | 常設・**main と同一にしない** |
+| `phase2` / `phase3` | Phase マイルストーン作業 → PR で `main` へ | Phase 完了後も参照用に残すか削除 |
 | `feat/*` | 機能・WBS 実装 | 1 Issue / 1 WBS タスク = 1 ブランチ |
 | `fix/*` | 不具合修正 | 修正単位で短命 |
 | `docs/*` | 仕様・README のみ | 短命 |
@@ -151,13 +154,18 @@ EOF
 )"
 git push -u origin HEAD
 gh pr create --repo hrn-dev-work/SmartResearch-HQ --title "feat(spreadsheet): Sheets export サービスの骨組みを追加 (WBS 2.3)" --body "$(cat <<'EOF'
-## Summary
-- ...
+## Summary / 概要
 
-## Test plan
-- [ ] ...
+- Sheets export サービスの骨組みを追加（WBS 2.3）
+- EN: Add Sheets export service skeleton (WBS 2.3)
+
+## Test plan / テスト手順
+
+- [ ] `bash scripts/ci-check.sh` が通る
+- [ ] CI `backend` / `frontend` green
 
 ## Related
+
 - Issue: Closes #42
 - Branch: `feat/wbs-2-3-sheets-export`
 - WBS: 2.3 — Google Sheets 連携
@@ -202,14 +210,34 @@ bash scripts/git-push-pr.sh
 手動 PR の例（自動を使わない場合）:
 
 ```bash
-gh pr create --base main --fill
+gh pr create --base main --title "..." --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
 ```
+
+`gh pr create --fill` は使わない（コミット subject から英語のみの本文になりやすい）。
 
 ---
 
-## 4. マイルストーン branch（Phase 1 / 2）
+## 4. マイルストーン branch（Phase 1 / 2 / 3）
 
-Phase 単位の作業は **`main` から** `phase1` / `phase2` 等を切る（完了後は PR で `main` へマージ）。
+### phase1 は main と別物
+
+| ブランチ | 指すコミット | 役割 |
+|----------|--------------|------|
+| **`phase1`** | Phase 1 完了（WBS 1.1–1.6、`c81f5ad`） | **固定スナップショット**。以降更新しない |
+| **`main`** | 統合ブランチ（現在は phase1 より 2 commits 先行） | PR のマージ先。Phase 2 以降はここへ入る |
+
+`phase1` を `main` と同じコミットに **fast-forward しない**。Phase 1 の成果物だけを残す参照用ブランチとする。
+
+```bash
+# Phase 1 スナップショットを確認
+git fetch origin
+git log -1 --oneline origin/phase1   # feat: Phase 1 - design docs ...
+git log -1 --oneline origin/main     # main は git-workflow 等で先行しうる
+```
+
+### Phase 2 以降
+
+Phase 2 / 3 の作業は **`main` から** `phase2` / `phase3` を切り、完了後は PR で **`main` へマージ**（`phase1` へはマージしない）。
 
 ```bash
 git fetch origin
@@ -218,10 +246,10 @@ git pull --ff-only origin main
 git checkout -b phase2
 # ... 実装 ...
 git push -u origin phase2
-gh pr create --base main --fill
+gh pr create --base main --title "..." --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
 ```
 
-`phase1` は Phase 1 完了スナップショット。通常の機能追加は `feat/*` を `main` から切る。
+通常の機能追加は `feat/*` を `main` から切る。
 
 ---
 
