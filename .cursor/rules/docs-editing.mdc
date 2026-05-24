@@ -1,0 +1,23 @@
+---
+description: docs 編集時の正本・重複禁止・WBS との整合。
+globs: docs/**/*
+alwaysApply: false
+---
+
+# Docs（SmartResearch-HQ）
+
+## 正本の優先順
+
+1. ビジュアル・MVP 意思決定の根拠 → `docs/design.md`（§11）
+2. 要件・受入条件 → `docs/requirements.md`
+3. アーキ・ステートマシン → `docs/architecture.md`
+4. API I/O → `docs/api-specification.md`
+5. 進捗・工数 → `docs/wbs-roadmap.md`
+
+矛盾時は **design を正** にし requirements を直す。
+
+## 編集方針
+
+- requirements と design の **同じ段落の重複** は避け、片方に詳細・片方は要約 + リンク
+- `docs/プロジェクト計画書.md` は概要用。詳細仕様は上記 md を更新する
+- 仕様変更時は WBS の該当 Phase / ID を意識する（未完了タスクと齟齬がないか）

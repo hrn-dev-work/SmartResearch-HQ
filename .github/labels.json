@@ -1,0 +1,32 @@
+[
+  {
+    "name": "type: feature",
+    "color": "0e8a16",
+    "description": "機能追加・WBS タスク・改善"
+  },
+  {
+    "name": "type: bug",
+    "color": "d73a4a",
+    "description": "不具合・期待と異なる挙動"
+  },
+  {
+    "name": "type: docs",
+    "color": "0075ca",
+    "description": "仕様書・README・AGENTS などドキュメント"
+  },
+  {
+    "name": "type: spike",
+    "color": "fbca04",
+    "description": "調査・方針決定・見積もり"
+  },
+  {
+    "name": "type: chore",
+    "color": "cfd3d7",
+    "description": "依存更新・CI・設定・ツール"
+  },
+  {
+    "name": "status: blocked",
+    "color": "b60205",
+    "description": "依存イシュー待ちで着手不可"
+  }
+]
