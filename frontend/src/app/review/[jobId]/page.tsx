@@ -44,7 +44,8 @@ export default function ReviewPage() {
   }, [jobId]);
 
   useEffect(() => {
-    load();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load
+    void load();
   }, [load]);
 
   async function handleSelect(item: ReviewItem, candidateId: string) {

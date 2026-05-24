@@ -44,21 +44,11 @@ def _parse_item_dict(raw: dict[str, Any]) -> ShopeeSoldItem | None:
     if item_id is None:
         return None
     basic = raw.get("item_basic") or raw.get("item_card") or raw
-    title = (
-        basic.get("name")
-        or basic.get("title")
-        or raw.get("name")
-        or raw.get("title")
-        or ""
-    )
+    title = basic.get("name") or basic.get("title") or raw.get("name") or raw.get("title") or ""
     if not str(title).strip():
         return None
     image = (
-        basic.get("image")
-        or basic.get("thumb")
-        or raw.get("image")
-        or raw.get("image_url")
-        or ""
+        basic.get("image") or basic.get("thumb") or raw.get("image") or raw.get("image_url") or ""
     )
     if isinstance(image, list) and image:
         image = image[0]
@@ -150,7 +140,9 @@ async def fetch_sold_items(
                 await page.wait_for_timeout(1500)
 
             html = await page.content()
-            for match in re.finditer(r"<script[^>]*type=\"application/json\"[^>]*>(.*?)</script>", html, re.S):
+            for match in re.finditer(
+                r"<script[^>]*type=\"application/json\"[^>]*>(.*?)</script>", html, re.S
+            ):
                 try:
                     payload = json.loads(match.group(1))
                 except json.JSONDecodeError:
