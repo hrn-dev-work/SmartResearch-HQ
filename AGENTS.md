@@ -7,7 +7,8 @@
 ## いまのフェーズ
 
 - **Phase 1** ✅ 完了（docs + モノレポ骨組み）
-- **Phase 2〜** 進行中 → タスクは `docs/wbs-roadmap.md` の **未完了 1 件だけ** 着手
+- **Phase 2** ✅ 完了（2.2c Gemini は任意・未着手）
+- **Phase 3** 進行中 → タスクは `docs/wbs-roadmap.md` の **未完了 1 件だけ** 着手
 
 ## 読む順（実装前）
 

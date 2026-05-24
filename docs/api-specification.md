@@ -49,6 +49,9 @@ Content-Type: `application/json`
 |-----------|-----|
 | `mode` | `portfolio` \| `production` |
 | `matching_provider` | `amazon_search` \| `none` \| `gemini` |
+| `redis` | production 時のみ: `ok` \| `unavailable`。portfolio では省略 |
+
+production 検証: `docker compose up -d redis` 後、`mode=production` で `redis: ok` になること。
 
 ---
 
