@@ -112,8 +112,8 @@ main ──pull──► 作業ブランチ作成 ──commit──► push ─
 | **0. 着手前** | `main` を最新化。Issue があれば作成（任意）。WBS 1 件にスコープ固定 |
 | **1. ブランチ** | `main` から作業ブランチを切る。**main のまま作業しない** |
 | **2. コミット** | 作業ブランチ上でコミット（Conventional Commits） |
-| **3. push** | `git push -u origin HEAD` |
-| **4. PR** | `gh pr create`。`Closes #N` / `WBS:` / `Branch:` を本文に |
+| **3. push** | `git push -u origin HEAD` または `bash scripts/git-push-pr.sh` |
+| **4. PR** | 自動（下記 §3.1）または手動 `gh pr create`。`Closes #N` / `WBS:` / `Branch:` を本文に |
 | **5. マージ** | GitHub UI または `gh pr merge --squash`（推奨: squash） |
 | **6. 片付け** | リモートブランチ削除 → ローカルで `main` に戻って `pull` |
 
@@ -171,6 +171,38 @@ EOF
 gh pr merge --squash --delete-branch
 git checkout main
 git pull --ff-only origin main
+```
+
+### 3.1 push 後の PR 自動作成
+
+**初回セットアップ（ローカル hook、推奨）**
+
+```bash
+bash scripts/install-git-hooks.sh   # core.hooksPath=.githooks
+```
+
+以降、`git push` の直後に **open PR がなければ** `gh pr create` 相当を実行（`main` / `master` は除外）。
+
+**代替: push + PR を一発**
+
+```bash
+bash scripts/git-push-pr.sh
+```
+
+**GitHub Actions（リモートでも自動）**
+
+[`.github/workflows/auto-pr.yml`](../.github/workflows/auto-pr.yml) — `main` 以外へ push されたとき、open PR がなければ `main` 向け PR を作成。
+
+| 方法 | いつ動く | 要件 |
+|------|----------|------|
+| `post-push` hook | ローカル `git push` 後 | `gh auth login` |
+| `git-push-pr.sh` | スクリプト実行時 | 同上 |
+| Auto PR workflow | `origin` へ push 後 | リポジトリ Actions 有効 |
+
+手動 PR の例（自動を使わない場合）:
+
+```bash
+gh pr create --base main --fill
 ```
 
 ---

@@ -33,6 +33,21 @@ test-results/
 .coverage
 htmlcov/
 
+# Agent / Cursor debug output (local)
+.git-status-tmp.txt
+pytest-out.txt
+stash-pop.txt
+git-st.txt
+commit-check.txt
+branch-state.txt
+rebase-state.txt
+final-status.txt
+diff-detail.txt
+diff-stat.txt
+*-log.txt
+*-state.txt
+show-*.txt
+
 # Secrets (never commit)
 credentials.json
 service-account*.json

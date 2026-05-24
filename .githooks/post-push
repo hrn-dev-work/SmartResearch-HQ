@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# After git push, create a PR if the branch does not have one yet.
+# Install: bash scripts/install-git-hooks.sh
+
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+BRANCH="$(git branch --show-current)"
+
+if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
+  exit 0
+fi
+
+bash "$ROOT/scripts/ensure-pr.sh" main
