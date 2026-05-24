@@ -45,7 +45,9 @@ class ProductionResearchService:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def create_research(self, shopee_shop_url: str, seller_display_name: str | None) -> CreateResearchResponse:
+    async def create_research(
+        self, shopee_shop_url: str, seller_display_name: str | None
+    ) -> CreateResearchResponse:
         job = await create_job_record(
             self._session,
             shopee_shop_url=shopee_shop_url,
@@ -84,7 +86,9 @@ class ProductionResearchService:
             updated_at=job.updated_at,
         )
 
-    async def list_items(self, job_id: UUID, page: int, page_size: int) -> ReviewItemsPageResponse | None:
+    async def list_items(
+        self, job_id: UUID, page: int, page_size: int
+    ) -> ReviewItemsPageResponse | None:
         job_exists = await self._session.execute(
             select(ResearchJob.id).where(ResearchJob.id == job_id)
         )

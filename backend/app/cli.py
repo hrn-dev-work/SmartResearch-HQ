@@ -45,7 +45,9 @@ async def cmd_run(args: argparse.Namespace) -> int:
         if refreshed is None:
             print("Job missing after pipeline")
             return 1
-        print(f"Status: {refreshed.status.value}  items={refreshed.item_count}  progress={refreshed.progress_pct}%")
+        print(
+            f"Status: {refreshed.status.value}  items={refreshed.item_count}  progress={refreshed.progress_pct}%"
+        )
         if refreshed.error:
             print(f"Error: {refreshed.error.code} — {refreshed.error.message}")
             return 1

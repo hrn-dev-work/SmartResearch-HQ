@@ -40,7 +40,9 @@ async def get_research_job(
     else:
         job = service.get_job(job_id)
     if job is None:
-        raise HTTPException(status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}})
+        raise HTTPException(
+            status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}}
+        )
     return job
 
 
@@ -56,7 +58,9 @@ async def list_research_items(
     else:
         result = service.list_items(job_id, page, page_size)
     if result is None:
-        raise HTTPException(status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}})
+        raise HTTPException(
+            status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}}
+        )
     return result
 
 
@@ -76,5 +80,7 @@ async def export_research_job(
     else:
         result = service.export_job(job_id)
     if result is None:
-        raise HTTPException(status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}})
+        raise HTTPException(
+            status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}}
+        )
     return result
