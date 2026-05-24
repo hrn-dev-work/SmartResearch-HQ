@@ -48,15 +48,22 @@ async def decide_review(
                 raise HTTPException(
                     status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(exc)}}
                 ) from exc
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "error": {
-                    "code": "NOT_SUPPORTED",
-                    "message": "manual_asin requires production mode",
-                }
-            },
-        )
+        try:
+            return service.decide(item_id, None, False, manual_asin=body.manual_asin)
+        except ValueError as exc:
+            if str(exc) == "INVALID_ASIN":
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "error": {
+                            "code": "INVALID_ASIN",
+                            "message": "ASIN must match BXXXXXXXXX",
+                        }
+                    },
+                ) from exc
+            raise HTTPException(
+                status_code=400, detail={"error": {"code": "VALIDATION", "message": str(exc)}}
+            ) from exc
 
     if body.candidate_id is None:
         raise HTTPException(

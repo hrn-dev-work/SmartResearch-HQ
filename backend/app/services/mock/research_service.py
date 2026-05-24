@@ -1,5 +1,7 @@
 from uuid import UUID
 
+import re
+
 from app.core.status import JobStatus
 from app.schemas.research import (
     CreateResearchResponse,
@@ -32,11 +34,28 @@ class MockResearchService:
         return ReviewItemsPageResponse(items=items, page=page, page_size=page_size, total=total)
 
     def decide(
-        self, item_id: UUID, candidate_id: UUID | None, rejected: bool
+        self,
+        item_id: UUID,
+        candidate_id: UUID | None,
+        rejected: bool,
+        manual_asin: str | None = None,
     ) -> DecideReviewResponse:
-        fixtures.save_decision(item_id, None if rejected else candidate_id)
-        status = "REJECTED" if rejected else "APPROVED"
-        return DecideReviewResponse(item_id=item_id, status=status, exported=False)
+        if rejected:
+            fixtures.save_rejected_decision(item_id)
+            return DecideReviewResponse(item_id=item_id, status="REJECTED", exported=False)
+
+        if manual_asin is not None:
+            normalized = manual_asin.strip().upper()
+            if not re.fullmatch(r"B[A-Z0-9]{9}", normalized):
+                raise ValueError("INVALID_ASIN")
+            fixtures.save_manual_asin_decision(item_id, normalized)
+            return DecideReviewResponse(item_id=item_id, status="APPROVED", exported=False)
+
+        if candidate_id is None:
+            raise ValueError("candidate_id or manual_asin required")
+
+        fixtures.save_candidate_decision(item_id, candidate_id)
+        return DecideReviewResponse(item_id=item_id, status="APPROVED", exported=False)
 
     def export_job(self, job_id: UUID) -> ExportJobResponse | None:
         job = fixtures.get_job(job_id)

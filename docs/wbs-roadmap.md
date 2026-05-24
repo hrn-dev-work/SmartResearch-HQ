@@ -52,7 +52,7 @@ python -m app.cli run --url "https://shopee.sg/..." --limit 5
 arq app.workers.settings.WorkerSettings
 ```
 
-## Phase 3: UI / API（共通） — 進行中
+## Phase 3: UI / API（共通） — 完了
 
 | ID | タスク | 成果物 | 状態 |
 |----|--------|--------|------|
@@ -61,7 +61,7 @@ arq app.workers.settings.WorkerSettings
 | 3.3 | API クライアント + 型 | `frontend/src/lib/api.ts` | ✅ 先行完了 |
 | 3.4 | ジョブ進捗ポーリング/SSE | hooks + API | ✅ MVP ポーリング |
 | 3.5 | FastAPI ↔ Redis 本接続 | docker-compose 起動検証 | ✅ 初版（health `redis`） |
-| 3.6 | 手動 ASIN 入力 UI | レビュー画面 §design 3.3 | 未着手（Phase 2 API 後） |
+| 3.6 | 手動 ASIN 入力 UI | レビュー画面 §design 3.3 | ✅ |
 
 ## Phase 4: ポートフォリオ化（表版）
 
