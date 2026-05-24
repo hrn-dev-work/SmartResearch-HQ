@@ -14,40 +14,19 @@ render_manual() {
   cat <<EOF
 ## Summary
 
-- (Describe what changed in English)
-
-## 概要
-
-- （変更内容を日本語で記述）
+- What changed _(変更内容)_
 
 ## Test plan
 
-- [ ] \`bash scripts/ci-check.sh\` passes
+- [ ] \`bash scripts/ci-check.sh\`
 - [ ] CI \`backend\` / \`frontend\` green
-- [ ] (Add manual checks if needed)
-
-## テスト手順
-
-- [ ] \`bash scripts/ci-check.sh\` が通る
-- [ ] CI \`backend\` / \`frontend\` が green
-- [ ] （手動確認があれば記述）
 
 ## Related
 
-<!-- Keep English keywords for GitHub. Remove unused lines. -->
-- Issue: Closes #
-- Issue: Refs #
-- PR: Depends on #
-- PR: Related #
+<!-- English keywords for GitHub. Delete unused lines. -->
 - Branch: \`${BRANCH}\`
-- WBS: x.y — task name
-
-## 関連
-
-- イシュー: Closes #（上記 Related と同じ番号）
-- PR: Depends on #（上記 Related と同じ番号）
-- ブランチ: \`${BRANCH}\`
-- WBS: x.y — タスク名
+- WBS: x.y
+- Issue: Closes #
 EOF
 }
 
@@ -61,37 +40,18 @@ render_auto() {
   cat <<EOF
 ## Summary
 
-- Auto-created on push to \`${BRANCH}\`. Add summary before merge.
-
-## 概要
-
-- \`${BRANCH}\` への push 後に自動作成。マージ前に変更内容を追記すること。
-
-## Commits
-
-${commits}
-
-## コミット
+- Auto-created on push to \`${BRANCH}\` — fill in before merge _(push 後に自動作成。マージ前に追記)_
 
 ${commits}
 
 ## Test plan
 
-- [ ] \`bash scripts/ci-check.sh\` passes
+- [ ] \`bash scripts/ci-check.sh\`
 - [ ] CI \`backend\` / \`frontend\` green
-
-## テスト手順
-
-- [ ] \`bash scripts/ci-check.sh\` が通る
-- [ ] CI \`backend\` / \`frontend\` が green
 
 ## Related
 
 - Branch: \`${BRANCH}\`
-
-## 関連
-
-- ブランチ: \`${BRANCH}\`
 EOF
 }
 

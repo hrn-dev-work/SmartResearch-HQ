@@ -67,48 +67,30 @@ Fixes #<issue>         # マージでイシューをクローズ（fix 系）
 
 **タイトル**: コミット subject と同一（複数コミット PR はマージ後の要約 1 行）
 
-**本文**: 各セクションは **英語を先**、その直下に **日本語**（`## 概要` / `## テスト手順` / `## 関連`）。Related のキーワード（`Closes` / `WBS:` 等）は英語のまま。
+**本文**: **3 セクション**（Summary / Test plan / Related）。英語が主、日本語は同じ行の _(…)_ か短い注記。Related のキーワード（`Closes` / `WBS:` 等）は英語のまま。
 
 手動 PR の雛形: `bash scripts/render-pr-body.sh manual feat/your-branch`
 
 ```markdown
 ## Summary
 
-- <What changed (English)>
-
-## 概要
-
-- <何が変わったか（日本語）>
+- What changed _(変更内容)_
 
 ## Test plan
 
-- [ ] `bash scripts/ci-check.sh` passes
+- [ ] `bash scripts/ci-check.sh`
 - [ ] CI `backend` / `frontend` green
-- [ ] <manual checks if any>
-
-## テスト手順
-
-- [ ] `bash scripts/ci-check.sh` が通る
-- [ ] CI `backend` / `frontend` green
-- [ ] <画面・API の手動確認>
 
 ## Related
 
-<!-- Keep English keywords for GitHub. 該当行だけ残す。なければセクションごと削除 -->
-- Issue: Closes #<n>        # マージでクローズ
-- Issue: Refs #<n>          # 参照のみ
-- PR: Depends on #<n>       # 先にマージが必要
-- PR: Related #<n>          # 関連 PR（分割 PR など）
-- Branch: `<type>/<name>`    # 作業ブランチ
-- WBS: <x.y> — <task name>
-
-## 関連
-
-- イシュー: Closes #<n>（上記 Related と同じ番号）
-- PR: Depends on #<n>（上記 Related と同じ番号）
-- ブランチ: `<type>/<name>`
-- WBS: <x.y> — <タスク名>
+<!-- 該当行だけ残す。なければセクションごと削除 -->
+- Branch: `<type>/<name>`
+- WBS: <x.y>
+- Issue: Closes #<n>
+- PR: Depends on #<n>
 ```
+
+**マイルストーン PR**（phase2 等）: Summary 先頭に **Merge order:** 1 行、コミット一覧は Summary 内の箇条書き（Commits 見出しは作らない）。
 
 ### Related の選び方
 
