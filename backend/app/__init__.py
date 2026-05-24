@@ -1,0 +1,1 @@
+"""SmartResearch-HQ backend application."""

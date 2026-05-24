@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.local
+.env.*.local
+
+# Build / cache
+.next/
+out/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs & runtime
+*.log
+playwright-report/
+test-results/
+.coverage
+htmlcov/
+
+# Secrets (never commit)
+credentials.json
+service-account*.json
+*.pem
+
+# Playwright browsers (local install)
+/playwright/.cache/
+
+# Cursor session markers (local only)
+.cursor/retrospective/.session-edited
+
+# Agent / Cursor workflow (local only — not published)
+.cursor/
+AGENTS.md
+frontend/AGENTS.md
+frontend/CLAUDE.md
+docs/cursor-agent-efficiency.md
+docs/prompt-templates.md
+docs/implementation-retrospective.md
+docs/git-workflow.md
+scripts/sync-skill-prompt-table.py
+scripts/git-start-branch.sh
+scripts/sync-github-labels.py
+.github/

@@ -1,0 +1,79 @@
+import type {
+  CreateResearchResponse,
+  ResearchJob,
+  ReviewItemsPage,
+} from "./types";
+
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...init?.headers,
+    },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const message =
+      (body as { error?: { message?: string } })?.error?.message ??
+      res.statusText;
+    throw new Error(message);
+  }
+  return res.json() as Promise<T>;
+}
+
+export async function createResearch(
+  shopeeShopUrl: string,
+  sellerDisplayName?: string,
+): Promise<CreateResearchResponse> {
+  return request<CreateResearchResponse>("/research", {
+    method: "POST",
+    body: JSON.stringify({
+      shopee_shop_url: shopeeShopUrl,
+      seller_display_name: sellerDisplayName || null,
+    }),
+  });
+}
+
+export async function getResearchJob(jobId: string): Promise<ResearchJob> {
+  return request<ResearchJob>(`/research/${jobId}`);
+}
+
+export async function getReviewItems(
+  jobId: string,
+  page = 1,
+  pageSize = 20,
+): Promise<ReviewItemsPage> {
+  return request<ReviewItemsPage>(
+    `/research/${jobId}/items?page=${page}&page_size=${pageSize}`,
+  );
+}
+
+export async function decideReview(
+  itemId: string,
+  candidateId: string | null,
+  rejected = false,
+): Promise<void> {
+  await request(`/review/${itemId}/decide`, {
+    method: "POST",
+    body: JSON.stringify({ candidate_id: candidateId, rejected }),
+  });
+}
+
+export async function exportJob(jobId: string): Promise<{
+  exported_count: number;
+  skipped_count: number;
+}> {
+  return request(`/research/${jobId}/export`, { method: "POST" });
+}
+
+export async function checkHealth(): Promise<{
+  status: string;
+  mode: string;
+  matching_provider?: string;
+}> {
+  return request("/health");
+}
