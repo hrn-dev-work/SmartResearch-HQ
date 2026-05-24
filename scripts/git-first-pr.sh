@@ -38,32 +38,17 @@ else
   gh pr create --base "$BASE" --title "chore: Git ブランチ運用・GitHub テンプレ・エージェント設定を追加" --body "$(cat <<'EOF'
 ## Summary
 
-- Add git-workflow docs, commit-pr-style skill, CI, and GitHub templates
-- Track .cursor rules needed for GitHub workflow
-
-## 概要
-
-- Git ブランチ運用規約（docs/git-workflow.md）と commit-pr-style スキルを追加
-- CI（backend / frontend）、PR / Issue テンプレ、ラベル定義を追加
-- .gitignore を更新し、GitHub 運用に必要な .cursor を追跡対象に
+- Add git-workflow docs, commit-pr-style skill, CI, and GitHub templates _(Git 運用規約・テンプレ・スキル追加)_
+- Track .cursor rules needed for GitHub workflow _(.cursor / AGENTS.md を追跡対象に)_
 
 ## Test plan
 
-- [ ] `bash scripts/ci-check.sh` passes
-- [ ] CI `backend` / `frontend` green
-
-## テスト手順
-
-- [ ] `bash scripts/ci-check.sh` が通る
-- [ ] CI `backend` / `frontend` green
+- [ ] `bash scripts/ci-check.sh`
+- [ ] CI green
 
 ## Related
 
 - Branch: `chore/git-workflow-setup`
-
-## 関連
-
-- ブランチ: `chore/git-workflow-setup`
 EOF
 )"
 fi
