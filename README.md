@@ -69,6 +69,7 @@ docker compose up -d postgres redis
 - [DB スキーマ](docs/database-schema.md)
 - [API 仕様](docs/api-specification.md)
 - [WBS・ロードマップ](docs/wbs-roadmap.md)
+- [Git ブランチ運用](docs/git-workflow.md) — 作業ブランチ → PR → CI → マージ
 
 ## 環境変数
 
