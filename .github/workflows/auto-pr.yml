@@ -70,17 +70,22 @@ jobs:
               .join('\n');
 
             const body = [
-              '## Summary',
-              `Auto-created on push to \`${branch}\`.`,
+              '## Summary / 概要',
               '',
-              '## Commits',
+              `- \`${branch}\` への push 後に自動作成。マージ前に変更内容を追記すること。`,
+              `- EN: Auto-created on push to \`${branch}\`. Add summary before merge.`,
+              '',
+              '## Commits / コミット',
+              '',
               commitLines,
               '',
-              '## Test plan',
-              '- [ ] `bash scripts/ci-check.sh` passes',
-              '- [ ] CI `backend` / `frontend` green',
+              '## Test plan / テスト手順',
+              '',
+              '- [ ] `bash scripts/ci-check.sh` が通る',
+              '- [ ] CI `backend` / `frontend` が green',
               '',
               '## Related',
+              '',
               `- Branch: \`${branch}\``,
             ].join('\n');
 

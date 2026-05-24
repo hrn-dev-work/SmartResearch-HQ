@@ -59,15 +59,20 @@ Refs #42
 **タイトル**: `feat(spreadsheet): Sheets export サービスの骨組みを追加 (WBS 2.3)`
 
 ```markdown
-## Summary
+## Summary / 概要
+
 - 確定アイテムの Sheets 出力サービスを追加（portfolio は Mock レスポンス）
 - WBS 2.3 の初版
+- EN: Add Sheets export service; portfolio returns count only
 
-## Test plan
+## Test plan / テスト手順
+
+- [ ] `bash scripts/ci-check.sh` が通る
+- [ ] CI `backend` / `frontend` green
 - [ ] portfolio で export API が件数のみ返すこと
-- [ ] `pytest backend/tests/` の spreadsheet 関連
 
 ## Related
+
 - Issue: Closes #42
 - Branch: `feat/wbs-2-3-sheets-export`
 - WBS: 2.3 — Google Sheets 連携
@@ -107,13 +112,19 @@ Fixes #55
 ### PR
 
 ```markdown
-## Summary
-- 候補空配列時に手動 ASIN フォームへフォールバック
+## Summary / 概要
 
-## Test plan
+- 候補空配列時に手動 ASIN フォームへフォールバック
+- EN: Fall back to manual ASIN form when candidate list is empty
+
+## Test plan / テスト手順
+
+- [ ] `bash scripts/ci-check.sh` が通る
+- [ ] CI `backend` / `frontend` green
 - [ ] 候補 0 件のジョブで手動入力 UI が出ること
 
 ## Related
+
 - Issue: Closes #55
 - Branch: `fix/review-empty-candidates`
 ```
@@ -136,10 +147,13 @@ Fixes #55
 **PR #62**（UI 連携）:
 
 ```markdown
-## Summary
+## Summary / 概要
+
 - レビュー画面から Gemini 候補を表示
+- EN: Show Gemini candidates on the review screen
 
 ## Related
+
 - Issue: Closes #60
 - PR: Depends on #61
 - PR: Related #61
@@ -158,13 +172,17 @@ docs(wbs): Phase 2 タスク 2.2 を完了に更新
 ```
 
 ```markdown
-## Summary
-- `docs/wbs-roadmap.md` で 2.2 を完了に更新
+## Summary / 概要
 
-## Test plan
+- `docs/wbs-roadmap.md` で 2.2 を完了に更新
+- EN: Mark WBS 2.2 tasks as done in roadmap
+
+## Test plan / テスト手順
+
 - [ ] 表の ID・成果物パスが実装と一致すること
 
 ## Related
+
 - WBS: 2.2 — 候補マッチング
 - Branch: `docs/wbs-2-2-done`
 ```

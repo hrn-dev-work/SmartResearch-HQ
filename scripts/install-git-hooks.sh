@@ -7,7 +7,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-chmod +x .githooks/post-push scripts/ensure-pr.sh scripts/git-push-pr.sh
+chmod +x .githooks/post-push scripts/ensure-pr.sh scripts/git-push-pr.sh scripts/render-pr-body.sh
 
 git config core.hooksPath .githooks
 

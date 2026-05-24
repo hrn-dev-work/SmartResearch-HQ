@@ -34,26 +34,7 @@ if [[ -z "$TITLE" ]]; then
   TITLE="chore: merge ${BRANCH} into ${BASE}"
 fi
 
-COMMITS="$(git log "origin/${BASE}..HEAD" --format='- %s' 2>/dev/null || git log "${BASE}..HEAD" --format='- %s' 2>/dev/null || true)"
-if [[ -z "$COMMITS" ]]; then
-  COMMITS="- (no commits vs ${BASE})"
-fi
-
-BODY="$(cat <<EOF
-## Summary
-Auto-created after push to \`${BRANCH}\`.
-
-## Commits
-${COMMITS}
-
-## Test plan
-- [ ] \`bash scripts/ci-check.sh\` passes
-- [ ] CI \`backend\` / \`frontend\` green
-
-## Related
-- Branch: \`${BRANCH}\`
-EOF
-)"
+BODY="$(bash "$ROOT/scripts/render-pr-body.sh" auto "$BRANCH" "$BASE")"
 
 gh pr create --base "$BASE" --head "$BRANCH" --title "$TITLE" --body "$BODY"
 echo "PR created for ${BRANCH} -> ${BASE}"

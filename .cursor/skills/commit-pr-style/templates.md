@@ -67,17 +67,25 @@ Fixes #<issue>         # マージでイシューをクローズ（fix 系）
 
 **タイトル**: コミット subject と同一（複数コミット PR はマージ後の要約 1 行）
 
-```markdown
-## Summary
-- <何が変わったか（ユーザー / レビュアー視点）>
-- <WBS x.y 対応なら ID と成果物>
+**本文**: 見出しは英日併記。**Summary は日本語を先に**（必須）。EN 行は任意 1 行。Related のキーワード（`Closes` / `WBS:` 等）は英語のまま。
 
-## Test plan
-- [ ] <確認手順・コマンド>
-- [ ] <回帰が必要な画面 / API>
+手動 PR の雛形: `bash scripts/render-pr-body.sh manual feat/your-branch`
+
+```markdown
+## Summary / 概要
+
+- <何が変わったか（日本語・レビュー / 将来の自分向け）>
+- EN: <optional one-line aligned with commit subject>
+
+## Test plan / テスト手順
+
+- [ ] `bash scripts/ci-check.sh` が通る
+- [ ] CI `backend` / `frontend` green
+- [ ] <画面・API の手動確認>
 
 ## Related
-<!-- 該当する行だけ残す。なければセクションごと削除 -->
+
+<!-- Keep English keywords for GitHub. 該当行だけ残す。なければセクションごと削除 -->
 - Issue: Closes #<n>        # マージでクローズ
 - Issue: Refs #<n>          # 参照のみ
 - PR: Depends on #<n>       # 先にマージが必要
