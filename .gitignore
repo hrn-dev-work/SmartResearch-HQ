@@ -42,16 +42,8 @@ service-account*.json
 # Cursor session markers (local only)
 .cursor/retrospective/.session-edited
 
-# Agent / Cursor workflow (local only — not published)
-.cursor/
-AGENTS.md
+# Agent internal notes (local — optional)
+docs/cursor-agent-efficiency.md
+docs/implementation-retrospective.md
 frontend/AGENTS.md
 frontend/CLAUDE.md
-docs/cursor-agent-efficiency.md
-docs/prompt-templates.md
-docs/implementation-retrospective.md
-docs/git-workflow.md
-scripts/sync-skill-prompt-table.py
-scripts/git-start-branch.sh
-scripts/sync-github-labels.py
-.github/
