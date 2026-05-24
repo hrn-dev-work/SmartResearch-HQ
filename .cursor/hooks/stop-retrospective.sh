@@ -24,7 +24,7 @@ if status == "completed" and loop_count == 0 and marker.is_file():
     out["followup_message"] = (
         "【自動・実装反省会】今回のコード変更について "
         ".cursor/rules/implementation-retrospective.mdc の手順で反省会を実施してください。"
-        "docs/implementation-retrospective.md に追記し、再発防止に効く改善のみ "
+        "docs/local/implementation-retrospective.md に追記し、再発防止に効く改善のみ "
         ".cursor/rules/*.mdc を最小更新してください。"
         "完了したら「反省会完了」と1行で報告してください。"
         "（ユーザーがスキップを明示している場合のみ省略可）"

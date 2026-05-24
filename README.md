@@ -66,7 +66,7 @@ bash scripts/bootstrap-local.sh   # .env / backend venv / frontend npm ci
 bash scripts/ci-check.sh
 ```
 
-CI の概要: [docs/git-workflow.md §5.1](docs/git-workflow.md)（個人用メモ: `docs/ci-cd-guide.md` は gitignore）
+CI の概要: [docs/git-workflow.md §5.1](docs/git-workflow.md)（個人用メモ: [`docs/local/`](docs/local/) は gitignore）
 
 ### 任意ツール
 
@@ -116,6 +116,7 @@ docker compose up -d postgres redis
 
 ```
 ├── docs/           # 設計ドキュメント
+│   └── local/      # ローカル専用（gitignore。README のみ tracked）
 ├── frontend/       # Next.js ダッシュボード & レビュー UI
 ├── backend/        # FastAPI（portfolio 時は Mock サービス）
 │   └── app/services/matching/  # 候補マッチング（プラガブル）
@@ -133,6 +134,7 @@ docker compose up -d postgres redis
 - [API 仕様](docs/api-specification.md)
 - [WBS・ロードマップ](docs/wbs-roadmap.md)
 - [Git ブランチ運用](docs/git-workflow.md) — 作業ブランチ → PR → CI → マージ
+- [ローカル専用メモ](docs/local/README.md) — 個人用・反省会ログ（`docs/local/` 内は gitignore）
 
 ## 環境変数
 

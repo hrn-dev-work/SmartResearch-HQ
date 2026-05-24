@@ -59,9 +59,11 @@ service-account*.json
 # Cursor session markers (local only)
 .cursor/retrospective/.session-edited
 
-# Agent internal notes (local — optional)
-docs/cursor-agent-efficiency.md
-docs/implementation-retrospective.md
-docs/ci-cd-guide.md
+# Agent / personal notes (local only — see docs/local/README.md)
+docs/local/*
+!docs/local/README.md
 frontend/AGENTS.md
 frontend/CLAUDE.md
+
+# Agent debug output (local)
+.ci-investigation-gh.txt

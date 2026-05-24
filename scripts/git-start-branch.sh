@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# Start work on a new branch from up-to-date main.
+# Start work on a new branch from up-to-date default branch.
 # Usage: bash scripts/git-start-branch.sh feat/wbs-2-3-sheets-export
 
 set -euo pipefail
 
 if [[ $# -ne 1 ]]; then
   echo "Usage: bash scripts/git-start-branch.sh <branch-name>" >&2
-  echo "Example: bash scripts/git-start-branch.sh feat/wbs-2-3-sheets-export" >&2
   exit 1
 fi
 
@@ -16,11 +15,6 @@ cd "$ROOT"
 
 if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
   echo "ERROR: work branch must not be main/master" >&2
-  exit 1
-fi
-
-if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  echo "ERROR: not a git repository" >&2
   exit 1
 fi
 

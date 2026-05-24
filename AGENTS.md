@@ -2,7 +2,7 @@
 
 エージェント向けの入口。ユーザーは短い依頼でよい。
 
-**詳細資料（背景・ファイル一覧・セットアップ）**: [`docs/cursor-agent-efficiency.md`](docs/cursor-agent-efficiency.md)
+**詳細資料（背景・ファイル一覧・セットアップ）**: [`docs/local/cursor-agent-efficiency.md`](docs/local/cursor-agent-efficiency.md)（`docs/local/` は gitignore）
 
 ## いまのフェーズ
 
@@ -17,7 +17,7 @@
 3. `docs/requirements.md` + `docs/design.md`
 4. 必要なら `docs/architecture.md` / `docs/api-specification.md`
 
-実装後の振り返りログ: [`docs/implementation-retrospective.md`](docs/implementation-retrospective.md)
+実装後の振り返りログ: [`docs/local/implementation-retrospective.md`](docs/local/implementation-retrospective.md)
 
 ## ローカル既定
 
