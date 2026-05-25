@@ -1,4 +1,4 @@
-from typing import Annotated, Union
+from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +10,7 @@ from app.services.matching.protocol import CandidateMatcher
 from app.services.mock.research_service import MockResearchService
 from app.services.production.research_service import ProductionResearchService
 
-ResearchService = Union[MockResearchService, ProductionResearchService]
+ResearchService = MockResearchService | ProductionResearchService
 
 
 async def get_research_service(

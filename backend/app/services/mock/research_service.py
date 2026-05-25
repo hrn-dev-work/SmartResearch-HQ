@@ -1,3 +1,4 @@
+import re
 from uuid import UUID
 
 from app.core.status import JobStatus
@@ -12,7 +13,9 @@ from app.services.mock import fixtures
 
 
 class MockResearchService:
-    def create_research(self, shopee_shop_url: str, seller_display_name: str | None) -> CreateResearchResponse:
+    def create_research(
+        self, shopee_shop_url: str, seller_display_name: str | None
+    ) -> CreateResearchResponse:
         job_id = fixtures.seed_demo_job(shopee_shop_url, seller_display_name)
         return CreateResearchResponse(
             job_id=job_id,
@@ -29,10 +32,29 @@ class MockResearchService:
         items, total = fixtures.get_items(job_id, page, page_size)
         return ReviewItemsPageResponse(items=items, page=page, page_size=page_size, total=total)
 
-    def decide(self, item_id: UUID, candidate_id: UUID | None, rejected: bool) -> DecideReviewResponse:
-        fixtures.save_decision(item_id, None if rejected else candidate_id)
-        status = "REJECTED" if rejected else "APPROVED"
-        return DecideReviewResponse(item_id=item_id, status=status, exported=False)
+    def decide(
+        self,
+        item_id: UUID,
+        candidate_id: UUID | None,
+        rejected: bool,
+        manual_asin: str | None = None,
+    ) -> DecideReviewResponse:
+        if rejected:
+            fixtures.save_rejected_decision(item_id)
+            return DecideReviewResponse(item_id=item_id, status="REJECTED", exported=False)
+
+        if manual_asin is not None:
+            normalized = manual_asin.strip().upper()
+            if not re.fullmatch(r"B[A-Z0-9]{9}", normalized):
+                raise ValueError("INVALID_ASIN")
+            fixtures.save_manual_asin_decision(item_id, normalized)
+            return DecideReviewResponse(item_id=item_id, status="APPROVED", exported=False)
+
+        if candidate_id is None:
+            raise ValueError("candidate_id or manual_asin required")
+
+        fixtures.save_candidate_decision(item_id, candidate_id)
+        return DecideReviewResponse(item_id=item_id, status="APPROVED", exported=False)
 
     def export_job(self, job_id: UUID) -> ExportJobResponse | None:
         job = fixtures.get_job(job_id)

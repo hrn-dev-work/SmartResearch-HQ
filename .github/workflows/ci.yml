@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, phase1, phase2, phase3]
+  push:
+    branches: [main, phase1, phase2, phase3]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Org/repo で GITHUB_TOKEN が制限されていると checkout が
+# "Repository not found" になる。明示的に contents: read を付与する。
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Ruff format
+        run: ruff format --check .
+
+      - name: Pytest
+        env:
+          APP_MODE: portfolio
+          MATCHING_PROVIDER: amazon_search
+        run: pytest -q
+
+  frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Production build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+        run: npm run build
+
+  sync-pr-checkboxes:
+    name: sync-pr-checkboxes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: [backend, frontend]
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync CI checkboxes on PR body
+        env:
+          # Default GITHUB_TOKEN is blocked when the org forbids Actions from approving/editing PRs.
+          # Add fine-grained PAT (pull_requests: write) as GH_PR_SYNC_TOKEN if sync fails.
+          GH_TOKEN: ${{ secrets.GH_PR_SYNC_TOKEN || github.token }}
+          GITHUB_TOKEN: ${{ secrets.GH_PR_SYNC_TOKEN || github.token }}
+          PR_CI_CHECKBOX_MARK: x
+        run: bash scripts/sync-pr-checkboxes.sh ${{ github.event.pull_request.number }}

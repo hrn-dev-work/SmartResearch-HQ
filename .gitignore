@@ -20,7 +20,9 @@ build/
 
 # IDE
 .idea/
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 *.swp
 .DS_Store
 
@@ -31,6 +33,21 @@ test-results/
 .coverage
 htmlcov/
 
+# Agent / Cursor debug output (local)
+.git-status-tmp.txt
+pytest-out.txt
+stash-pop.txt
+git-st.txt
+commit-check.txt
+branch-state.txt
+rebase-state.txt
+final-status.txt
+diff-detail.txt
+diff-stat.txt
+*-log.txt
+*-state.txt
+show-*.txt
+
 # Secrets (never commit)
 credentials.json
 service-account*.json
@@ -39,19 +56,31 @@ service-account*.json
 # Playwright browsers (local install)
 /playwright/.cache/
 
-# Cursor session markers (local only)
-.cursor/retrospective/.session-edited
-
-# Agent / Cursor workflow (local only — not published)
+# Cursor agent config — entire .cursor/ is local-only (rules, skills, hooks; never commit)
+# Usage: docs/local/cursor-usage.md (gitignored; copy from another machine or create locally)
 .cursor/
-AGENTS.md
+
+# Generated from local .cursor/skills (scripts/sync-skill-prompt-table.py)
+docs/prompt-templates.md
+
+# Agent / personal notes (local only — see docs/local/README.md)
+docs/local/*
+!docs/local/README.md
 frontend/AGENTS.md
 frontend/CLAUDE.md
-docs/cursor-agent-efficiency.md
-docs/prompt-templates.md
-docs/implementation-retrospective.md
-docs/git-workflow.md
-scripts/sync-skill-prompt-table.py
-scripts/git-start-branch.sh
-scripts/sync-github-labels.py
-.github/
+
+# Agent / CI scratch output (local)
+.ci-investigation-gh.txt
+ci結果.md
+ci-fix-log.txt
+ship-pr-result.txt
+*-result.txt
+commit-out.txt
+commit-capture.txt
+.agent-shell-out.txt
+.agent-git-workflow.log
+.push-log.txt
+_fix-main*.log
+scripts/_ship-*.sh
+scripts/_agent-*.sh
+scripts/_cleanup-local.sh

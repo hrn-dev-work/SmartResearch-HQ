@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Push branch and optionally open/sync a PR. Agent entry point for "push until PR".
+# Usage:
+#   bash scripts/git-ship.sh push              # push only
+#   bash scripts/git-ship.sh pr [base]         # push + ensure PR + post-workflow
+#   bash scripts/git-ship.sh pr-url [base]      # print PR URL (create if missing)
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+MODE="${1:-pr}"
+BASE="${2:-main}"
+BRANCH="$(git branch --show-current)"
+REMOTE="${GIT_PUSH_REMOTE:-origin}"
+
+if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
+  echo "ERROR: git-ship must not run on ${BRANCH}. Create a work branch first." >&2
+  echo "  bash scripts/git-start-branch.sh feat/your-task" >&2
+  exit 1
+fi
+
+if [[ "$MODE" == "pr-url" ]]; then
+  if gh pr view --head "$BRANCH" --json url -q .url 2>/dev/null; then
+    exit 0
+  fi
+  MODE="pr"
+fi
+
+git push -u "$REMOTE" HEAD "${@:3}"
+
+case "$MODE" in
+  push)
+    echo "Pushed ${BRANCH} -> ${REMOTE}"
+    ;;
+  pr)
+    bash "$ROOT/scripts/ensure-pr.sh" "$BASE"
+    bash "$ROOT/scripts/post-workflow.sh" || true
+    URL="$(gh pr view --head "$BRANCH" --json url,number,title -q '"\(.url) (#\(.number) \(.title))"' 2>/dev/null || true)"
+    if [[ -n "$URL" ]]; then
+      echo "PR: ${URL}"
+    else
+      echo "WARN: push OK but PR URL not found (gh auth / network?)" >&2
+    fi
+    ;;
+  *)
+    echo "Usage: bash scripts/git-ship.sh push|pr|pr-url [base] [git-push-args...]" >&2
+    exit 1
+    ;;
+esac

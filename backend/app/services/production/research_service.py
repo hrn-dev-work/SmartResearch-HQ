@@ -1,11 +1,9 @@
+from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-
+from app.config import get_settings
 from app.core.status import JobStatus
-from app.db.models import AmazonCandidate, JobItem, ResearchJob, ReviewDecision
+from app.db.models import JobItem, ResearchJob, ReviewDecision
 from app.schemas.research import (
     AmazonCandidateResponse,
     CreateResearchResponse,
@@ -18,6 +16,22 @@ from app.schemas.research import (
     SellerSummary,
 )
 from app.services.production.pipeline import create_job_record, run_job_pipeline
+from app.services.spreadsheet.exporter import SpreadsheetConfigError, build_export_row, export_rows
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
+
+def _resolve_amazon_fields(item: JobItem, decision: ReviewDecision) -> tuple[str, str]:
+    if decision.manual_asin:
+        asin = decision.manual_asin.upper()
+        return asin, f"https://www.amazon.com/dp/{asin}"
+    if decision.chosen_candidate_id is None:
+        return "", ""
+    candidate = next((c for c in item.candidates if c.id == decision.chosen_candidate_id), None)
+    if candidate is None:
+        return "", ""
+    return candidate.asin, candidate.amazon_url
 
 
 def _asin_pattern_ok(asin: str) -> bool:
@@ -30,7 +44,9 @@ class ProductionResearchService:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def create_research(self, shopee_shop_url: str, seller_display_name: str | None) -> CreateResearchResponse:
+    async def create_research(
+        self, shopee_shop_url: str, seller_display_name: str | None
+    ) -> CreateResearchResponse:
         job = await create_job_record(
             self._session,
             shopee_shop_url=shopee_shop_url,
@@ -69,7 +85,9 @@ class ProductionResearchService:
             updated_at=job.updated_at,
         )
 
-    async def list_items(self, job_id: UUID, page: int, page_size: int) -> ReviewItemsPageResponse | None:
+    async def list_items(
+        self, job_id: UUID, page: int, page_size: int
+    ) -> ReviewItemsPageResponse | None:
         job_exists = await self._session.execute(
             select(ResearchJob.id).where(ResearchJob.id == job_id)
         )
@@ -186,15 +204,67 @@ class ProductionResearchService:
         job = await self.get_job(job_id)
         if job is None:
             return None
+
         result = await self._session.execute(
             select(JobItem)
             .where(JobItem.job_id == job_id)
-            .options(selectinload(JobItem.decision))
+            .options(selectinload(JobItem.decision), selectinload(JobItem.candidates))
         )
-        items = result.scalars().all()
-        exported = sum(1 for i in items if i.decision and not i.decision.rejected)
-        skipped = len(items) - exported
-        return ExportJobResponse(job_id=job_id, exported_count=exported, skipped_count=skipped)
+        items = list(result.scalars().all())
+        settings = get_settings()
+        now = datetime.now(UTC)
+
+        pending_rows: list[dict] = []
+        pending_decisions: list[ReviewDecision] = []
+        skipped = 0
+
+        for item in items:
+            decision = item.decision
+            if decision is None or decision.rejected:
+                skipped += 1
+                continue
+            if decision.exported_at is not None:
+                skipped += 1
+                continue
+
+            asin, amazon_url = _resolve_amazon_fields(item, decision)
+            if not asin:
+                skipped += 1
+                continue
+
+            pending_rows.append(
+                build_export_row(
+                    shopee_title=item.title,
+                    shopee_item_id=item.shopee_item_id,
+                    amazon_asin=asin,
+                    amazon_url=amazon_url,
+                    sold_count=item.sold_count,
+                    exported_at=now,
+                )
+            )
+            pending_decisions.append(decision)
+
+        if pending_rows and settings.google_sheet_id:
+            try:
+                await export_rows(
+                    settings.google_sheet_id,
+                    pending_rows,
+                    credentials_path=settings.google_sheets_credentials_path,
+                )
+            except SpreadsheetConfigError as exc:
+                raise ValueError(str(exc)) from exc
+
+        for decision in pending_decisions:
+            decision.exported_at = now
+
+        if pending_decisions:
+            await self._session.commit()
+
+        return ExportJobResponse(
+            job_id=job_id,
+            exported_count=len(pending_rows),
+            skipped_count=skipped,
+        )
 
     async def run_pipeline(self, job_id: UUID, *, max_items: int = 20) -> None:
         await run_job_pipeline(self._session, job_id, max_items=max_items)
