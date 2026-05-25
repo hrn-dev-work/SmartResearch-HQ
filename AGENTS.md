@@ -52,10 +52,16 @@
 
 ## Git（ブランチ運用）
 
-[`docs/git-workflow.md`](docs/git-workflow.md) — **phase1 直コミット禁止**。ブランチ → PR → **CI green** → squash マージ。
+[`docs/git-workflow.md`](docs/git-workflow.md) — **main 直コミット禁止**。ブランチ → PR → **CI green** → squash マージ。
 
-- ローカル CI: `bash scripts/ci-check.sh`
-- 作業開始: `bash scripts/git-start-branch.sh feat/wbs-x-y-説明`
+| 依頼 | スキル / コマンド |
+|------|-------------------|
+| **プッシュまで** | `commit-pr-style` → `bash scripts/git-ship.sh push` |
+| **PR作成まで** | `commit-pr-style` → `bash scripts/git-ship.sh pr` |
+| 作業開始 | `bash scripts/git-start-branch.sh feat/...` |
+| ローカル CI | `bash scripts/ci-check.sh` |
+
+push / PR 作成は **許可なく実行してよい**（`security-git.mdc`）。
 
 ## フロントのみ
 
@@ -63,6 +69,8 @@ Next.js 16 の注意: `frontend/AGENTS.md`
 
 ## ユーザー依頼の例
 
+- ✅ 「プッシュまでお願い」→ commit + push まで（PR は作らない）
+- ✅ 「PR作成までお願い」→ commit + push + PR URL 報告
 - ✅ 「WBS 2.3 用ブランチを切って、コミット・push・PR まで」
 - ✅ 「レビュー画面で候補を confidence 降順に」（→ ブランチ上で実装）
 - ✅ 「WBS 2.2 の Amazon 検索マッチャの骨組み」

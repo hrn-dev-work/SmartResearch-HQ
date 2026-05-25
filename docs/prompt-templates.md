@@ -4,4 +4,4 @@
 |-----|------|---------|-------------|------------------------|
 | 1 | 環境 | `wsl-local-dev` | WSL Ubuntu で API(:8000)/UI(:3000) を起動。venv・ポート・Playwright のトラブル対応。 | ローカルで SmartResearch-HQ を起動して。WSL Ubuntu、portfolio（Mock）で health が ok になるまで確認して。 |
 | 2 | UI・要件 | `refined-saas-workflow` | requirements を design と突合して清書したあと、脱AI 感の UI（リサーチ開始・レビュー画面）を実装する。 | 先に requirements.md を design.md §11 と突合して清書して。そのあとレビュー画面の UI を脱AI 感で実装して。 |
-| 3 | Git・PR | `commit-pr-style` | 作業ブランチで commit/push/PR まで。CI（backend+frontend）green 後に squash マージ。 | 作業ブランチを切って、CI を通して commit・push・PR まで。green なら squash マージして。 |
+| 3 | Git・PR | `commit-pr-style` | 「プッシュまで」「PR作成まで」で commit→push→PR まで自動実行。CI green 後 squash マージ。 | プッシュまでお願い。／ PR作成までお願い。 |

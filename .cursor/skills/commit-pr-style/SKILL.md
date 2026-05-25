@@ -1,11 +1,12 @@
 ---
 name: commit-pr-style
 description: >-
-  Git branch workflow for SmartResearch-HQ: branch from phase1, commit, push, PR,
-  CI-gated squash merge. Unified templates and Related links. Safe git ops allowed;
-  blocks force push and default-branch direct commits. Use for git, PR, CI, merge.
-summary: 作業ブランチで commit/push/PR まで。CI（backend+frontend）green 後に squash マージ。
-user-prompt: 作業ブランチを切って、CI を通して commit・push・PR まで。green なら squash マージして。
+  Git branch workflow for SmartResearch-HQ. Use when the user asks to push, create
+  a PR, commit, merge, or says プッシュまで, PR作成まで, PRまで, pushして, PR作って,
+  commit, gh pr, squash merge, or git workflow. Runs commit/push/PR without extra
+  permission (except destructive git). CI-gated squash merge.
+summary: 「プッシュまで」「PR作成まで」で commit→push→PR まで自動実行。CI green 後 squash マージ。
+user-prompt: プッシュまでお願い。／ PR作成までお願い。
 category: Git・PR
 disable-model-invocation: false
 ---
@@ -16,15 +17,74 @@ disable-model-invocation: false
 
 **リモート**: `git@github.com:hrn-dev-work/SmartResearch-HQ.git`
 
-**Git 実行**: 危険操作以外は **明示依頼なしで可**（`.cursor/rules/security-git.mdc`）
+**Git 実行**: 危険操作以外は **ユーザー都度の許可なしで実行してよい**（`.cursor/rules/security-git.mdc`）。「プッシュまで」「PR作成まで」と言われたら **確認せず最後までやる**。
+
+---
+
+## 依頼の解釈（必読）
+
+| ユーザー | やること | 報告 |
+|----------|----------|------|
+| **プッシュまで** / push して | 下記 **A→E** の **E まで**（PR は作らない） | push したブランチ名 |
+| **PR作成まで** / PR まで / PR 作って | 下記 **A→F** 全部 | **PR URL**（必須） |
+| **マージまで** / squash マージ | **A→F** のあと CI green なら merge | マージ後の `main` HEAD |
+| コミットだけ | **A→D** | commit hash |
+
+**禁止**: 「push していいですか？」と聞いて止まる。red CI のままマージする。
+
+### 手順 A→F（エージェントがそのまま実行）
+
+```bash
+# A. 状態確認
+git branch --show-current
+git status
+git fetch origin
+
+# B. main にいる + 変更あり → 作業ブランチ（未作成なら）
+# bash scripts/git-start-branch.sh feat/...
+
+# C. push 前 CI（red なら直してから進む）
+bash scripts/ci-check.sh
+
+# D. コミット（未コミットの変更がある場合）
+git add <files>
+git commit -m "$(cat <<'EOF'
+<type>(<scope>): English subject
+
+English why (1–2 sentences).
+
+---
+
+日本語の why（1–2 文）。
+
+Refs #
+EOF
+)"
+
+# E. プッシュまで
+bash scripts/git-ship.sh push
+
+# F. PR作成まで（依頼に PR が含まれるとき、または post-push で未作成のとき）
+bash scripts/git-ship.sh pr
+# または本文を書き分けたいとき:
+# gh pr create --base main \
+#   --title "$(bash scripts/render-pr-title.sh)" \
+#   --body "$(bash scripts/render-pr-body.sh manual "$(git branch --show-current)")"
+```
+
+**フック未設定時**（初回のみ）: `bash scripts/install-git-hooks.sh`
+
+**マイルストーン PR**（phase2 / phase3）: 本文は [templates.md](templates.md) の例に合わせて `gh pr edit` または `scripts/update-open-pr-bodies.sh` を参考に **Summary / Commits / Test plan / Related** を埋める。
+
+---
 
 ## ブランチ運用（必須）
 
 ### 鉄則
 
-- **既定ブランチ `phase1` では作業しない**（直接 commit / push 禁止）
+- **既定ブランチ `main` では作業しない**（直接 commit / push 禁止）
 - 1 作業 = 1 ブランチ = 1 PR
-- **マージは CI green 後**に squash。マージ後は `phase1` を `pull`
+- **マージは CI green 後**に squash。マージ後は `main` を `pull`
 
 ### 着手前
 
@@ -36,31 +96,12 @@ git fetch origin
 
 | 現在 | 動き |
 |------|------|
-| `phase1` + 変更 | **先に作業ブランチ** |
+| `main` + 変更 | **先に作業ブランチ** |
 | 作業ブランチ | そのまま commit / PR |
 
 ```bash
 bash scripts/git-start-branch.sh feat/wbs-2-3-説明
 ```
-
-### フロー — commit → CI → push → PR
-
-1. 分析（下記）
-2. `bash scripts/ci-check.sh`（push 前推奨）
-3. `git add` → `git commit`（`phase1` でないこと）
-4. `git push -u origin HEAD`
-5. `gh pr create --base phase1 ...`
-
-### フロー — マージ（CI green 必須）
-
-```bash
-gh pr checks
-# backend / frontend が pass であること
-gh pr merge --squash --delete-branch
-git checkout phase1 && git pull --ff-only origin phase1
-```
-
-CI red → 修正して push → 再実行を待つ。**マージしない。**
 
 ---
 
@@ -75,7 +116,7 @@ CI red → 修正して push → 再実行を待つ。**マージしない。**
 
 ---
 
-## 分析
+## 分析（コミット・PR 文案を書く前）
 
 ```bash
 git status
@@ -83,39 +124,33 @@ git diff
 git diff --staged
 git log --oneline -10
 git branch --show-current
-git diff phase1...HEAD
+git diff main...HEAD
 gh issue list --limit 20
 gh pr list --limit 20
 ```
 
 ## コミット
 
-```
-<type>(<scope>): <要点>[ (WBS x.y)]
-```
+**subject**: 英語のみ（Conventional Commits）。**body**: 英語 → `---` → 日本語（why を簡潔に）。
 
-Body に **why**。Issue: `Refs #N` / `Fixes #N`
+雛形: `bash scripts/render-commit-msg.sh feat spreadsheet "add export skeleton (WBS 2.3)"`
 
 ## PR
 
-タイトル = commit subject（英語）。本文は [templates.md](templates.md)（**各セクションは英語先、その下に日本語**）。
+### タイトル（英語のみ）
 
-`gh pr create --fill` は使わない（英語のみになりやすい）。雛形: `bash scripts/render-pr-body.sh manual <branch>`
+雛形: `bash scripts/render-pr-title.sh [base] [branch]`
 
-Test plan に `- [ ] CI backend / frontend green` を入れる。
+### 本文
 
-```bash
-gh pr create --base phase1 --title "..." --body "$(cat <<'EOF' ... EOF)"
-```
+英語ブロック → `---` → 日本語ブロック。**Summary / Commits / Test plan / Related**。詳細 [templates.md](templates.md)。
 
-## Issue
-
-[templates.md](templates.md) 参照。ラベル: `python3 scripts/sync-github-labels.py`
+雛形: `bash scripts/render-pr-body.sh manual <branch>`
 
 ## 禁止
 
 - `git config` 変更、force push、`--no-verify`
-- `phase1` / `main` への直接 commit / push
+- `main` / `master` への直接 commit / push
 - **CI red のマージ**
 - 秘密情報のコミット
 
@@ -123,4 +158,5 @@ gh pr create --base phase1 --title "..." --body "$(cat <<'EOF' ... EOF)"
 
 - [docs/git-workflow.md](../../../docs/git-workflow.md)
 - [examples.md](examples.md)
+- `scripts/git-ship.sh` — push / PR 一発
 - `.github/workflows/ci.yml`

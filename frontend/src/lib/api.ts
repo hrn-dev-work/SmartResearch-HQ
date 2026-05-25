@@ -16,9 +16,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     },
   });
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
+    const body = (await res.json().catch(() => ({}))) as {
+      error?: { message?: string };
+      detail?: { error?: { message?: string } };
+    };
     const message =
-      (body as { error?: { message?: string } })?.error?.message ??
+      body.error?.message ??
+      body.detail?.error?.message ??
       res.statusText;
     throw new Error(message);
   }
@@ -52,14 +56,29 @@ export async function getReviewItems(
   );
 }
 
+export type DecideReviewOptions = {
+  candidateId?: string | null;
+  manualAsin?: string;
+  rejected?: boolean;
+};
+
 export async function decideReview(
   itemId: string,
-  candidateId: string | null,
+  candidateIdOrOptions: string | null | DecideReviewOptions,
   rejected = false,
 ): Promise<void> {
+  const options: DecideReviewOptions =
+    typeof candidateIdOrOptions === "object" && candidateIdOrOptions !== null
+      ? candidateIdOrOptions
+      : { candidateId: candidateIdOrOptions, rejected };
+
   await request(`/review/${itemId}/decide`, {
     method: "POST",
-    body: JSON.stringify({ candidate_id: candidateId, rejected }),
+    body: JSON.stringify({
+      candidate_id: options.candidateId ?? null,
+      manual_asin: options.manualAsin ?? null,
+      rejected: options.rejected ?? false,
+    }),
   });
 }
 

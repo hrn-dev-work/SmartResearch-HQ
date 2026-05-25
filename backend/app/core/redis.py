@@ -1,0 +1,14 @@
+"""Redis connectivity helpers (production / ARQ)."""
+
+from app.config import get_settings
+from redis.asyncio import Redis
+
+
+async def ping_redis() -> bool:
+    """Return True when Redis responds to PING."""
+    settings = get_settings()
+    client = Redis.from_url(settings.redis_url)
+    try:
+        return bool(await client.ping())
+    finally:
+        await client.aclose()
