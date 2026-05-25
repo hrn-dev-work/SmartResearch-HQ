@@ -286,6 +286,8 @@ git status -sb
 
 ### phase1 は main と別物
 
+> **Note:** Remote branch `phase1` is a legacy milestone snapshot with unrelated history; do not open PRs from it. Use main + feat/* branches.
+
 | ブランチ | 指すコミット | 役割 |
 |----------|--------------|------|
 | **`phase1`** | Phase 1 完了（WBS 1.1–1.6、`c81f5ad`） | **固定スナップショット**。以降更新しない |
