@@ -254,6 +254,32 @@ bash scripts/sync-pr-checkboxes.sh    # 現在ブランチの PR
 bash scripts/sync-pr-checkboxes.sh 5  # PR 番号指定
 ```
 
+### 3.3 Cursor + UNC（`\\wsl.localhost\...`）で scripts が `M` になる
+
+**WSL ターミナルで `git diff` が空なのに、Cursor の Source Control だけ変更がある**ときは、ロジック変更ではなく **改行（CRLF↔LF）または実行権限** のことが多い。
+
+| 確認 | コマンド（WSL） |
+|------|------------------|
+| 実変更か | `git diff --stat scripts/dev.sh` |
+| 改行だけか | 差分の各行が `-` と `+` で中身同一 → CRLF |
+
+**予防（リポジトリ済み）**
+
+- `.gitattributes` — `*.sh` / `scripts/**` / `.githooks/**` を LF
+- `.vscode/settings.json` — `"git.path": "\\\\wsl.localhost\\Ubuntu\\usr\\bin\\git"`
+- `bash scripts/install-git-hooks.sh` — `core.filemode false`
+
+**直し（1 回）**
+
+```bash
+cd ~/workspace/SmartResearch-HQ
+find scripts .githooks -type f -exec sed -i 's/\r$//' {} +
+git add --renormalize scripts/ .githooks/
+git status -sb
+```
+
+エージェントは Git を **WSL 内**で実行し、UNC 上の PowerShell `git` に依存しない（`~/.cursor/skills/wsl-agent-invoke/SKILL.md`）。
+
 ---
 
 ## 4. マイルストーン branch（Phase 1 / 2 / 3）
