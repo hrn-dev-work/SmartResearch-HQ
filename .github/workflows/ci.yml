@@ -10,6 +10,11 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Org/repo で GITHUB_TOKEN が制限されていると checkout が
+# "Repository not found" になる。明示的に contents: read を付与する。
+permissions:
+  contents: read
+
 jobs:
   backend:
     name: backend
@@ -75,6 +80,7 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: [backend, frontend]
     permissions:
+      contents: read
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
