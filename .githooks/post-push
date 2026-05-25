@@ -12,3 +12,4 @@ if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
 fi
 
 bash "$ROOT/scripts/ensure-pr.sh" main
+bash "$ROOT/scripts/sync-pr-checkboxes.sh" "$BRANCH" 2>/dev/null || true

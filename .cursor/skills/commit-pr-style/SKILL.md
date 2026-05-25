@@ -90,22 +90,30 @@ gh pr list --limit 20
 
 ## コミット
 
+**subject**: 英語のみ（Conventional Commits）。**body**: 英語 → `---` → 日本語（why を簡潔に）。
+
 ```
-<type>(<scope>): <要点>[ (WBS x.y)]
+<type>(<scope>): <English summary>[ (WBS x.y)]
+
+<English why>
+
+---
+
+<日本語の why>
+
+Refs #N / Fixes #N
 ```
 
-Body に **why**。Issue: `Refs #N` / `Fixes #N`
+雛形: `bash scripts/render-commit-msg.sh feat spreadsheet "add export skeleton (WBS 2.3)"`
 
-コミット subject は日本語可。PR タイトルとは別（下記）。
+PR タイトル = subject（英語）。body の `---` 以降は PR 本文の日本語ブロックに流用可。
 
 ## PR
 
 ### タイトル（英語のみ・必須）
 
 - **Conventional Commits** 形式: `type(scope): summary`
-- **日本語をタイトルに入れない**（コミット subject をそのままコピーしない）
-- コミットが日本語なら **英語に要約して** タイトルを書く
-- **1 コミット PR**: 英語 subject と同一でよい
+- **1 コミット PR**: subject と同一
 - **複数コミット PR**: 最新コミット名を使わない。変更全体の **英語 1 行要約**
 - **phase2 / phase3 等**: `Phase N: <English summary>`（例: `Phase 3: Redis health + manual ASIN (WBS 3.5–3.6)`）
 
@@ -113,11 +121,11 @@ Body に **why**。Issue: `Refs #N` / `Fixes #N`
 
 ### 本文
 
-[templates.md](templates.md) — **3 セクション**（Summary / Test plan / Related）。英語が主、日本語は同行の _(…)_。
+[templates.md](templates.md) — **3 セクション**（Summary / Test plan / Related）。各セクション **英語 → `---` → 日本語**。
+
+Test plan は `- [ ]` チェックボックス。CI green 後は `bash scripts/sync-pr-checkboxes.sh` で自動 `[x]`（push hook でも実行）。
 
 `gh pr create --fill` は使わない。雛形: `bash scripts/render-pr-body.sh manual <branch>`
-
-Test plan に `- [ ] CI backend / frontend green` を入れる。
 
 ```bash
 gh pr create --base main \
@@ -136,6 +144,7 @@ gh pr create --base main \
 - **CI red のマージ**
 - 秘密情報のコミット
 - **日本語 PR タイトル**、**複数コミット PR で最新コミット名をタイトルにする**
+- **日本語コミット subject**、**body に `---` なしの日英混在**
 
 ## 参照
 

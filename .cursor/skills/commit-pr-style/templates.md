@@ -50,16 +50,50 @@ PR にはラベル必須ではない（Issue の `Closes #N` で足りる）。
 
 ## コミット
 
-```
-<type>(<scope>): <変更の要点>[ (WBS x.y)]
+**subject**: 英語のみ（Conventional Commits）。PR タイトルと揃える。
 
-<why を 1〜3 文。複数論点なら箇条書き可>
+**body**: 英語 → `---` → 日本語（両方とも **why を簡潔に**）。Issue 参照は末尾。
+
+```
+<type>(<scope>): <English summary>[ (WBS x.y)]
+
+<English why — 1–2 sentences or bullets>
+
+---
+
+<日本語の why — 1〜2 文>
 
 Refs #<issue>          # 関連イシュー（クローズしない）
 Fixes #<issue>         # マージでイシューをクローズ（fix 系）
 ```
 
-**subject ルール**: 1 行・50 文字目安・末尾句点なし・命令形（「追加する」より「追加」）
+**subject ルール**: 1 行・50 文字目安・末尾句点なし・命令形（add / fix / update）
+
+雛形: `bash scripts/render-commit-msg.sh feat spreadsheet "add export skeleton (WBS 2.3)"`
+
+**例**（`7b871a5` 相当）:
+
+```
+chore(git): compact bilingual PR template
+
+Unify PR body to EN --- JA sections; add pr-ci-checkbox sync.
+
+---
+
+PR 本文を英語---日本語形式に統一。CI green 時はチェックボックスを自動 [x] に。
+```
+
+**例**（マイルストーン squash、`7945182` 相当）:
+
+```
+feat: Phase 2 Sheets export and job polling (WBS 2.3, 3.4)
+
+Production Sheets export, review-screen job polling, CI scaffolding.
+
+---
+
+本番 Sheets エクスポート、レビュー画面の進捗ポーリング、CI 骨組み。
+```
 
 ---
 
@@ -76,30 +110,45 @@ Fixes #<issue>         # マージでイシューをクローズ（fix 系）
 
 雛形: `bash scripts/render-pr-title.sh [base] [branch]`
 
-**本文**: **3 セクション**（Summary / Test plan / Related）。英語が主、日本語は同行の _(…)_。Related のキーワード（`Closes` / `WBS:` 等）は英語のまま。
+**本文**: **3 セクション**（Summary / Test plan / Related）。各セクションは **英語 → `---` → 日本語**。Related のキーワード（`Closes` / `WBS:` 等）は英語ブロックに書く。
+
+Test plan は GitHub チェックボックス（`- [ ]` / `- [x]`）。CI green 時は `scripts/sync-pr-checkboxes.sh` が `ci-check.sh` / `backend`+`frontend` 行を自動で `[x]` にする。
 
 手動 PR の雛形: `bash scripts/render-pr-body.sh manual feat/your-branch`
 
 ```markdown
 ## Summary
 
-- What changed _(変更内容)_
+- What changed
+
+---
+
+- 変更内容
 
 ## Test plan
 
-- [ ] `bash scripts/ci-check.sh`
+- [ ] `bash scripts/ci-check.sh` passes
+- [ ] CI `backend` / `frontend` green
+
+---
+
+- [ ] `bash scripts/ci-check.sh` が通る
 - [ ] CI `backend` / `frontend` green
 
 ## Related
 
-<!-- 該当行だけ残す。なければセクションごと削除 -->
 - Branch: `<type>/<name>`
 - WBS: <x.y>
 - Issue: Closes #<n>
-- PR: Depends on #<n>
+
+---
+
+- ブランチ: `<type>/<name>`
+- WBS: <x.y>
+- イシュー: Closes #<n>
 ```
 
-**マイルストーン PR**（phase2 等）: Summary 先頭に **Merge order:** 1 行、コミット一覧は Summary 内の箇条書き（Commits 見出しは作らない）。
+**マイルストーン PR**（phase2 等）: Summary 英語ブロック先頭に **Merge order:** 1 行。コミット一覧は Summary 内の箇条書き（Commits 見出しは作らない）。
 
 ### Related の選び方
 

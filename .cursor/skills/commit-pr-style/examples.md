@@ -5,7 +5,18 @@
 ```bash
 git checkout -b feat/wbs-2-3-sheets-export   # 未コミット変更はそのまま付いてくる
 git add .
-git commit -m "feat(spreadsheet): Sheets export 骨組み (WBS 2.3)"
+git commit -m "$(cat <<'EOF'
+feat(spreadsheet): add Sheets export skeleton (WBS 2.3)
+
+Call real Sheets API in production only; portfolio returns count.
+
+---
+
+production のみ実 API を呼び、portfolio は件数のみ返す。
+
+Refs #42
+EOF
+)"
 git push -u origin HEAD
 gh pr create --base main --title "feat(spreadsheet): add Sheets export skeleton (WBS 2.3)" --body "..."
 ```
@@ -47,7 +58,11 @@ bash scripts/git-start-branch.sh feat/wbs-2-3-sheets-export
 ### コミット
 
 ```
-feat(spreadsheet): Sheets export サービスの骨組みを追加 (WBS 2.3)
+feat(spreadsheet): add Sheets export skeleton (WBS 2.3)
+
+Call real Sheets API in production only; portfolio returns count.
+
+---
 
 production のみ実 API を呼び、portfolio は件数のみ返す。
 
@@ -61,20 +76,37 @@ Refs #42
 ```markdown
 ## Summary
 
-- Add Sheets export service; portfolio returns count only _(確定アイテムの Sheets 出力。portfolio は Mock)_
-- Initial WBS 2.3 implementation _(WBS 2.3 初版)_
+- Add Sheets export service; portfolio returns count only
+- Initial WBS 2.3 implementation
+
+---
+
+- 確定アイテムの Sheets 出力サービスを追加（portfolio は Mock）
+- WBS 2.3 の初版
 
 ## Test plan
 
-- [ ] `bash scripts/ci-check.sh`
+- [ ] `bash scripts/ci-check.sh` passes
 - [ ] CI `backend` / `frontend` green
-- [ ] portfolio export API returns count only _(件数のみ返すこと)_
+- [ ] portfolio export API returns count only
+
+---
+
+- [ ] `bash scripts/ci-check.sh` が通る
+- [ ] CI `backend` / `frontend` green
+- [ ] portfolio で export API が件数のみ返すこと
 
 ## Related
 
 - Issue: Closes #42
 - Branch: `feat/wbs-2-3-sheets-export`
 - WBS: 2.3 — Google Sheets export
+
+---
+
+- イシュー: Closes #42
+- ブランチ: `feat/wbs-2-3-sheets-export`
+- WBS: 2.3 — Google Sheets 連携
 ```
 
 ---
@@ -103,7 +135,13 @@ Refs #42
 ### コミット
 
 ```
-fix(review): 候補 0 件でも手動 ASIN UI を表示
+fix(review): show manual ASIN UI when candidate list is empty
+
+Fall back to manual ASIN form instead of blank screen.
+
+---
+
+候補 0 件でも白画面にせず、手動 ASIN フォームを表示する。
 
 Fixes #55
 ```
@@ -115,18 +153,33 @@ Fixes #55
 ```markdown
 ## Summary
 
-- Fall back to manual ASIN form when candidate list is empty _(候補 0 件で手動 ASIN UI)_
+- Fall back to manual ASIN form when candidate list is empty
+
+---
+
+- 候補 0 件でも白画面にせず、手動 ASIN フォームを表示
 
 ## Test plan
 
-- [ ] `bash scripts/ci-check.sh`
+- [ ] `bash scripts/ci-check.sh` passes
 - [ ] CI `backend` / `frontend` green
-- [ ] Manual ASIN UI appears for jobs with zero candidates _(候補なしジョブで表示)_
+- [ ] Manual ASIN UI appears for jobs with zero candidates
+
+---
+
+- [ ] `bash scripts/ci-check.sh` が通る
+- [ ] CI `backend` / `frontend` green
+- [ ] 候補 0 件のジョブで手動入力 UI が出ること
 
 ## Related
 
 - Issue: Closes #55
 - Branch: `fix/review-empty-candidates`
+
+---
+
+- イシュー: Closes #55
+- ブランチ: `fix/review-empty-candidates`
 ```
 
 ---
@@ -172,9 +225,13 @@ Fixes #55
 ## 例 4: ドキュメントのみ
 
 ```
-docs(wbs): Phase 2 タスク 2.2 を完了に更新
+docs(wbs): mark WBS 2.2 tasks done in roadmap
 
-実装済みタスクの状態を roadmap と揃える。
+Align roadmap status with implemented Phase 2 work.
+
+---
+
+実装済み Phase 2 に合わせ roadmap の 2.2 を完了に更新。
 ```
 
 ```markdown
@@ -212,4 +269,30 @@ production で PA-API の throttling 時にリトライ方針を決める。
 ## Related
 - WBS: 2.2
 - Issue: Blocks #70
+```
+
+---
+
+## 例 6: main 上の squash コミット（参考）
+
+`7b871a5` / `7945182` のように、マージ後も読みやすい英日 body にする。
+
+```
+chore(git): compact bilingual PR template
+
+Unify PR body to 3 sections with inline _(日本語)_; add render-pr-title.sh.
+
+---
+
+PR 本文を 3 セクション＋同行 _(…)_ に統一。タイトル生成スクリプトを追加。
+```
+
+```
+feat: Phase 2 Sheets export and job polling (WBS 2.3, 3.4)
+
+Production Sheets export, review-screen job polling, CI scaffolding.
+
+---
+
+本番 Sheets エクスポート、レビュー画面の進捗ポーリング、CI 骨組み。
 ```

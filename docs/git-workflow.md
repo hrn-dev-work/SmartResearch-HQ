@@ -114,7 +114,7 @@ main ──pull──► 作業ブランチ作成 ──commit──► push ─
 |------|----------|
 | **0. 着手前** | `main` を最新化。Issue があれば作成（任意）。WBS 1 件にスコープ固定 |
 | **1. ブランチ** | `main` から作業ブランチを切る。**main のまま作業しない** |
-| **2. コミット** | 作業ブランチ上でコミット（Conventional Commits） |
+| **2. コミット** | 作業ブランチ上でコミット（Conventional Commits・subject 英語、body は `英語` → `---` → `日本語`） |
 | **3. push** | `git push -u origin HEAD` または `bash scripts/git-push-pr.sh` |
 | **4. PR** | 自動（下記 §3.1）または手動 `gh pr create`。`Closes #N` / `WBS:` / `Branch:` を本文に |
 | **5. マージ** | GitHub UI または `gh pr merge --squash`（推奨: squash） |
@@ -147,7 +147,13 @@ git checkout -b feat/wbs-2-3-sheets-export
 git status
 git add <files>
 git commit -m "$(cat <<'EOF'
-feat(spreadsheet): Sheets export サービスの骨組みを追加 (WBS 2.3)
+feat(spreadsheet): add Sheets export skeleton (WBS 2.3)
+
+Call real Sheets API in production only; portfolio returns count.
+
+---
+
+production のみ実 API を呼び、portfolio は件数のみ返す。
 
 Refs #42
 EOF
@@ -156,17 +162,32 @@ git push -u origin HEAD
 gh pr create --repo hrn-dev-work/SmartResearch-HQ --title "feat(spreadsheet): add Sheets export skeleton (WBS 2.3)" --body "$(cat <<'EOF'
 ## Summary
 
-- Add Sheets export service skeleton (WBS 2.3) _(Sheets export 骨組み)_
+- Add Sheets export service skeleton (WBS 2.3)
+
+---
+
+- Sheets export サービスの骨組みを追加（WBS 2.3）
 
 ## Test plan
 
-- [ ] `bash scripts/ci-check.sh`
+- [ ] `bash scripts/ci-check.sh` passes
+- [ ] CI green
+
+---
+
+- [ ] `bash scripts/ci-check.sh` が通る
 - [ ] CI green
 
 ## Related
 
 - Issue: Closes #42
 - Branch: `feat/wbs-2-3-sheets-export`
+- WBS: 2.3
+
+---
+
+- イシュー: Closes #42
+- ブランチ: `feat/wbs-2-3-sheets-export`
 - WBS: 2.3
 EOF
 )"
