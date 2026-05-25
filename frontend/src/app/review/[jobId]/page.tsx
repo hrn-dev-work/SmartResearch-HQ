@@ -19,6 +19,10 @@ export default function ReviewPage() {
   const params = useParams();
   const jobId = params.jobId as string;
 
+  return <ReviewPageBody key={jobId} jobId={jobId} />;
+}
+
+function ReviewPageBody({ jobId }: { jobId: string }) {
   const [job, setJob] = useState<ResearchJob | null>(null);
   const [items, setItems] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +30,39 @@ export default function ReviewPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const [jobData, itemsData] = await Promise.all([
+          getResearchJob(jobId),
+          getReviewItems(jobId),
+        ]);
+        if (cancelled) {
+          return;
+        }
+        setJob(jobData);
+        setItems(itemsData.items);
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err.message : "読み込みに失敗しました",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [jobId]);
+
+  const reload = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -43,21 +79,16 @@ export default function ReviewPage() {
     }
   }, [jobId]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load
-    void load();
-  }, [load]);
-
   async function handleSelect(item: ReviewItem, candidateId: string) {
     await decideReview(item.item_id, candidateId);
     setMessage(`確定: ${item.title}`);
-    await load();
+    await reload();
   }
 
   async function handleReject(item: ReviewItem) {
     await decideReview(item.item_id, null, true);
     setMessage(`却下: ${item.title}`);
-    await load();
+    await reload();
   }
 
   async function handleExport() {
