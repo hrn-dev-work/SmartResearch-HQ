@@ -29,7 +29,11 @@ async def _set_job_status(
     job.error_code = error_code
     job.error_message = error_message
     job.updated_at = datetime.now(UTC)
-    if status in (JobStatus.AWAITING_REVIEW, JobStatus.SCRAPE_FAILED, JobStatus.AI_FAILED):
+    if status in (
+        JobStatus.AWAITING_REVIEW,
+        JobStatus.SCRAPE_FAILED,
+        JobStatus.AI_FAILED,
+    ):
         if status == JobStatus.AWAITING_REVIEW:
             job.completed_at = datetime.now(UTC)
     await session.flush()

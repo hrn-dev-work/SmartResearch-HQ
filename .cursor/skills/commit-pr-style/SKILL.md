@@ -98,7 +98,9 @@ Body に **why**。Issue: `Refs #N` / `Fixes #N`
 
 ## PR
 
-タイトル = commit subject。本文は [templates.md](templates.md)。
+タイトル = commit subject（英語）。本文は [templates.md](templates.md)（**各セクションは英語先、その下に日本語**）。
+
+`gh pr create --fill` は使わない（英語のみになりやすい）。雛形: `bash scripts/render-pr-body.sh manual <branch>`
 
 Test plan に `- [ ] CI backend / frontend green` を入れる。
 

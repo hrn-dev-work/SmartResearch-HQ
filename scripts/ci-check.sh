@@ -16,8 +16,24 @@ ruff check .
 ruff format --check .
 APP_MODE=portfolio MATCHING_PROVIDER=amazon_search pytest -q
 
+ensure_npm() {
+  if command -v npm >/dev/null 2>&1; then
+    return 0
+  fi
+  export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+  if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    # shellcheck disable=SC1091
+    source "$NVM_DIR/nvm.sh"
+  fi
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "npm not found. Install Node (e.g. nvm install 20) or add npm to PATH." >&2
+    exit 1
+  fi
+}
+
 echo "== frontend =="
 cd "$ROOT/frontend"
+ensure_npm
 npm ci
 npm run lint
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 npm run build

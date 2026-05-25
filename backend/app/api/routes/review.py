@@ -46,7 +46,8 @@ async def decide_review(
                         },
                     ) from exc
                 raise HTTPException(
-                    status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(exc)}}
+                    status_code=404,
+                    detail={"error": {"code": "NOT_FOUND", "message": str(exc)}},
                 ) from exc
         raise HTTPException(
             status_code=400,
@@ -74,6 +75,7 @@ async def decide_review(
             return await service.decide(item_id, body.candidate_id, False)
         except ValueError as exc:
             raise HTTPException(
-                status_code=400, detail={"error": {"code": "VALIDATION", "message": str(exc)}}
+                status_code=400,
+                detail={"error": {"code": "VALIDATION", "message": str(exc)}},
             ) from exc
     return service.decide(item_id, body.candidate_id, False)

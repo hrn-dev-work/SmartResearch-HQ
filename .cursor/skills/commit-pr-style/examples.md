@@ -60,16 +60,37 @@ Refs #42
 
 ```markdown
 ## Summary
+
+- Add Sheets export service; portfolio returns count only
+- Initial WBS 2.3 implementation
+
+## 概要
+
 - 確定アイテムの Sheets 出力サービスを追加（portfolio は Mock レスポンス）
 - WBS 2.3 の初版
 
 ## Test plan
+
+- [ ] `bash scripts/ci-check.sh` passes
+- [ ] CI `backend` / `frontend` green
+- [ ] portfolio export API returns count only
+
+## テスト手順
+
+- [ ] `bash scripts/ci-check.sh` が通る
+- [ ] CI `backend` / `frontend` green
 - [ ] portfolio で export API が件数のみ返すこと
-- [ ] `pytest backend/tests/` の spreadsheet 関連
 
 ## Related
+
 - Issue: Closes #42
 - Branch: `feat/wbs-2-3-sheets-export`
+- WBS: 2.3 — Google Sheets export
+
+## 関連
+
+- イシュー: Closes #42
+- ブランチ: `feat/wbs-2-3-sheets-export`
 - WBS: 2.3 — Google Sheets 連携
 ```
 
@@ -108,14 +129,34 @@ Fixes #55
 
 ```markdown
 ## Summary
+
+- Fall back to manual ASIN form when candidate list is empty
+
+## 概要
+
 - 候補空配列時に手動 ASIN フォームへフォールバック
 
 ## Test plan
+
+- [ ] `bash scripts/ci-check.sh` passes
+- [ ] CI `backend` / `frontend` green
+- [ ] Manual ASIN UI appears for jobs with zero candidates
+
+## テスト手順
+
+- [ ] `bash scripts/ci-check.sh` が通る
+- [ ] CI `backend` / `frontend` green
 - [ ] 候補 0 件のジョブで手動入力 UI が出ること
 
 ## Related
+
 - Issue: Closes #55
 - Branch: `fix/review-empty-candidates`
+
+## 関連
+
+- イシュー: Closes #55
+- ブランチ: `fix/review-empty-candidates`
 ```
 
 ---
@@ -137,13 +178,27 @@ Fixes #55
 
 ```markdown
 ## Summary
+
+- Show Gemini candidates on the review screen
+
+## 概要
+
 - レビュー画面から Gemini 候補を表示
 
 ## Related
+
 - Issue: Closes #60
 - PR: Depends on #61
 - PR: Related #61
 - Branch: `feat/wbs-2-2c-gemini-matcher-ui`
+- WBS: 2.2c — Gemini multimodal matcher
+
+## 関連
+
+- イシュー: Closes #60
+- PR: Depends on #61
+- PR: Related #61
+- ブランチ: `feat/wbs-2-2c-gemini-matcher-ui`
 - WBS: 2.2c — Gemini マルチモーダル
 ```
 
@@ -159,12 +214,23 @@ docs(wbs): Phase 2 タスク 2.2 を完了に更新
 
 ```markdown
 ## Summary
+
+- Mark WBS 2.2 tasks as done in roadmap
+
+## 概要
+
 - `docs/wbs-roadmap.md` で 2.2 を完了に更新
 
 ## Test plan
+
+- [ ] Roadmap IDs and artifact paths match implementation
+
+## テスト手順
+
 - [ ] 表の ID・成果物パスが実装と一致すること
 
 ## Related
+
 - WBS: 2.2 — 候補マッチング
 - Branch: `docs/wbs-2-2-done`
 ```
