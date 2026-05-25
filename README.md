@@ -1,124 +1,53 @@
 # SmartResearch-HQ
 
-Cross-border e-commerce product research and Shopee→Amazon matching with scraping, candidate matching, and human review.
-
-| Edition | Purpose | This repo |
-|---------|---------|-----------|
-| **Portfolio** | Demo for hiring / proposals | Mock API + frontend + design docs |
-| **Production** | Real operations | Playwright, matching, Google Sheets (private) |
+越境EC（Shopee 等）の商品リサーチと Shopee→Amazon 名寄せを、**スクレイピング・候補マッチング・Human-in-the-loop レビュー**で支援するシステムです。
 
 ---
 
-越境EC（Shopee 等）の商品リサーチ・名寄せを **スクレイピング + 候補マッチング + Human-in-the-loop** で自動化するシステム。
+## 概要
 
-| 版 | 目的 | 本リポジトリ |
-|----|------|-------------|
-| **表**（ポートフォリオ） | 転職・提案用デモ | Mock API + フロント + 設計 docs |
-| **裏**（完全版） | 実運用・副収入 | Private で Playwright / マッチング / Sheets |
+手作業で行われがちな「商品調査 → Amazon 候補の抽出 → 人による確定」を、ワークフローとして自動化します。  
+同一コードベース上で、**デモ環境**と**本番環境**の 2 モードを切り替えて運用できます。
 
-## Tech stack
+| モード | 用途 | 本リポジトリでの内容 |
+|--------|------|----------------------|
+| **Portfolio**（デモ環境） | 提案・検証・デモンストレーション | Mock API、フロントエンド、設計ドキュメント |
+| **Production**（本番環境） | 実際の業務運用 | Playwright、マッチング、Google Sheets 連携（非公開実装を含む） |
 
-- **Frontend**: Next.js 16, TypeScript, Tailwind CSS
-- **Backend**: FastAPI, Pydantic v2
-- **Infra**: PostgreSQL 16, Redis 7 (`docker compose` for production verification)
-- **Phase 2+**: Playwright, Amazon PA-API title search, Google Sheets (Gemini optional)
+デモ環境では外部 API や本番スクレイピングに依存せず、フィクスチャデータで一連の画面操作を確認できます。
 
 ---
 
-## 技術スタック
+## 主な機能
 
-- **Frontend**: Next.js 16, TypeScript, Tailwind CSS
-- **Backend**: FastAPI, Pydantic v2
-- **Infra**: PostgreSQL 16, Redis 7（docker compose — production 検証用）
-- **Phase 2+**: Playwright, Amazon PA-API タイトル検索, Google Sheets（Gemini は任意）
+- Shopee 商品 URL からのリサーチジョブ投入
+- Amazon 候補の提示とレビュー画面での確定（Human-in-the-loop）
+- ジョブ進捗の可視化（ダッシュボード）
+- 本番モード向け: Playwright による抽出、Amazon 検索連携、スプレッドシート出力（Phase 2 以降）
 
-## Development setup
+---
 
-### Prerequisites
+## 技術構成
 
-| Item | Version / notes |
-|------|-----------------|
-| OS | **WSL Ubuntu** on Windows. Avoid Git Bash + UNC paths (breaks venv) |
-| Python | **3.12** (`python3.12-venv` if needed) |
-| Node.js | **20 LTS** (same as CI) |
-| Editor | **Cursor** or VS Code — open `~/workspace/SmartResearch-HQ` from WSL |
-| Docker | Optional — for production verification (Postgres / Redis) |
+| 層 | 技術 |
+|----|------|
+| フロントエンド | Next.js 16, TypeScript, Tailwind CSS |
+| バックエンド | FastAPI, Pydantic v2 |
+| インフラ | PostgreSQL 16, Redis 7（本番検証時は `docker compose`） |
+| Phase 2 以降 | Playwright, Amazon PA-API タイトル検索, Google Sheets（Gemini は任意） |
 
-### First-time bootstrap
+---
+
+## デモの起動（Portfolio / Mock）
+
+Postgres と Redis は**不要**です。
 
 ```bash
 cd ~/workspace/SmartResearch-HQ
-bash scripts/bootstrap-local.sh   # .env / backend venv / frontend npm ci
-bash scripts/install-git-hooks.sh # auto: WBS roadmap, PR checkboxes
-```
-
-### Recommended extensions
-
-Cursor/VS Code will prompt for workspace extensions (`.vscode/extensions.json`).
-
-| Extension | Use |
-|-----------|-----|
-| **Ruff** | Python lint / format |
-| **Python** + **Pylance** | Types, venv |
-| **ESLint** | TS / React lint |
-| **Tailwind CSS IntelliSense** | Tailwind classes |
-| **Docker** | compose editing |
-| **GitHub Actions** | CI syntax |
-| **EditorConfig** | Indent / EOL |
-
-Format on save: `.vscode/settings.json` (Python → Ruff, TS → ESLint).
-
-### Quality checks (before push)
-
-```bash
-bash scripts/ci-check.sh   # mirrors GitHub CI (Ruff + pytest + ESLint + build)
-```
-
-Git workflow: [docs/git-workflow.md](docs/git-workflow.md) — branch → PR → CI → squash merge.
-
----
-
-## 開発環境
-
-### 前提
-
-| 項目 | バージョン / 備考 |
-|------|-------------------|
-| OS | **WSL Ubuntu**（Windows 上）。Git Bash + UNC パスは venv 破損の原因になるため使わない |
-| Python | **3.12**（`python3.12-venv` パッケージが必要な場合あり） |
-| Node.js | **20 LTS**（CI と同じ） |
-| エディタ | **Cursor** または VS Code。リポジトリを WSL 側 `~/workspace/SmartResearch-HQ` で開く |
-| Docker | 任意。`production` 検証（Postgres / Redis）時のみ |
-
-### 初回セットアップ
-
-```bash
-cd ~/workspace/SmartResearch-HQ
-bash scripts/bootstrap-local.sh   # .env / venv / npm ci
-bash scripts/install-git-hooks.sh # 自動: WBS ロードマップ・PR チェックボックス
-```
-
-### 推奨拡張機能
-
-`.vscode/extensions.json` 参照。保存時フォーマットは Ruff / ESLint。
-
-### push 前の品質チェック
-
-```bash
-bash scripts/ci-check.sh
-```
-
-ブランチ運用: [docs/git-workflow.md](docs/git-workflow.md)
-
-## Quick start (portfolio / Mock)
-
-Postgres and Redis are **not** required.
-
-```bash
 bash scripts/bootstrap-local.sh
 ```
 
-**Backend**
+**API**
 
 ```bash
 cd backend && source .venv/bin/activate
@@ -127,15 +56,15 @@ uvicorn app.main:app --reload --port 8000
 
 `GET http://localhost:8000/api/v1/health` → `{ "status": "ok", "mode": "portfolio", ... }`
 
-**Frontend**
+**UI**
 
 ```bash
 cd frontend && npm run dev
 ```
 
-Open http://localhost:3000 → enter a Shopee URL → review Amazon candidates.
+http://localhost:3000 を開き、Shopee URL を入力 → レビュー画面で Amazon 候補を確認できます。
 
-**Production check (optional)**
+本番モードの動作確認（任意）:
 
 ```bash
 cp .env.example .env
@@ -144,74 +73,66 @@ docker compose up -d postgres redis
 
 ---
 
-## クイックスタート（portfolio / Mock）
-
-**Postgres / Redis は不要**です。上記コマンドと同じ。
-
-- API: http://localhost:8000/api/v1/health
-- UI: http://localhost:3000 → Shopee URL 入力 → レビュー画面で候補選択
-
-## Repository layout
-
-```
-├── docs/           # Design docs (+ docs/local/ gitignored notes)
-├── frontend/       # Next.js dashboard & review UI
-├── backend/        # FastAPI (Mock services in portfolio mode)
-├── docker-compose.yml
-└── scripts/        # bootstrap, CI, git hooks, automation
-```
-
----
-
 ## リポジトリ構成
 
 ```
-├── docs/           # 設計ドキュメント
+├── docs/           # 設計・要件・アーキテクチャ
 ├── frontend/       # Next.js ダッシュボード & レビュー UI
-├── backend/        # FastAPI（portfolio 時は Mock）
+├── backend/        # FastAPI（portfolio 時は Mock サービス）
 ├── docker-compose.yml
-└── scripts/        # bootstrap, CI, 自動化スクリプト
+└── scripts/        # bootstrap、CI、自動化
 ```
-
-## Documentation
-
-- [Project plan](docs/プロジェクト計画書.md)
-- [Requirements](docs/requirements.md)
-- [Design (UI / MVP)](docs/design.md)
-- [Architecture](docs/architecture.md)
-- [Database schema](docs/database-schema.md)
-- [API specification](docs/api-specification.md)
-- [WBS roadmap](docs/wbs-roadmap.md) — task status auto-synced from artifacts
-- [Git workflow](docs/git-workflow.md)
 
 ---
 
 ## ドキュメント
 
-- [プロジェクト計画書](docs/プロジェクト計画書.md)
-- [要件定義](docs/requirements.md)
-- [設計（UI・MVP）](docs/design.md)
-- [アーキテクチャ](docs/architecture.md)
-- [DB スキーマ](docs/database-schema.md)
-- [API 仕様](docs/api-specification.md)
-- [WBS・ロードマップ](docs/wbs-roadmap.md) — 成果物から状態を自動更新
-- [Git ブランチ運用](docs/git-workflow.md)
-
-## Environment variables
-
-| Variable | Description |
-|----------|-------------|
-| `APP_MODE` | `portfolio` (Mock) / `production` |
-| `MATCHING_PROVIDER` | `amazon_search` (default) / `none` / `gemini` |
-| `AMAZON_PAAPI_*` | PA-API 5.0 (production) |
-| `GEMINI_API_KEY` | Only when using `gemini` (never commit) |
-| `NEXT_PUBLIC_API_URL` | Frontend → API (default `http://localhost:8000/api/v1`) |
-
-Copy from `.env.example` or run `bootstrap-local.sh`. `.env` is gitignored.
+| 資料 | 内容 |
+|------|------|
+| [プロジェクト計画書](docs/プロジェクト計画書.md) | 目的・戦略・マッチング方針 |
+| [要件定義](docs/requirements.md) | 機能要件・受入条件 |
+| [設計（UI・MVP）](docs/design.md) | 画面・UX の設計根拠 |
+| [アーキテクチャ](docs/architecture.md) | システム構成・状態遷移 |
+| [DB スキーマ](docs/database-schema.md) | データモデル |
+| [API 仕様](docs/api-specification.md) | REST I/O |
+| [WBS・ロードマップ](docs/wbs-roadmap.md) | フェーズ別タスクと進捗 |
+| [Git ブランチ運用](docs/git-workflow.md) | ブランチ・PR・CI |
 
 ---
 
-## 環境変数
+## ロードマップ
+
+WBS 表（[docs/wbs-roadmap.md](docs/wbs-roadmap.md)）と連動し、`pre-commit` で README のチェックが自動更新されます。
+
+- [x] **Phase 1** — 設計・モノレポ・ドキュメント整合
+- [x] **Phase 2** — Playwright / Amazon 検索 / Sheets / ワーカー
+- [x] **Phase 3** — 進捗ポーリング・Redis 本接続・手動 ASIN UI
+- [ ] **Phase 4** — 公開デモ・Vercel デプロイ
+
+---
+
+## 開発者向け
+
+### 前提環境
+
+| 項目 | 備考 |
+|------|------|
+| OS | **WSL Ubuntu**（Windows 上）。Git Bash + UNC パスは venv 破損の原因になるため非推奨 |
+| Python | **3.12** |
+| Node.js | **20 LTS**（CI と同じ） |
+| エディタ | Cursor または VS Code。WSL 側 `~/workspace/SmartResearch-HQ` で開く |
+| Docker | 本番検証（Postgres / Redis）時のみ |
+
+初回セットアップ:
+
+```bash
+bash scripts/bootstrap-local.sh
+bash scripts/install-git-hooks.sh
+```
+
+push 前の品質チェック: `bash scripts/ci-check.sh`（Ruff + pytest + ESLint + build）
+
+### 環境変数
 
 | 変数 | 説明 |
 |------|------|
@@ -219,54 +140,34 @@ Copy from `.env.example` or run `bootstrap-local.sh`. `.env` is gitignored.
 | `MATCHING_PROVIDER` | `amazon_search`（既定） / `none` / `gemini` |
 | `AMAZON_PAAPI_*` | PA-API 5.0（production 時） |
 | `GEMINI_API_KEY` | `gemini` 利用時のみ（コミット禁止） |
-| `NEXT_PUBLIC_API_URL` | フロント → API |
+| `NEXT_PUBLIC_API_URL` | フロント → API（既定 `http://localhost:8000/api/v1`） |
 
-## Roadmap
+`.env.example` をコピーするか、`bootstrap-local.sh` で生成。`.env` は git 管理外です。
 
-Phase checkboxes sync from [docs/wbs-roadmap.md](docs/wbs-roadmap.md) via `scripts/sync-wbs-roadmap.py` (runs on pre-commit).
-
-- [x] **Phase 1** — Design, monorepo, docs alignment
-- [x] **Phase 2** — Playwright, Amazon search, Sheets, workers
-- [x] **Phase 3** — Job polling, Redis health, manual ASIN UI
-- [ ] **Phase 4** — Public demo, Vercel deploy
-
----
-
-## ロードマップ
-
-`pre-commit` で WBS 表と連動してチェックが自動更新されます。
-
-- [x] **Phase 1** — 設計・モノレポ・docs 整合
-- [x] **Phase 2** — Playwright / Amazon 検索 / Sheets / ワーカー
-- [x] **Phase 3** — 進捗ポーリング・Redis 本接続・手動 ASIN UI
-- [ ] **Phase 4** — 公開デモ・Vercel デプロイ
-
-## Automation (no manual steps)
-
-| Trigger | What runs |
-|---------|-----------|
-| `git commit` (pre-commit) | WBS roadmap + README phase checkboxes |
-| `git push` (post-push) | Create PR if missing; sync PR CI checkboxes |
-| `bash scripts/ci-check.sh` | Roadmap sync + local CI mirror |
-| GitHub CI (on PR) | `sync-pr-checkboxes` job when backend/frontend pass |
-
----
-
-## 自動化（手動不要）
+### 自動化
 
 | タイミング | 内容 |
 |------------|------|
 | `git commit` | WBS ロードマップ + README フェーズチェック |
 | `git push` | PR 自動作成・CI チェックボックス同期 |
-| `ci-check.sh` | ロードマップ同期 + ローカル CI |
 | GitHub CI | PR 本文の CI チェックを自動 `[x]` |
-
-## License
-
-Private / portfolio use. Portfolio edition omits scraping internals and proprietary prompts.
 
 ---
 
-## ライセンス
+## ライセンス・公開範囲
 
-Private / Portfolio 用途に応じて運用。表版ではスクレイピング回避・プロンプト等のコア実装は非公開。
+本リポジトリは非公開運用を前提としています。  
+デモ環境（portfolio）では、スクレイピングの詳細実装やプロプライエタリなプロンプト等を含めない構成とし、本番環境（production）向けの実装は別管理としています。
+
+---
+
+## English summary
+
+**SmartResearch-HQ** automates cross-border e-commerce product research and Shopee→Amazon matching with scraping (production), candidate matching, and human review.
+
+| Mode | Use case | In this repository |
+|------|----------|-------------------|
+| **Portfolio** | Demos, evaluation, stakeholder walkthroughs | Mock API, frontend, design docs |
+| **Production** | Live operations | Playwright, matching, Google Sheets (private implementation) |
+
+Quick demo: `bash scripts/bootstrap-local.sh`, then run backend (`uvicorn`) and frontend (`npm run dev`). No database required for portfolio mode.
