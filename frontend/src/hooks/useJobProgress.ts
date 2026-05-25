@@ -41,8 +41,7 @@ export function useJobProgress(jobId: string) {
       }
     }
 
-    setLoading(true);
-    poll();
+    void poll();
 
     return () => {
       cancelled = true;

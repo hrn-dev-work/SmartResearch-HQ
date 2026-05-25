@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.services.spreadsheet.exporter import (
     SHEET_HEADER,
@@ -9,7 +9,7 @@ from app.services.spreadsheet.exporter import (
 
 
 def test_build_export_row():
-    exported_at = datetime(2026, 5, 25, 12, 0, tzinfo=timezone.utc)
+    exported_at = datetime(2026, 5, 25, 12, 0, tzinfo=UTC)
     row = build_export_row(
         shopee_title="Sample Item",
         shopee_item_id="12345",

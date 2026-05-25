@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from app.core.status import JobStatus
@@ -16,7 +16,7 @@ _decisions: dict[UUID, UUID | None] = {}
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def seed_demo_job(shopee_url: str, display_name: str | None) -> UUID:

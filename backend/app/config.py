@@ -1,15 +1,15 @@
-from enum import Enum
+from enum import StrEnum
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class AppMode(str, Enum):
+class AppMode(StrEnum):
     PORTFOLIO = "portfolio"
     PRODUCTION = "production"
 
 
-class MatchingProvider(str, Enum):
+class MatchingProvider(StrEnum):
     AMAZON_SEARCH = "amazon_search"
     NONE = "none"
     GEMINI = "gemini"
