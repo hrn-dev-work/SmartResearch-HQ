@@ -2,12 +2,11 @@
 # After code edits + agent completion: warn on uncommitted changes, then retrospective (stop).
 set -euo pipefail
 
-read -r _input || true
+input=$(cat)
 
-python3 <<'PY'
+printf '%s' "$input" | python3 <<'PY'
 import json
 import subprocess
-import sys
 from pathlib import Path
 
 try:
