@@ -1,36 +1,41 @@
-## Summary
+**Summary**
 
-- (Describe what changed in English)
+* What changed
 
-## 概要
+**Commits**
 
-- （変更内容を日本語で記述）
+* `type(scope)`: short description
 
-## Test plan
+**Test plan**
 
-- [ ] `bash scripts/ci-check.sh` passes
-- [ ] CI `backend` / `frontend` green
-- [ ] (Add manual checks if needed)
+* [ ] `bash scripts/ci-check.sh` passes
+* [ ] CI backend / frontend green
+* [ ] (Add manual checks if needed)
 
-## テスト手順
+**Related**
 
-- [ ] `bash scripts/ci-check.sh` が通る
-- [ ] CI `backend` / `frontend` が green
-- [ ] （手動確認があれば記述）
+* **Branch:** `feat/...`
+* **WBS:** x.y
+* **Issue:** Closes #
 
-## Related
+---
 
-<!-- Keep English keywords for GitHub. Remove unused lines. -->
-- Issue: Closes #
-- Issue: Refs #
-- PR: Depends on #
-- PR: Related #
-- Branch: `feat/...`
-- WBS: x.y — task name
+**概要 (Summary)**
 
-## 関連
+* 変更内容
 
-- イシュー: Closes #（上記 Related と同じ番号）
-- PR: Depends on #（上記 Related と同じ番号）
-- ブランチ: `feat/...`
-- WBS: x.y — タスク名
+**コミット (Commits)**
+
+* `type(scope)`: 短い説明
+
+**テスト計画 (Test plan)**
+
+* [ ] `bash scripts/ci-check.sh` が通る
+* [ ] CI backend / frontend green
+* [ ] （手動確認があれば記述）
+
+**関連 (Related)**
+
+* **ブランチ:** `feat/...`
+* **WBS:** x.y
+* **イシュー:** Closes #

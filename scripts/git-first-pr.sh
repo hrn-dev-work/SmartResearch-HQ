@@ -20,9 +20,13 @@ if git diff --cached --quiet; then
   echo "Nothing to commit."
 else
   git commit -m "$(cat <<'EOF'
-chore: Git ブランチ運用・GitHub テンプレ・エージェント設定を追加
+chore: add git workflow, GitHub templates, and agent settings
 
-main 直コミットをやめ、作業ブランチ→PR→squash マージのフローに統一する。
+Stop direct commits to main; unify on branch → PR → squash merge.
+
+---
+
+main 直コミットをやめ、作業ブランチ→PR→squash マージに統一する。
 Issue/PR テンプレ、ラベル定義、commit-pr-style スキル、git-workflow 規約を含む。
 EOF
 )"
@@ -35,7 +39,7 @@ python3 scripts/sync-github-labels.py || true
 if gh pr view --head "$BRANCH" >/dev/null 2>&1; then
   gh pr view --head "$BRANCH" --json url -q .url
 else
-  gh pr create --base "$BASE" --title "chore: Git ブランチ運用・GitHub テンプレ・エージェント設定を追加" --body "$(cat <<'EOF'
+  gh pr create --base "$BASE" --title "chore: add git workflow, GitHub templates, and agent settings" --body "$(cat <<'EOF'
 ## Summary
 
 - Add git-workflow docs, commit-pr-style skill, CI, and GitHub templates _(Git 運用規約・テンプレ・スキル追加)_

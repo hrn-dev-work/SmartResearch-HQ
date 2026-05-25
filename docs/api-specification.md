@@ -49,6 +49,9 @@ Content-Type: `application/json`
 |-----------|-----|
 | `mode` | `portfolio` \| `production` |
 | `matching_provider` | `amazon_search` \| `none` \| `gemini` |
+| `redis` | production 時のみ: `ok` \| `unavailable`。portfolio では省略 |
+
+production 検証: `docker compose up -d redis` 後、`mode=production` で `redis: ok` になること。
 
 ---
 
@@ -220,4 +223,5 @@ portfolio 時は即 `AWAITING_REVIEW` / `progress_pct: 100` を返す場合あ�
 - `POST /research` は即座にフィクスチャデータで `AWAITING_REVIEW` まで進行。
 - 固定の Shopee 画像 URL と Amazon 候補 3 件を返す。
 - `export` は `exported_count` を返すが外部 API は呼ばない。
+- `POST /review/{item_id}/decide` で `manual_asin` を受け付ける（Mock 内で確定保存）。
 - Postgres / Redis / 外部マッチング API は使用しない。

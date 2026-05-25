@@ -50,65 +50,113 @@ PR にはラベル必須ではない（Issue の `Closes #N` で足りる）。
 
 ## コミット
 
-```
-<type>(<scope>): <変更の要点>[ (WBS x.y)]
+**subject**: 英語のみ（Conventional Commits）。PR タイトルと揃える。
 
-<why を 1〜3 文。複数論点なら箇条書き可>
+**body**: 英語 → `---` → 日本語（両方とも **why を簡潔に**）。Issue 参照は末尾。
+
+```
+<type>(<scope>): <English summary>[ (WBS x.y)]
+
+<English why — 1–2 sentences or bullets>
+
+---
+
+<日本語の why — 1〜2 文>
 
 Refs #<issue>          # 関連イシュー（クローズしない）
 Fixes #<issue>         # マージでイシューをクローズ（fix 系）
 ```
 
-**subject ルール**: 1 行・50 文字目安・末尾句点なし・命令形（「追加する」より「追加」）
+**subject ルール**: 1 行・50 文字目安・末尾句点なし・命令形（add / fix / update）
+
+雛形: `bash scripts/render-commit-msg.sh feat spreadsheet "add export skeleton (WBS 2.3)"`
+
+**例**（`7b871a5` 相当）:
+
+```
+chore(git): compact bilingual PR template
+
+Unify PR body to EN --- JA sections; add pr-ci-checkbox sync.
+
+---
+
+PR 本文を英語---日本語形式に統一。CI green 時はチェックボックスを自動 [x] に。
+```
+
+**例**（マイルストーン squash、`7945182` 相当）:
+
+```
+feat: Phase 2 Sheets export and job polling (WBS 2.3, 3.4)
+
+Production Sheets export, review-screen job polling, CI scaffolding.
+
+---
+
+本番 Sheets エクスポート、レビュー画面の進捗ポーリング、CI 骨組み。
+```
 
 ---
 
 ## Pull Request
 
-**タイトル**: コミット subject と同一（複数コミット PR はマージ後の要約 1 行）
+**タイトル**: **英語のみ**（Conventional Commits）。コミット subject が日本語でも **コピーしない**。
 
-**本文**: 各セクションは **英語を先**、その直下に **日本語**（`## 概要` / `## テスト手順` / `## 関連`）。Related のキーワード（`Closes` / `WBS:` 等）は英語のまま。
+| 状況 | タイトル |
+|------|----------|
+| 1 コミット、subject が英語 | subject と同一 |
+| 1 コミット、subject が日本語 | 内容を **英語 1 行** に要約 |
+| 複数コミット | 最新コミット名を使わず **英語 1 行要約** |
+| `phase2` / `phase3` 等 | `Phase N: <English summary>` |
+
+雛形: `bash scripts/render-pr-title.sh [base] [branch]`
+
+**本文**: 英語ブロック（**Summary** / **Commits** / **Test plan** / **Related**）→ `---` → 日本語ブロック（**概要 (Summary)** / **コミット (Commits)** / **テスト計画 (Test plan)** / **関連 (Related)**）。箇条書きは `*`。Related のラベルは **Branch:** 等を太字。
+
+Test plan は `* [ ]` チェックボックス。CI green 時は `scripts/sync-pr-checkboxes.sh` が自動 `[x]`。
 
 手動 PR の雛形: `bash scripts/render-pr-body.sh manual feat/your-branch`
 
 ```markdown
-## Summary
+**Summary**
 
-- <What changed (English)>
+* What changed
 
-## 概要
+**Commits**
 
-- <何が変わったか（日本語）>
+* `type(scope)`: short description
 
-## Test plan
+**Test plan**
 
-- [ ] `bash scripts/ci-check.sh` passes
-- [ ] CI `backend` / `frontend` green
-- [ ] <manual checks if any>
+* [ ] `bash scripts/ci-check.sh` passes
+* [ ] CI backend / frontend green
 
-## テスト手順
+**Related**
 
-- [ ] `bash scripts/ci-check.sh` が通る
-- [ ] CI `backend` / `frontend` green
-- [ ] <画面・API の手動確認>
+* **Branch:** `feat/...`
+* **WBS:** x.y
 
-## Related
+---
 
-<!-- Keep English keywords for GitHub. 該当行だけ残す。なければセクションごと削除 -->
-- Issue: Closes #<n>        # マージでクローズ
-- Issue: Refs #<n>          # 参照のみ
-- PR: Depends on #<n>       # 先にマージが必要
-- PR: Related #<n>          # 関連 PR（分割 PR など）
-- Branch: `<type>/<name>`    # 作業ブランチ
-- WBS: <x.y> — <task name>
+**概要 (Summary)**
 
-## 関連
+* 変更内容
 
-- イシュー: Closes #<n>（上記 Related と同じ番号）
-- PR: Depends on #<n>（上記 Related と同じ番号）
-- ブランチ: `<type>/<name>`
-- WBS: <x.y> — <タスク名>
+**コミット (Commits)**
+
+* `type(scope)`: 短い説明
+
+**テスト計画 (Test plan)**
+
+* [ ] `bash scripts/ci-check.sh` が通る
+* [ ] CI backend / frontend green
+
+**関連 (Related)**
+
+* **ブランチ:** `feat/...`
+* **WBS:** x.y
 ```
+
+**マイルストーン PR**（phase3 等）: Summary 先頭に Merge order 1 行。Commits セクションにコミット一覧（Summary 内に混ぜない）。
 
 ### Related の選び方
 

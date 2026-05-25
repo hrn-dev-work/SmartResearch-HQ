@@ -25,16 +25,17 @@ if ! gh auth status >/dev/null 2>&1; then
 fi
 
 if gh pr view --head "$BRANCH" --json number --jq .number >/dev/null 2>&1; then
+  PR_NUM="$(gh pr view --head "$BRANCH" --json number -q .number)"
+  bash "$ROOT/scripts/sync-pr-checkboxes.sh" "$PR_NUM" || true
   gh pr view --head "$BRANCH" --web 2>/dev/null || gh pr view --head "$BRANCH"
   exit 0
 fi
 
-TITLE="$(git log "origin/${BASE}..HEAD" --format=%s -1 2>/dev/null || git log "${BASE}..HEAD" --format=%s -1 2>/dev/null || true)"
-if [[ -z "$TITLE" ]]; then
-  TITLE="chore: merge ${BRANCH} into ${BASE}"
-fi
+TITLE="$(bash "$ROOT/scripts/render-pr-title.sh" "$BASE" "$BRANCH")"
 
 BODY="$(bash "$ROOT/scripts/render-pr-body.sh" auto "$BRANCH" "$BASE")"
 
 gh pr create --base "$BASE" --head "$BRANCH" --title "$TITLE" --body "$BODY"
+PR_NUM="$(gh pr view --head "$BRANCH" --json number -q .number)"
+bash "$ROOT/scripts/sync-pr-checkboxes.sh" "$PR_NUM" || true
 echo "PR created for ${BRANCH} -> ${BASE}"

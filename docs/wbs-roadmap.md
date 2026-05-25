@@ -2,6 +2,8 @@
 
 想定総工数: **30〜40 時間**（AI 駆動開発前提）
 
+> **状態列は自動更新**: 成果物パスがリポジトリに存在すると `scripts/sync-wbs-roadmap.py` が ✅ に更新（`pre-commit` / `ci-check.sh` で実行）。README の Phase チェックボックスも連動。
+
 ## Phase 1: 要件定義・設計 ✅
 
 | ID | タスク | 成果物 | 状態 |
@@ -60,14 +62,14 @@ arq app.workers.settings.WorkerSettings
 | 3.2 | レビュー UI | `frontend/src/app/review/[jobId]/` | ✅ 先行完了 |
 | 3.3 | API クライアント + 型 | `frontend/src/lib/api.ts` | ✅ 先行完了 |
 | 3.4 | ジョブ進捗ポーリング/SSE | hooks + API | ✅ MVP ポーリング |
-| 3.5 | FastAPI ↔ Redis 本接続 | docker-compose 起動検証 | 未着手 |
-| 3.6 | 手動 ASIN 入力 UI | レビュー画面 §design 3.3 | 未着手（Phase 2 API 後） |
+| 3.5 | FastAPI ↔ Redis 本接続 | docker-compose 起動検証 | ✅ 初版 |
+| 3.6 | 手動 ASIN 入力 UI | レビュー画面 §design 3.3 | ✅ 初版 |
 
 ## Phase 4: ポートフォリオ化（表版）
 
 | ID | タスク | 成果物 | 工数目安 |
 |----|--------|--------|----------|
-| 4.1 | Mock API 完成度向上 | `MockResearchService` | 2h |
+| 4.1 | Mock API 完成度向上 | `MockResearchService` | ✅ |
 | 4.2 | README・スクリーンショット | ルート README | 1h |
 | 4.3 | デモ動画（Loom 等） | 外部 | 2h |
 | 4.4 | Vercel デプロイ + CORS / レート制限 | 公開 URL | 2h |

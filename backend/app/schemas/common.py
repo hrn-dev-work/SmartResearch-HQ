@@ -15,3 +15,4 @@ class HealthResponse(BaseModel):
     status: str
     mode: str
     matching_provider: str | None = None
+    redis: str | None = None

@@ -51,3 +51,7 @@ echo "  1) cd $ROOT/backend && source .venv/bin/activate && uvicorn app.main:app
 echo "  2) cd $ROOT/frontend && npm run dev"
 echo ""
 echo "Or run: bash scripts/start-dev.sh"
+echo ""
+echo "Optional — auto PR after git push:"
+echo "  bash scripts/install-git-hooks.sh"
+echo "  # or: bash scripts/git-push-pr.sh  (instead of git push)"
