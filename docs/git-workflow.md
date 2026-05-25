@@ -2,7 +2,7 @@
 
 SmartResearch-HQ の **ブランチ・コミット・PR・マージ** の規約。個人開発向け **GitHub Flow（簡易版）**。
 
-文言テンプレ: ローカルに `.cursor/skills/commit-pr-style/` がある場合は参照（公開 clone には含まれない）。
+文言テンプレ: ローカル `.cursor/skills/commit-pr-style/` を参照（**`.cursor/` 全体が gitignore**。公開 clone には含まれない。使い方: `docs/local/cursor-usage.md`）。
 
 ---
 
@@ -233,6 +233,26 @@ gh pr create --base main --title "$(bash scripts/render-pr-title.sh)" --body "$(
 ```
 
 `gh pr create --fill` は使わない（コミット subject から英語のみの本文になりやすい）。
+
+### 3.2 PR 本文の CI チェック自動同期
+
+CI の `backend` / `frontend` が green になると、ワークフロー `sync-pr-checkboxes` が PR 本文の Test plan 行（`ci-check.sh` / `backend / frontend`）を `[x]` に更新する。
+
+**`GitHub Actions is not permitted to create or approve pull requests` が出る場合**
+
+組織またはリポジトリで、既定の `GITHUB_TOKEN` による PR 編集が禁止されている。次のいずれかで解消する。
+
+| 方法 | 手順 |
+|------|------|
+| **A. リポジトリ設定** | Settings → Actions → General → Workflow permissions を **Read and write** に。組織で制限している場合は、Org の「Allow GitHub Actions to create and approve pull requests」を有効化 |
+| **B. PAT シークレット（推奨・組織ロック時）** | fine-grained PAT を作成（対象リポジトリ、**Pull requests: Read and write**、Contents: Read）→ Settings → Secrets and variables → Actions → **`GH_PR_SYNC_TOKEN`** に登録。CI は `secrets.GH_PR_SYNC_TOKEN \|\| github.token` を使用 |
+
+ローカルでは `gh auth login` 済みなら push 後の `post-push` または手動で同期できる:
+
+```bash
+bash scripts/sync-pr-checkboxes.sh    # 現在ブランチの PR
+bash scripts/sync-pr-checkboxes.sh 5  # PR 番号指定
+```
 
 ---
 
