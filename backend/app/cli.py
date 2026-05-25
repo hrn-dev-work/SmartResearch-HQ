@@ -4,12 +4,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import sys
-from uuid import UUID
 
 from app.config import AppMode, get_settings
 from app.db.session import SessionLocal
-from app.services.production.pipeline import create_job_record, run_job_pipeline
+from app.services.production.pipeline import create_job_record
 from app.services.production.research_service import ProductionResearchService
 from app.services.scraper.shopee_crawler import fetch_sold_items
 
@@ -45,7 +43,10 @@ async def cmd_run(args: argparse.Namespace) -> int:
         if refreshed is None:
             print("Job missing after pipeline")
             return 1
-        print(f"Status: {refreshed.status.value}  items={refreshed.item_count}  progress={refreshed.progress_pct}%")
+        print(
+            f"Status: {refreshed.status.value}  items={refreshed.item_count}  "
+            f"progress={refreshed.progress_pct}%"
+        )
         if refreshed.error:
             print(f"Error: {refreshed.error.code} — {refreshed.error.message}")
             return 1
@@ -58,8 +59,8 @@ async def cmd_run(args: argparse.Namespace) -> int:
 
 
 async def cmd_migrate(_args: argparse.Namespace) -> int:
-    from alembic.config import Config
     from alembic import command
+    from alembic.config import Config
 
     alembic_cfg = Config("alembic.ini")
     command.upgrade(alembic_cfg, "head")
