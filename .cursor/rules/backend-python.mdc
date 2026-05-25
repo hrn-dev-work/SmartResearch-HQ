@@ -1,0 +1,41 @@
+---
+description: バックエンド変更時の Mock・マッチング・二刀流の既定。
+globs: backend/**/*
+alwaysApply: false
+---
+
+# Backend（SmartResearch-HQ）
+
+実装の共通原則: `.cursor/rules/implementation-core.mdc` / テスト: `testing-istqb.mdc`
+
+## DDD レイヤ（本リポジトリ）
+
+| 層 | パス | 責務 |
+|----|------|------|
+| API | `app/api/` | HTTP 入出力、deps 経由で service 呼び出し |
+| Application | `app/services/` | ユースケース・ドメインロジック |
+| Infrastructure | `app/db/`, `workers/`, scraper, spreadsheet | 永続化・キュー・外部 I/O |
+| Shared | `app/core/`, `app/schemas/` | ステータス・例外・DTO |
+
+`services/` が `db.models` の内部を直接いじるより、repository 的関数に寄せる（DIP）。
+
+## モード
+
+- `APP_MODE=portfolio` → `MockResearchService` / インメモリ。DB・Redis 不要
+- `APP_MODE=production` → ユーザーが裏版・E2E と明示したときのみ
+
+## マッチング
+
+- 既定: `MATCHING_PROVIDER=amazon_search`（`AmazonSearchMatcher`）
+- `none` → 手動 ASIN。`gemini` → 明示依頼時のみ。キーをリポジトリにコミットしない
+
+## 実装の置き場
+
+- スクレイパ: `backend/app/services/scraper/`
+- マッチング: `backend/app/services/matching/`（`get_candidate_matcher()`）
+- Mock: `backend/app/services/mock/` — 表版の挙動を変えるときは API 契約 `docs/api-specification.md` と整合
+
+## 変更方針
+
+- ワーカー・Gemini・Sheets は Phase 2 タスク単位。依頼のファイル以外を広げない
+- ステータス名 `AI_INFERENCE` は「候補マッチング中」（Gemini 専用ではない）
