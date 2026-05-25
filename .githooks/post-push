@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# After git push: ensure PR exists and run post-workflow automation.
+# After git push: sync PR checkboxes if a PR already exists (does not create PR).
+# PR creation: bash scripts/git-ship.sh pr
 # Install: bash scripts/install-git-hooks.sh
 
 set -euo pipefail
@@ -12,5 +13,4 @@ if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
   exit 0
 fi
 
-bash "$ROOT/scripts/ensure-pr.sh" main
 bash "$ROOT/scripts/post-workflow.sh" || true

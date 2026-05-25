@@ -201,7 +201,14 @@ git checkout main
 git pull --ff-only origin main
 ```
 
-### 3.1 push 後の PR 自動作成
+### 3.1 push と PR 作成
+
+**エージェント / 手動**
+
+| 依頼 | コマンド |
+|------|----------|
+| プッシュまで | `bash scripts/git-ship.sh push` |
+| PR 作成まで | `bash scripts/git-ship.sh pr` |
 
 **初回セットアップ（ローカル hook、推奨）**
 
@@ -209,23 +216,15 @@ git pull --ff-only origin main
 bash scripts/install-git-hooks.sh   # core.hooksPath=.githooks
 ```
 
-以降、`git push` の直後に **open PR がなければ** `gh pr create` 相当を実行（`main` / `master` は除外）。
+- `pre-commit` → WBS ロードマップ + README チェック同期
+- `post-push` → **既存 PR** のチェックボックス同期のみ（PR は自動作成しない）
+- PR 新規作成は **`git-ship.sh pr`** または `ensure-pr.sh`
 
-**代替: push + PR を一発**
+**代替（旧名）**
 
 ```bash
-bash scripts/git-push-pr.sh
+bash scripts/git-push-pr.sh    # = git-ship.sh pr
 ```
-
-**GitHub Actions（リモートでも自動）**
-
-[`.github/workflows/auto-pr.yml`](../.github/workflows/auto-pr.yml) — `main` 以外へ push されたとき、open PR がなければ `main` 向け PR を作成。
-
-| 方法 | いつ動く | 要件 |
-|------|----------|------|
-| `post-push` hook | ローカル `git push` 後 | `gh auth login` |
-| `git-push-pr.sh` | スクリプト実行時 | 同上 |
-| Auto PR workflow | `origin` へ push 後 | リポジトリ Actions 有効 |
 
 手動 PR の例（自動を使わない場合）:
 
