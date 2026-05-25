@@ -245,7 +245,7 @@ CI の `backend` / `frontend` が green になると、ワークフロー `sync-
 | 方法 | 手順 |
 |------|------|
 | **A. リポジトリ設定** | Settings → Actions → General → Workflow permissions を **Read and write** に。組織で制限している場合は、Org の「Allow GitHub Actions to create and approve pull requests」を有効化 |
-| **B. PAT シークレット（推奨・組織ロック時）** | fine-grained PAT を作成（対象リポジトリ、**Pull requests: Read and write**、Contents: Read）→ Settings → Secrets and variables → Actions → **`GH_PR_SYNC_TOKEN`** に登録。CI は `secrets.GH_PR_SYNC_TOKEN \|\| github.token` を使用 |
+| **B. PAT シークレット（推奨・組織ロック時）** | fine-grained PAT を作成（対象リポジトリ、**Pull requests: Read and write**、Contents: Read）→ Settings → Secrets and variables → Actions → **`GH_PR_SYNC_TOKEN`** に登録。`sync-pr-checkboxes` と **Auto PR**（`auto-pr.yml`）の両方が `secrets.GH_PR_SYNC_TOKEN \|\| github.token` を使用 |
 
 ローカルでは `gh auth login` 済みなら push 後の `post-push` または手動で同期できる:
 
@@ -285,8 +285,6 @@ git status -sb
 ## 4. マイルストーン branch（Phase 1 / 2 / 3）
 
 ### phase1 は main と別物
-
-> **Note:** Remote branch `phase1` is a legacy milestone snapshot with unrelated history; do not open PRs from it. Use main + feat/* branches.
 
 | ブランチ | 指すコミット | 役割 |
 |----------|--------------|------|
