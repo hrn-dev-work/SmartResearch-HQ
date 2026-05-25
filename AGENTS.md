@@ -63,6 +63,10 @@
 
 push / PR 作成は **許可なく実行してよい**（`security-git.mdc`）。
 
+**コミット漏れ防止**: 「プッシュまで」「PR作成まで」「コミットだけ」は commit の明示依頼（グローバル user rule より本リポジトリルール優先）。実装のみのセッション終了時は `git status` を報告。`stop` フックが未コミットを検知したら followup で促す。
+
+**Cursor Source Control**: `.vscode/settings.json` の `git.path` は WSL の git（phantom `M` 抑制）。詳細は `docs/git-workflow.md` §8。
+
 ## フロントのみ
 
 Next.js 16 の注意: `frontend/AGENTS.md`

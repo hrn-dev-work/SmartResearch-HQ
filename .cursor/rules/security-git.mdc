@@ -11,23 +11,36 @@ alwaysApply: true
 - クライアント（ブラウザ）にサーバー専用キーを渡さない
 - ログに PII・領収書・個人情報を出さない
 
+## Git — コミットの明示（グローバル user rule との整合）
+
+本リポジトリでは、次を **コミットの明示依頼** とみなす（グローバル「明示時のみ commit」より **本ルールを優先**）:
+
+| ユーザー依頼 | エージェント |
+|--------------|--------------|
+| **プッシュまで** / push して | 未コミットがあれば **commit → push** まで（`commit-pr-style` A→E） |
+| **PR作成まで** / PR まで / PR 作って | **commit → push → PR** まで（A→F） |
+| **コミットだけ** / commit して | **commit** のみ（A→D） |
+| 上記以外の実装のみ | **勝手に commit しない**。終了報告で `git status` を必ず提示 |
+
 ## Git — 実行 OK（危険操作以外）
 
-エージェントは **以下をユーザー都度の明示なしで実行してよい**:
+エージェントは **以下をユーザー都度の明示なしで実行してよい**（上表の明示依頼時は commit / push / PR も含む）:
 
 - 作業ブランチの作成・切替（`git-start-branch.sh` 含む）
 - 作業ブランチ上での `git add` / `git commit`
 - 作業ブランチの `git push` / `git push -u origin HEAD`
 - `gh pr create` / `gh issue create` / ラベル同期
 - **`gh pr merge --squash`** — **CI の required checks がすべて green のときのみ**
-- `git checkout phase1` + `git pull --ff-only`（マージ後の片付け）
+- `git checkout main` + `git pull --ff-only`（マージ後の片付け）
 
 手順・文言: [docs/git-workflow.md](../../docs/git-workflow.md) + `commit-pr-style` スキル
+
+**Git コマンドは WSL Ubuntu 内で実行**（UNC / PowerShell の `git` 禁止）。Source Control の phantom `M` 対策は `docs/git-workflow.md` §8。
 
 ## Git — 禁止（明示があっても原則拒否）
 
 - `git config` の変更
-- **既定ブランチ**（現在 `phase1` / 将来 `main`）への **直接 commit / push**
+- **既定ブランチ `main`** への **直接 commit / push**（`phase1` は legacy スナップショット。新規作業・push 禁止）
 - **force push**（特に `phase1` / `main` / `master`）
 - `git reset --hard` / 履歴改変
 - `--no-verify` / hook スキップ

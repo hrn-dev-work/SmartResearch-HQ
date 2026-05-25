@@ -19,6 +19,13 @@ disable-model-invocation: false
 
 **Git 実行**: 危険操作以外は **ユーザー都度の許可なしで実行してよい**（`.cursor/rules/security-git.mdc`）。「プッシュまで」「PR作成まで」と言われたら **確認せず最後までやる**。
 
+### グローバル user rule との優先
+
+Cursor のグローバル「明示時のみ commit」と衝突する場合、**本リポジトリでは本スキル + `security-git.mdc` を優先**する。
+
+- **プッシュまで** / **PR作成まで** / **コミットだけ** → 明示的な commit 依頼。未コミットがあれば **質問せず commit** する
+- 実装のみの依頼 → commit しないが、終了時に **WSL の `git status`** で未コミットを報告する
+
 ---
 
 ## 依頼の解釈（必読）

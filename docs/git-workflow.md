@@ -393,7 +393,9 @@ CI が red のときは **マージしない**。修正 → push → CI 再実�
 
 - 既定ブランチ（`main`）でコミット依頼 → **先に作業ブランチを切る**
 - 既定ブランチへの直接 push はしない
+- `phase1` は legacy スナップショット。**新規作業・push は `main` 系ブランチのみ**
 - force push は禁止
+- **コミット明示**: 「プッシュまで」「PR作成まで」「コミットだけ」→ commit 可（`.cursor/rules/security-git.mdc`）。実装のみ → 終了時に `git status` 報告
 
 ---
 
@@ -410,3 +412,23 @@ main にいる変更を feature ブランチに移して PR 作成して。
 ```
 PR #12 を squash マージして、main を最新化して。
 ```
+
+---
+
+## 8. Cursor on Windows + WSL（phantom diff / コミット漏れ見え）
+
+ワークスペースが `\\wsl.localhost\...` のとき、**Source Control は WSL の git を使う**。
+
+| 設定 | 値 |
+|------|-----|
+| `.vscode/settings.json` | `"git.path": "\\\\wsl.localhost\\Ubuntu\\usr\\bin\\git"` |
+| ローカル hook（推奨） | `bash scripts/install-git-hooks.sh`（`core.filemode false`） |
+| エージェントの git | **WSL bash 内のみ**（PowerShell / UNC の `git` 禁止） |
+
+| 症状 | 確認 | 対処 |
+|------|------|------|
+| Cursor だけ大量 `M`、WSL で `git diff` が空 | `git diff --stat <file>` | `git.path` を WSL に。`install-git-hooks.sh` |
+| 全行 `-`/`+`（中身同じ） | CRLF | `sed -i 's/\r$//' <file>` → `git add --renormalize`。`.gitattributes` の `eol=lf` |
+| 実装したのに commit されていない | WSL `git status -sb` | 「プッシュまで」で `git-ship.sh push`。`stop` フックが未コミットを followup |
+
+Shell 出力が空になるときは WSL で結果をファイルに書き、Read する（`wsl-agent-invoke` スキル参照）。

@@ -36,6 +36,8 @@ alwaysApply: true
 - テスト: `.cursor/rules/testing-istqb.mdc`（ISTQB 準拠。触った範囲から追加。「テスト不要」明示時のみスキップ）
 - Git・秘密情報: `.cursor/rules/security-git.mdc`（**危険操作以外は git/PR 実行可**。マージは CI green 後）
 - ブランチ→PR→CI→マージ: [docs/git-workflow.md](../../docs/git-workflow.md) + `commit-pr-style` スキル
+- **コミット明示**: 「プッシュまで」「PR作成まで」「コミットだけ」= commit 依頼（`security-git.mdc`）。それ以外の実装依頼では勝手に commit しない
+- **終了報告**: コードを変更したら WSL で `git status -sb` を実行し、未コミットがあれば件数と主要パスを報告（phantom `M` は `git diff` で実変更か確認）
 - コード実装完了後: `.cursor/rules/implementation-retrospective.mdc`（`stop` フック起票時も同手順）
 
 ## UI / 要件が絡むとき
