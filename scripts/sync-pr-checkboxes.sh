@@ -47,5 +47,9 @@ if [[ "$BODY" == "$NEW_BODY" ]]; then
   exit 0
 fi
 
-gh pr edit "$PR_NUM" --body "$NEW_BODY"
+REPO="${GITHUB_REPOSITORY:-hrn-dev-work/SmartResearch-HQ}"
+TMP="$(mktemp)"
+python3 -c "import json, sys; print(json.dumps({\"body\": sys.argv[1]}))" "$NEW_BODY" >"$TMP"
+gh api "repos/${REPO}/pulls/${PR_NUM}" -X PATCH --input "$TMP"
+rm -f "$TMP"
 echo "PR #${PR_NUM}: synced CI checkboxes (mark='${MARK}')"
