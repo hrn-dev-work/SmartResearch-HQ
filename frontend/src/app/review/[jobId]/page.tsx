@@ -7,13 +7,13 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Header } from "@/components/Header";
 import { StatusBadge } from "@/components/StatusBadge";
+import { isJobInProgress, useJobProgress } from "@/hooks/useJobProgress";
 import {
   decideReview,
   exportJob,
-  getResearchJob,
   getReviewItems,
 } from "@/lib/api";
-import type { ResearchJob, ReviewItem } from "@/lib/types";
+import type { ReviewItem } from "@/lib/types";
 
 export default function ReviewPage() {
   const params = useParams();
@@ -23,72 +23,70 @@ export default function ReviewPage() {
 }
 
 function ReviewPageBody({ jobId }: { jobId: string }) {
-  const [job, setJob] = useState<ResearchJob | null>(null);
   const [items, setItems] = useState<ReviewItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [itemsLoading, setItemsLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const {
+    job,
+    loading: jobLoading,
+    error: jobError,
+    isPolling,
+  } = useJobProgress(jobId);
+
+  const displayError = error ?? jobError;
+
   useEffect(() => {
+    if (!job || isJobInProgress(job.status)) return;
+
     let cancelled = false;
 
     void (async () => {
       try {
-        const [jobData, itemsData] = await Promise.all([
-          getResearchJob(jobId),
-          getReviewItems(jobId),
-        ]);
-        if (cancelled) {
-          return;
-        }
-        setJob(jobData);
+        const itemsData = await getReviewItems(jobId);
+        if (cancelled) return;
         setItems(itemsData.items);
       } catch (err) {
         if (!cancelled) {
           setError(
-            err instanceof Error ? err.message : "読み込みに失敗しました",
+            err instanceof Error ? err.message : "商品一覧の読み込みに失敗しました",
           );
         }
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setItemsLoading(false);
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [jobId]);
+  }, [job, jobId]);
 
-  const reload = useCallback(async () => {
-    setLoading(true);
+  const loadItems = useCallback(async () => {
+    setItemsLoading(true);
     setError(null);
     try {
-      const [jobData, itemsData] = await Promise.all([
-        getResearchJob(jobId),
-        getReviewItems(jobId),
-      ]);
-      setJob(jobData);
+      const itemsData = await getReviewItems(jobId);
       setItems(itemsData.items);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "読み込みに失敗しました");
+      setError(err instanceof Error ? err.message : "商品一覧の読み込みに失敗しました");
     } finally {
-      setLoading(false);
+      setItemsLoading(false);
     }
   }, [jobId]);
 
   async function handleSelect(item: ReviewItem, candidateId: string) {
     await decideReview(item.item_id, candidateId);
     setMessage(`確定: ${item.title}`);
-    await reload();
+    await loadItems();
   }
 
   async function handleReject(item: ReviewItem) {
     await decideReview(item.item_id, null, true);
     setMessage(`却下: ${item.title}`);
-    await reload();
+    await loadItems();
   }
 
   async function handleExport() {
@@ -140,6 +138,11 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
           {job && (
             <div className="flex flex-wrap items-center gap-3">
               <StatusBadge status={job.status} />
+              {isPolling && (
+                <span className="text-sm text-slate-500">
+                  {job.progress_pct}% — 処理中…
+                </span>
+              )}
               <button
                 type="button"
                 onClick={handleExport}
@@ -157,15 +160,19 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
             {message}
           </p>
         )}
-        {error && (
+        {displayError && (
           <p className="mt-8 border-l-2 border-red-500 pl-3 text-sm text-red-600">
-            {error}
+            {displayError}
           </p>
         )}
 
         <section className="mt-16">
-          {loading ? (
+          {jobLoading || (itemsLoading && !isJobInProgress(job?.status ?? "PENDING")) ? (
             <p className="text-sm text-slate-500">読み込み中…</p>
+          ) : job && isJobInProgress(job.status) ? (
+            <p className="text-sm text-slate-500">
+              リサーチ処理中です（{job.progress_pct}%）。完了すると商品一覧が表示されます。
+            </p>
           ) : items.length === 0 ? (
             <p className="text-sm text-slate-500">レビュー対象がありません。</p>
           ) : (
