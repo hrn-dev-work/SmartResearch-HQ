@@ -12,7 +12,8 @@ from app.schemas.research import (
 # In-memory demo store (portfolio mode)
 _jobs: dict[UUID, ResearchJobResponse] = {}
 _items: dict[UUID, list[ReviewItemResponse]] = {}
-_decisions: dict[UUID, UUID | None] = {}
+# item_id -> "candidate:{uuid}" | "manual:{asin}" | "rejected"
+_decisions: dict[UUID, str] = {}
 
 
 def _now() -> datetime:
@@ -31,7 +32,7 @@ def seed_demo_job(shopee_url: str, display_name: str | None) -> UUID:
         status=JobStatus.AWAITING_REVIEW,
         progress_pct=100,
         seller=seller,
-        item_count=3,
+        item_count=4,
         error=None,
         created_at=now,
         updated_at=now,
@@ -74,6 +75,18 @@ def seed_demo_job(shopee_url: str, display_name: str | None) -> UUID:
                 decision=None,
             )
         )
+    # Item with no candidates (manual ASIN demo)
+    no_match_id = uuid4()
+    demo_items.append(
+        ReviewItemResponse(
+            item_id=no_match_id,
+            title="Vintage Camera Lens Adapter Ring",
+            image_url="https://picsum.photos/seed/shopee-nomatch/400/400",
+            sold_count=340,
+            candidates=[],
+            decision=None,
+        )
+    )
     _items[job_id] = demo_items
     return job_id
 
@@ -90,11 +103,18 @@ def get_items(job_id: UUID, page: int, page_size: int) -> tuple[list[ReviewItemR
     # attach decisions
     enriched = []
     for item in page_items:
-        decision = _decisions.get(item.item_id)
+        decision = item.item_id if item.item_id in _decisions else None
         enriched.append(item.model_copy(update={"decision": decision}))
     return enriched, len(all_items)
 
 
-def save_decision(item_id: UUID, candidate_id: UUID | None) -> bool:
-    _decisions[item_id] = candidate_id
-    return True
+def save_candidate_decision(item_id: UUID, candidate_id: UUID) -> None:
+    _decisions[item_id] = f"candidate:{candidate_id}"
+
+
+def save_manual_asin_decision(item_id: UUID, asin: str) -> None:
+    _decisions[item_id] = f"manual:{asin.upper()}"
+
+
+def save_rejected_decision(item_id: UUID) -> None:
+    _decisions[item_id] = "rejected"

@@ -1,97 +1,119 @@
 #!/usr/bin/env bash
-# Render PR body (manual scaffold or auto after push).
+# Render PR body: English block (Summary/Commits/Test plan/Related) → --- → Japanese block.
 # Usage:
 #   bash scripts/render-pr-body.sh manual [branch]
 #   bash scripts/render-pr-body.sh auto <branch> [base]
 
 set -euo pipefail
 
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MODE="${1:-manual}"
 BRANCH="${2:-feat/...}"
 BASE="${3:-main}"
 
+CI="$(bash "$ROOT/scripts/pr-ci-checkbox.sh" "$BRANCH" 2>/dev/null || echo " ")"
+
+format_commits() {
+  local log
+  log="$(git log "origin/${BASE}..HEAD" --format=%s 2>/dev/null || git log "${BASE}..HEAD" --format=%s 2>/dev/null || true)"
+  if [[ -z "$log" ]]; then
+    echo "* (no commits ahead of ${BASE})"
+    return
+  fi
+  while IFS= read -r subject; do
+    [[ -z "$subject" ]] && continue
+    if [[ "$subject" =~ ^([^:]+):\ (.+)$ ]]; then
+      echo "* \`${BASH_REMATCH[1]}\`: ${BASH_REMATCH[2]}"
+    else
+      echo "* ${subject}"
+    fi
+  done <<<"$log"
+}
+
 render_manual() {
   cat <<EOF
-## Summary
+**Summary**
 
-- (Describe what changed in English)
+* What changed
 
-## 概要
+**Commits**
 
-- （変更内容を日本語で記述）
+* \`type(scope)\`: short description
 
-## Test plan
+**Test plan**
 
-- [ ] \`bash scripts/ci-check.sh\` passes
-- [ ] CI \`backend\` / \`frontend\` green
-- [ ] (Add manual checks if needed)
+* [${CI}] \`bash scripts/ci-check.sh\` passes
+* [${CI}] CI backend / frontend green
+* [ ] (Add manual checks if needed)
 
-## テスト手順
+**Related**
 
-- [ ] \`bash scripts/ci-check.sh\` が通る
-- [ ] CI \`backend\` / \`frontend\` が green
-- [ ] （手動確認があれば記述）
+* **Branch:** \`${BRANCH}\`
+* **WBS:** x.y
 
-## Related
+---
 
-<!-- Keep English keywords for GitHub. Remove unused lines. -->
-- Issue: Closes #
-- Issue: Refs #
-- PR: Depends on #
-- PR: Related #
-- Branch: \`${BRANCH}\`
-- WBS: x.y — task name
+**概要 (Summary)**
 
-## 関連
+* 変更内容
 
-- イシュー: Closes #（上記 Related と同じ番号）
-- PR: Depends on #（上記 Related と同じ番号）
-- ブランチ: \`${BRANCH}\`
-- WBS: x.y — タスク名
+**コミット (Commits)**
+
+* \`type(scope)\`: 短い説明
+
+**テスト計画 (Test plan)**
+
+* [${CI}] \`bash scripts/ci-check.sh\` が通る
+* [${CI}] CI backend / frontend green
+* [ ] （手動確認があれば記述）
+
+**関連 (Related)**
+
+* **ブランチ:** \`${BRANCH}\`
+* **WBS:** x.y
 EOF
 }
 
 render_auto() {
   local commits
-  commits="$(git log "origin/${BASE}..HEAD" --format='- %s' 2>/dev/null || git log "${BASE}..HEAD" --format='- %s' 2>/dev/null || true)"
-  if [[ -z "$commits" ]]; then
-    commits="- (no commits ahead of ${BASE})"
-  fi
+  commits="$(format_commits)"
 
   cat <<EOF
-## Summary
+**Summary**
 
-- Auto-created on push to \`${BRANCH}\`. Add summary before merge.
+* Auto-created on push to \`${BRANCH}\`. Fill in before merge.
 
-## 概要
-
-- \`${BRANCH}\` への push 後に自動作成。マージ前に変更内容を追記すること。
-
-## Commits
+**Commits**
 
 ${commits}
 
-## コミット
+**Test plan**
+
+* [${CI}] \`bash scripts/ci-check.sh\` passes
+* [${CI}] CI backend / frontend green
+
+**Related**
+
+* **Branch:** \`${BRANCH}\`
+
+---
+
+**概要 (Summary)**
+
+* \`${BRANCH}\` への push 後に自動作成。マージ前に変更内容を追記すること。
+
+**コミット (Commits)**
 
 ${commits}
 
-## Test plan
+**テスト計画 (Test plan)**
 
-- [ ] \`bash scripts/ci-check.sh\` passes
-- [ ] CI \`backend\` / \`frontend\` green
+* [${CI}] \`bash scripts/ci-check.sh\` が通る
+* [${CI}] CI backend / frontend green
 
-## テスト手順
+**関連 (Related)**
 
-- [ ] \`bash scripts/ci-check.sh\` が通る
-- [ ] CI \`backend\` / \`frontend\` が green
-
-## Related
-
-- Branch: \`${BRANCH}\`
-
-## 関連
-
-- ブランチ: \`${BRANCH}\`
+* **ブランチ:** \`${BRANCH}\`
 EOF
 }
 

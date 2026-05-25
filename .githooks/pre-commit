@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Before commit: sync WBS roadmap + README checkboxes and stage doc updates.
+# Install: bash scripts/install-git-hooks.sh
+
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+bash "$ROOT/scripts/sync-wbs-roadmap.sh" --stage || true

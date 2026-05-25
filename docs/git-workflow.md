@@ -63,7 +63,7 @@ git checkout -b chore/git-workflow-setup
 git add .
 git commit -m "chore: Git ブランチ運用規約と GitHub テンプレを追加"
 git push -u origin HEAD
-gh pr create --base main --title "..." --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
+gh pr create --base main --title "$(bash scripts/render-pr-title.sh)" --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
 ```
 
 ---
@@ -114,7 +114,7 @@ main ──pull──► 作業ブランチ作成 ──commit──► push ─
 |------|----------|
 | **0. 着手前** | `main` を最新化。Issue があれば作成（任意）。WBS 1 件にスコープ固定 |
 | **1. ブランチ** | `main` から作業ブランチを切る。**main のまま作業しない** |
-| **2. コミット** | 作業ブランチ上でコミット（Conventional Commits） |
+| **2. コミット** | 作業ブランチ上でコミット（Conventional Commits・subject 英語、body は `英語` → `---` → `日本語`） |
 | **3. push** | `git push -u origin HEAD` または `bash scripts/git-push-pr.sh` |
 | **4. PR** | 自動（下記 §3.1）または手動 `gh pr create`。`Closes #N` / `WBS:` / `Branch:` を本文に |
 | **5. マージ** | GitHub UI または `gh pr merge --squash`（推奨: squash） |
@@ -147,26 +147,47 @@ git checkout -b feat/wbs-2-3-sheets-export
 git status
 git add <files>
 git commit -m "$(cat <<'EOF'
-feat(spreadsheet): Sheets export サービスの骨組みを追加 (WBS 2.3)
+feat(spreadsheet): add Sheets export skeleton (WBS 2.3)
+
+Call real Sheets API in production only; portfolio returns count.
+
+---
+
+production のみ実 API を呼び、portfolio は件数のみ返す。
 
 Refs #42
 EOF
 )"
 git push -u origin HEAD
-gh pr create --repo hrn-dev-work/SmartResearch-HQ --title "feat(spreadsheet): Sheets export サービスの骨組みを追加 (WBS 2.3)" --body "$(cat <<'EOF'
+gh pr create --repo hrn-dev-work/SmartResearch-HQ --title "feat(spreadsheet): add Sheets export skeleton (WBS 2.3)" --body "$(cat <<'EOF'
 ## Summary
 
-- Add Sheets export service skeleton (WBS 2.3) _(Sheets export 骨組み)_
+- Add Sheets export service skeleton (WBS 2.3)
+
+---
+
+- Sheets export サービスの骨組みを追加（WBS 2.3）
 
 ## Test plan
 
-- [ ] `bash scripts/ci-check.sh`
+- [ ] `bash scripts/ci-check.sh` passes
+- [ ] CI green
+
+---
+
+- [ ] `bash scripts/ci-check.sh` が通る
 - [ ] CI green
 
 ## Related
 
 - Issue: Closes #42
 - Branch: `feat/wbs-2-3-sheets-export`
+- WBS: 2.3
+
+---
+
+- イシュー: Closes #42
+- ブランチ: `feat/wbs-2-3-sheets-export`
 - WBS: 2.3
 EOF
 )"
@@ -180,7 +201,14 @@ git checkout main
 git pull --ff-only origin main
 ```
 
-### 3.1 push 後の PR 自動作成
+### 3.1 push と PR 作成
+
+**エージェント / 手動**
+
+| 依頼 | コマンド |
+|------|----------|
+| プッシュまで | `bash scripts/git-ship.sh push` |
+| PR 作成まで | `bash scripts/git-ship.sh pr` |
 
 **初回セットアップ（ローカル hook、推奨）**
 
@@ -188,28 +216,20 @@ git pull --ff-only origin main
 bash scripts/install-git-hooks.sh   # core.hooksPath=.githooks
 ```
 
-以降、`git push` の直後に **open PR がなければ** `gh pr create` 相当を実行（`main` / `master` は除外）。
+- `pre-commit` → WBS ロードマップ + README チェック同期
+- `post-push` → **既存 PR** のチェックボックス同期のみ（PR は自動作成しない）
+- PR 新規作成は **`git-ship.sh pr`** または `ensure-pr.sh`
 
-**代替: push + PR を一発**
+**代替（旧名）**
 
 ```bash
-bash scripts/git-push-pr.sh
+bash scripts/git-push-pr.sh    # = git-ship.sh pr
 ```
-
-**GitHub Actions（リモートでも自動）**
-
-[`.github/workflows/auto-pr.yml`](../.github/workflows/auto-pr.yml) — `main` 以外へ push されたとき、open PR がなければ `main` 向け PR を作成。
-
-| 方法 | いつ動く | 要件 |
-|------|----------|------|
-| `post-push` hook | ローカル `git push` 後 | `gh auth login` |
-| `git-push-pr.sh` | スクリプト実行時 | 同上 |
-| Auto PR workflow | `origin` へ push 後 | リポジトリ Actions 有効 |
 
 手動 PR の例（自動を使わない場合）:
 
 ```bash
-gh pr create --base main --title "..." --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
+gh pr create --base main --title "$(bash scripts/render-pr-title.sh)" --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
 ```
 
 `gh pr create --fill` は使わない（コミット subject から英語のみの本文になりやすい）。
@@ -245,7 +265,7 @@ git pull --ff-only origin main
 git checkout -b phase2
 # ... 実装 ...
 git push -u origin phase2
-gh pr create --base main --title "..." --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
+gh pr create --base main --title "$(bash scripts/render-pr-title.sh)" --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
 ```
 
 通常の機能追加は `feat/*` を `main` から切る。

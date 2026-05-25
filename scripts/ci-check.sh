@@ -4,6 +4,8 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
+bash "$ROOT/scripts/sync-wbs-roadmap.sh" --quiet || true
+
 echo "== backend =="
 cd "$ROOT/backend"
 if [[ ! -d .venv ]]; then
