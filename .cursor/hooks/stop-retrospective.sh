@@ -7,6 +7,7 @@ input=$(cat)
 printf '%s' "$input" | python3 <<'PY'
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 try:
