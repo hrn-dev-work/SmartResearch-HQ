@@ -1,0 +1,6 @@
+# Normalize line endings (WSL + Windows/Cursor on \\wsl.localhost\)
+* text=auto
+
+*.sh text eol=lf
+scripts/** text eol=lf
+.githooks/** text eol=lf

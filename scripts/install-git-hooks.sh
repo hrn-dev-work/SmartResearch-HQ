@@ -14,8 +14,10 @@ chmod +x scripts/render-pr-title.sh scripts/render-commit-msg.sh 2>/dev/null || 
 chmod +x scripts/git-push-pr.sh scripts/git-ship.sh 2>/dev/null || true
 
 git config core.hooksPath .githooks
+# Ignore chmod-only noise when Cursor (Windows) and WSL share the same repo via UNC.
+git config core.filemode false
 
-echo "Git hooks installed (core.hooksPath=.githooks)"
+echo "Git hooks installed (core.hooksPath=.githooks, core.filemode=false)"
 echo "  pre-commit  -> sync WBS roadmap + README phase checkboxes"
 echo "  post-push   -> sync PR checkboxes (existing PR only; use git-ship pr to create)"
 echo "Ship: bash scripts/git-ship.sh push | pr"

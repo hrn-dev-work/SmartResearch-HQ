@@ -1,4 +1,5 @@
 {
+  "git.path": "\\\\wsl.localhost\\Ubuntu\\usr\\bin\\git",
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
   "python.terminal.activateEnvironment": true,
   "python.analysis.extraPaths": ["${workspaceFolder}/backend"],
