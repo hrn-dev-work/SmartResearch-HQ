@@ -56,8 +56,12 @@ service-account*.json
 # Playwright browsers (local install)
 /playwright/.cache/
 
-# Cursor session markers (local only)
-.cursor/retrospective/.session-edited
+# Cursor agent config — entire .cursor/ is local-only (rules, skills, hooks; never commit)
+# Usage: docs/local/cursor-usage.md (gitignored; copy from another machine or create locally)
+.cursor/
+
+# Generated from local .cursor/skills (scripts/sync-skill-prompt-table.py)
+docs/prompt-templates.md
 
 # Agent / personal notes (local only — see docs/local/README.md)
 docs/local/*
@@ -65,5 +69,18 @@ docs/local/*
 frontend/AGENTS.md
 frontend/CLAUDE.md
 
-# Agent debug output (local)
+# Agent / CI scratch output (local)
 .ci-investigation-gh.txt
+ci結果.md
+ci-fix-log.txt
+ship-pr-result.txt
+*-result.txt
+commit-out.txt
+commit-capture.txt
+.agent-shell-out.txt
+.agent-git-workflow.log
+.push-log.txt
+_fix-main*.log
+scripts/_ship-*.sh
+scripts/_agent-*.sh
+scripts/_cleanup-local.sh
