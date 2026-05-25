@@ -56,8 +56,8 @@ service-account*.json
 # Playwright browsers (local install)
 /playwright/.cache/
 
-# Cursor session markers (local only)
-.cursor/retrospective/.session-edited
+# Cursor agent config (local / private — not published)
+.cursor/
 
 # Agent / personal notes (local only — see docs/local/README.md)
 docs/local/*
@@ -67,3 +67,9 @@ frontend/CLAUDE.md
 
 # Agent debug output (local)
 .ci-investigation-gh.txt
+ci結果.md
+ship-pr-result.txt
+.agent-shell-out.txt
+scripts/_ship-*.sh
+scripts/_agent-*.sh
+scripts/_cleanup-local.sh
