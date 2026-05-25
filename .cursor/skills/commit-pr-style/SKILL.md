@@ -123,9 +123,9 @@ PR タイトル = subject（英語）。body の `---` 以降は PR 本文の日
 
 ### 本文
 
-[templates.md](templates.md) — **3 セクション**（Summary / Test plan / Related）。各セクション **英語 → `---` → 日本語**。
+[templates.md](templates.md) — 英語ブロック（Summary / Commits / Test plan / Related）→ `---` → 日本語ブロック（見出しに `(Summary)` 等）。箇条書き `*`。
 
-Test plan は `- [ ]` チェックボックス。CI green 後は hook / CI job が自動 `[x]`。
+Test plan は `* [ ]` チェックボックス。CI green 後は hook / CI job が自動 `[x]`。
 
 `gh pr create --fill` は使わない。雛形: `bash scripts/render-pr-body.sh manual <branch>`
 

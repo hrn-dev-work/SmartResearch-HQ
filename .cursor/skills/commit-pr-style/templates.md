@@ -110,45 +110,53 @@ Production Sheets export, review-screen job polling, CI scaffolding.
 
 雛形: `bash scripts/render-pr-title.sh [base] [branch]`
 
-**本文**: **3 セクション**（Summary / Test plan / Related）。各セクションは **英語 → `---` → 日本語**。Related のキーワード（`Closes` / `WBS:` 等）は英語ブロックに書く。
+**本文**: 英語ブロック（**Summary** / **Commits** / **Test plan** / **Related**）→ `---` → 日本語ブロック（**概要 (Summary)** / **コミット (Commits)** / **テスト計画 (Test plan)** / **関連 (Related)**）。箇条書きは `*`。Related のラベルは **Branch:** 等を太字。
 
-Test plan は GitHub チェックボックス（`- [ ]` / `- [x]`）。CI green 時は `scripts/sync-pr-checkboxes.sh` が `ci-check.sh` / `backend`+`frontend` 行を自動で `[x]` にする。
+Test plan は `* [ ]` チェックボックス。CI green 時は `scripts/sync-pr-checkboxes.sh` が自動 `[x]`。
 
 手動 PR の雛形: `bash scripts/render-pr-body.sh manual feat/your-branch`
 
 ```markdown
-## Summary
+**Summary**
 
-- What changed
+* What changed
 
----
+**Commits**
 
-- 変更内容
+* `type(scope)`: short description
 
-## Test plan
+**Test plan**
 
-- [ ] `bash scripts/ci-check.sh` passes
-- [ ] CI `backend` / `frontend` green
+* [ ] `bash scripts/ci-check.sh` passes
+* [ ] CI backend / frontend green
 
----
+**Related**
 
-- [ ] `bash scripts/ci-check.sh` が通る
-- [ ] CI `backend` / `frontend` green
-
-## Related
-
-- Branch: `<type>/<name>`
-- WBS: <x.y>
-- Issue: Closes #<n>
+* **Branch:** `feat/...`
+* **WBS:** x.y
 
 ---
 
-- ブランチ: `<type>/<name>`
-- WBS: <x.y>
-- イシュー: Closes #<n>
+**概要 (Summary)**
+
+* 変更内容
+
+**コミット (Commits)**
+
+* `type(scope)`: 短い説明
+
+**テスト計画 (Test plan)**
+
+* [ ] `bash scripts/ci-check.sh` が通る
+* [ ] CI backend / frontend green
+
+**関連 (Related)**
+
+* **ブランチ:** `feat/...`
+* **WBS:** x.y
 ```
 
-**マイルストーン PR**（phase2 等）: Summary 英語ブロック先頭に **Merge order:** 1 行。コミット一覧は Summary 内の箇条書き（Commits 見出しは作らない）。
+**マイルストーン PR**（phase3 等）: Summary 先頭に Merge order 1 行。Commits セクションにコミット一覧（Summary 内に混ぜない）。
 
 ### Related の選び方
 
