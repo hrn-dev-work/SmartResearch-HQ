@@ -87,8 +87,9 @@ jobs:
 
       - name: Sync CI checkboxes on PR body
         env:
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_TOKEN: ${{ github.token }}
-          # backend/frontend already passed via needs; avoid gh auth status false negatives
+          # Default GITHUB_TOKEN is blocked when the org forbids Actions from approving/editing PRs.
+          # Add fine-grained PAT (pull_requests: write) as GH_PR_SYNC_TOKEN if sync fails.
+          GH_TOKEN: ${{ secrets.GH_PR_SYNC_TOKEN || github.token }}
+          GITHUB_TOKEN: ${{ secrets.GH_PR_SYNC_TOKEN || github.token }}
           PR_CI_CHECKBOX_MARK: x
         run: bash scripts/sync-pr-checkboxes.sh ${{ github.event.pull_request.number }}
