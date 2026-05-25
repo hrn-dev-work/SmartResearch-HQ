@@ -13,7 +13,7 @@ try:
     payload = json.load(sys.stdin)
 except json.JSONDecodeError:
     print("{}")
-    sys.exit(0)
+    raise SystemExit(0)
 
 status = payload.get("status", "")
 loop_count = int(payload.get("loop_count", 0))
@@ -23,7 +23,7 @@ out: dict = {}
 
 if status != "completed" or loop_count != 0 or not marker.is_file():
     print(json.dumps(out, ensure_ascii=False))
-    sys.exit(0)
+    raise SystemExit(0)
 
 parts: list[str] = []
 
