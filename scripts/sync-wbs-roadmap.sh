@@ -7,8 +7,15 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-python3 "$ROOT/scripts/sync-wbs-roadmap.py" "$@"
+STAGE=false
+for arg in "$@"; do
+  if [[ "$arg" == "--stage" ]]; then
+    STAGE=true
+  fi
+done
 
-if [[ "${1:-}" == "--stage" ]]; then
+python3 "$ROOT/scripts/sync-wbs-roadmap.py"
+
+if [[ "$STAGE" == true ]]; then
   git add docs/wbs-roadmap.md README.md 2>/dev/null || true
 fi
