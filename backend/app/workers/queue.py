@@ -2,9 +2,8 @@
 
 from uuid import UUID
 
-from arq import create_pool
-
 from app.workers.settings import WorkerSettings
+from arq import create_pool
 
 
 async def enqueue_research_job(job_id: UUID) -> None:

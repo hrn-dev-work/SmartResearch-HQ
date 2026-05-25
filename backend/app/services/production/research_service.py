@@ -1,11 +1,7 @@
 from uuid import UUID
 
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-
 from app.core.status import JobStatus
-from app.db.models import AmazonCandidate, JobItem, ResearchJob, ReviewDecision
+from app.db.models import JobItem, ResearchJob, ReviewDecision
 from app.schemas.research import (
     AmazonCandidateResponse,
     CreateResearchResponse,
@@ -18,6 +14,9 @@ from app.schemas.research import (
     SellerSummary,
 )
 from app.services.production.pipeline import create_job_record, run_job_pipeline
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 
 def _asin_pattern_ok(asin: str) -> bool:
@@ -30,7 +29,9 @@ class ProductionResearchService:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def create_research(self, shopee_shop_url: str, seller_display_name: str | None) -> CreateResearchResponse:
+    async def create_research(
+        self, shopee_shop_url: str, seller_display_name: str | None
+    ) -> CreateResearchResponse:
         job = await create_job_record(
             self._session,
             shopee_shop_url=shopee_shop_url,
@@ -69,7 +70,9 @@ class ProductionResearchService:
             updated_at=job.updated_at,
         )
 
-    async def list_items(self, job_id: UUID, page: int, page_size: int) -> ReviewItemsPageResponse | None:
+    async def list_items(
+        self, job_id: UUID, page: int, page_size: int
+    ) -> ReviewItemsPageResponse | None:
         job_exists = await self._session.execute(
             select(ResearchJob.id).where(ResearchJob.id == job_id)
         )
@@ -187,9 +190,7 @@ class ProductionResearchService:
         if job is None:
             return None
         result = await self._session.execute(
-            select(JobItem)
-            .where(JobItem.job_id == job_id)
-            .options(selectinload(JobItem.decision))
+            select(JobItem).where(JobItem.job_id == job_id).options(selectinload(JobItem.decision))
         )
         items = result.scalars().all()
         exported = sum(1 for i in items if i.decision and not i.decision.rejected)

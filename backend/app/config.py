@@ -1,15 +1,15 @@
-from enum import Enum
+from enum import StrEnum
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class AppMode(str, Enum):
+class AppMode(StrEnum):
     PORTFOLIO = "portfolio"
     PRODUCTION = "production"
 
 
-class MatchingProvider(str, Enum):
+class MatchingProvider(StrEnum):
     AMAZON_SEARCH = "amazon_search"
     NONE = "none"
     GEMINI = "gemini"
@@ -22,7 +22,9 @@ class Settings(BaseSettings):
     matching_provider: MatchingProvider = MatchingProvider.AMAZON_SEARCH
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
-    database_url: str = "postgresql+asyncpg://smartresearch:smartresearch@localhost:5432/smartresearch"
+    database_url: str = (
+        "postgresql+asyncpg://smartresearch:smartresearch@localhost:5432/smartresearch"
+    )
     redis_url: str = "redis://localhost:6379/0"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"

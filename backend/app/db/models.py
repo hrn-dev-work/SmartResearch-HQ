@@ -1,7 +1,18 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, Numeric, SmallInteger, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    SmallInteger,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,7 +34,9 @@ class ResearchJob(Base):
     __tablename__ = "research_jobs"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    seller_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("sellers.id"), nullable=False)
+    seller_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("sellers.id"), nullable=False
+    )
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="PENDING")
     progress_pct: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0)
     error_code: Mapped[str | None] = mapped_column(String(64))
@@ -36,14 +49,18 @@ class ResearchJob(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     seller: Mapped["Seller"] = relationship(back_populates="jobs")
-    items: Mapped[list["JobItem"]] = relationship(back_populates="job", cascade="all, delete-orphan")
+    items: Mapped[list["JobItem"]] = relationship(
+        back_populates="job", cascade="all, delete-orphan"
+    )
 
 
 class JobItem(Base):
     __tablename__ = "job_items"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("research_jobs.id"), nullable=False)
+    job_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("research_jobs.id"), nullable=False
+    )
     shopee_item_id: Mapped[str] = mapped_column(String(64), nullable=False)
     title: Mapped[str] = mapped_column(Text, nullable=False)
     image_url: Mapped[str] = mapped_column(Text, nullable=False)
@@ -65,7 +82,9 @@ class AmazonCandidate(Base):
     __tablename__ = "amazon_candidates"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    job_item_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("job_items.id"), nullable=False)
+    job_item_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("job_items.id"), nullable=False
+    )
     rank: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     asin: Mapped[str] = mapped_column(String(16), nullable=False)
     amazon_url: Mapped[str] = mapped_column(Text, nullable=False)
@@ -83,7 +102,9 @@ class ReviewDecision(Base):
     __table_args__ = (UniqueConstraint("job_item_id", name="uq_review_decisions_job_item"),)
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    job_item_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("job_items.id"), nullable=False)
+    job_item_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("job_items.id"), nullable=False
+    )
     chosen_candidate_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("amazon_candidates.id")
     )
