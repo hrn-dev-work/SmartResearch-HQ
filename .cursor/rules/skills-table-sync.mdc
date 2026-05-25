@@ -1,0 +1,30 @@
+---
+description: Skill 作成・変更後に docs/prompt-templates.md の表を同期する
+globs: .cursor/skills/**/*
+alwaysApply: false
+---
+
+# Skills 表の同期
+
+`.cursor/skills/**/SKILL.md` を **新規作成または変更** したら、同じ作業内で必ず表を更新する。
+
+## SKILL.md frontmatter（必須）
+
+| キー | 用途 |
+|------|------|
+| `name` | スキル名 |
+| `description` | エージェント向けトリガー（英語可） |
+| `category` | 表の「分類」（例: `環境`, `UI・要件`, `Git・PR`） |
+| `summary` | 表の「スキルの内容」（日本語・1 文） |
+| `user-prompt` | 表の「スキルを使うときの指示文」（ユーザーがそのまま送れる 1 文） |
+
+分類の並び順は `scripts/sync-skill-prompt-table.py` の `CATEGORY_ORDER` で定義する。新分類を足したらそこも更新する。
+
+## 同期コマンド
+
+```bash
+cd ~/workspace/SmartResearch-HQ
+python3 scripts/sync-skill-prompt-table.py
+```
+
+`docs/prompt-templates.md` は **生成物**。手で編集しない。

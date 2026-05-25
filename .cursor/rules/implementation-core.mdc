@@ -1,0 +1,53 @@
+---
+description: 実装の基本（DDD・命名・疎結合・可読性・DRY/YAGNI 等）。全レイヤ共通。
+alwaysApply: true
+---
+
+# 実装の基本
+
+`~/.cursor/rules/global-balanced-defaults.mdc`（最小変更・安全）を前提に、本リポジトリでは以下を優先する。  
+テストの粒度は `.cursor/rules/testing-istqb.mdc` を正とする。
+
+## DDD（実用版）
+
+- **ユビキタス言語**: リサーチジョブ・候補・レビュー・ASIN 等を code / API / UI / docs で同じ語にする
+- **境界**: ビジネスルールは `backend/app/services/` と `core/`。`api/` は入出力変換、`db/`・外部 API・Playwright は infrastructure
+- **依存方向**: 外側（api, workers, db）→ 内側（services）。matching は `protocol.py` で差し替え（Open/Closed）
+- **Tell, don't ask**: オブジェクトの内部状態を外から組み立てず、意図が分かるメソッド名で振る舞いを呼ぶ
+
+## 命名・文章
+
+- 役割が名前だけで分かる: `get_candidate_matcher` ✓ / `process_data` ✗
+- UI 文言・エラーメッセージ・コメントは **非エンジニアが読んで意図が伝わる** 短い日本語。略語は ASIN 等の定着語のみ
+- 関数・変数は動詞 + 名詞（`create_research`, `review_items`）。真偽値は `is_` / `has_` プレフィックス
+
+## 疎結合
+
+- 具象クラス直 import より **Protocol / factory**（例: `get_candidate_matcher()`）
+- 層をまたぐ知識を持たない: UI に按分式を書かない、route に SQL を書かない
+- 設定・秘密情報は `config.py` / env のみ。テストでは DI で差し替え可能にする
+
+## ネストを浅く
+
+- 早期 return で分岐を減らす。ネストは **原則 2 段まで**（3 段以上は関数分割を検討）
+- 1 関数 = 1 抽象レベル。ループ内にビジネス分岐を詰め込まない
+
+## 実装で守る原則
+
+| 原則 | 実装での意味 |
+|------|-------------|
+| **YAGNI** | 依頼・WBS にない機能・抽象化・設定項目を先回りで作らない |
+| **DRY** | 3 回目のコピペで共通化を検討。早すぎる共通化は YAGNI と両立させる |
+| **KISS** | 読み手が最短で理解できる案を選ぶ |
+| **SRP** | 1 モジュール = 1 理由で変更される。God 関数・God コンポーネント禁止 |
+| **DIP** | 上位は Protocol に依存。Mock / Production の切替は deps・factory に集約 |
+| **Fail fast** | 不正入力・欠落 env は早い段階で明示エラー。黙ってフォールバックしない |
+| **Explicit > Implicit** | マジック値・暗黙の副作用を避ける。ステータス名は `core/status.py` に集約 |
+| **LoD** | 知らないオブジェクトの内部を触らない（`a.get_b().get_c()` 連鎖を避ける） |
+| **Boy Scout** | 触った行の範囲で読みやすくする。依頼外の大規模整形はしない |
+
+## 仕様とコード
+
+- 挙動を変えるときは **先に** `docs/`（API なら `api-specification.md`）を更新してからコード
+- 依頼範囲外のリファクタ・ドライブバイ修正はしない（`agent-efficiency.mdc`）
+- コード実装後: `.cursor/rules/implementation-retrospective.mdc`（`stop` フックが自動起票する場合あり）
