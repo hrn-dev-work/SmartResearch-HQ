@@ -2,7 +2,7 @@
 
 SmartResearch-HQ の **ブランチ・コミット・PR・マージ** の規約。個人開発向け **GitHub Flow（簡易版）**。
 
-文言テンプレ: ローカル `.cursor/skills/commit-pr-style/` を参照（**`.cursor/` 全体が gitignore**。公開 clone には含まれない。使い方: `docs/local/cursor-usage.md`）。
+コミット・PR の文言テンプレは **ローカルの `.cursor/skills/commit-pr-style/`**（gitignore）。公開 clone では本書と `scripts/render-*.sh` を正とする（[`agent-setup.md`](agent-setup.md)）。
 
 ---
 
@@ -234,52 +234,6 @@ gh pr create --base main --title "$(bash scripts/render-pr-title.sh)" --body "$(
 
 `gh pr create --fill` は使わない（コミット subject から英語のみの本文になりやすい）。
 
-### 3.2 PR 本文の CI チェック自動同期
-
-CI の `backend` / `frontend` が green になると、ワークフロー `sync-pr-checkboxes` が PR 本文の Test plan 行（`ci-check.sh` / `backend / frontend`）を `[x]` に更新する。
-
-**`GitHub Actions is not permitted to create or approve pull requests` が出る場合**
-
-組織またはリポジトリで、既定の `GITHUB_TOKEN` による PR 編集が禁止されている。次のいずれかで解消する。
-
-| 方法 | 手順 |
-|------|------|
-| **A. リポジトリ設定** | Settings → Actions → General → Workflow permissions を **Read and write** に。組織で制限している場合は、Org の「Allow GitHub Actions to create and approve pull requests」を有効化 |
-| **B. PAT シークレット（推奨・組織ロック時）** | fine-grained PAT を作成（対象リポジトリ、**Pull requests: Read and write**、Contents: Read）→ Settings → Secrets and variables → Actions → **`GH_PR_SYNC_TOKEN`** に登録。`sync-pr-checkboxes` と **Auto PR**（`auto-pr.yml`）の両方が `secrets.GH_PR_SYNC_TOKEN \|\| github.token` を使用 |
-
-ローカルでは `gh auth login` 済みなら push 後の `post-push` または手動で同期できる:
-
-```bash
-bash scripts/sync-pr-checkboxes.sh    # 現在ブランチの PR
-bash scripts/sync-pr-checkboxes.sh 5  # PR 番号指定
-```
-
-### 3.3 Cursor + UNC（`\\wsl.localhost\...`）で scripts が `M` になる
-
-**WSL ターミナルで `git diff` が空なのに、Cursor の Source Control だけ変更がある**ときは、ロジック変更ではなく **改行（CRLF↔LF）または実行権限** のことが多い。
-
-| 確認 | コマンド（WSL） |
-|------|------------------|
-| 実変更か | `git diff --stat scripts/dev.sh` |
-| 改行だけか | 差分の各行が `-` と `+` で中身同一 → CRLF |
-
-**予防（リポジトリ済み）**
-
-- `.gitattributes` — `*.sh` / `scripts/**` / `.githooks/**` を LF
-- `.vscode/settings.json` — `"git.path": "\\\\wsl.localhost\\Ubuntu\\usr\\bin\\git"`
-- `bash scripts/install-git-hooks.sh` — `core.filemode false`
-
-**直し（1 回）**
-
-```bash
-cd ~/workspace/SmartResearch-HQ
-find scripts .githooks -type f -exec sed -i 's/\r$//' {} +
-git add --renormalize scripts/ .githooks/
-git status -sb
-```
-
-エージェントは Git を **WSL 内**で実行し、UNC 上の PowerShell `git` に依存しない（`~/.cursor/skills/wsl-agent-invoke/SKILL.md`）。
-
 ---
 
 ## 4. マイルストーン branch（Phase 1 / 2 / 3）
@@ -395,7 +349,7 @@ CI が red のときは **マージしない**。修正 → push → CI 再実�
 - 既定ブランチへの直接 push はしない
 - `phase1` は legacy スナップショット。**新規作業・push は `main` 系ブランチのみ**
 - force push は禁止
-- **コミット明示**: 「プッシュまで」「PR作成まで」「コミットだけ」→ commit 可（`.cursor/rules/security-git.mdc`）。実装のみ → 終了時に `git status` 報告
+- **コミット明示**: 「プッシュまで」「PR作成まで」「コミットだけ」→ commit 可（[`agent-setup.md`](agent-setup.md)）。実装のみ → 終了時に `git status` 報告
 
 ---
 
@@ -431,4 +385,4 @@ PR #12 を squash マージして、main を最新化して。
 | 全行 `-`/`+`（中身同じ） | CRLF | `sed -i 's/\r$//' <file>` → `git add --renormalize`。`.gitattributes` の `eol=lf` |
 | 実装したのに commit されていない | WSL `git status -sb` | 「プッシュまで」で `git-ship.sh push`。`stop` フックが未コミットを followup |
 
-Shell 出力が空になるときは WSL で結果をファイルに書き、Read する（`wsl-agent-invoke` スキル参照）。
+Shell 出力が空になるときは WSL で結果をファイルに書き、Read する（ローカル Cursor スキル `wsl-agent-invoke` 参照）。
