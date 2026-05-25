@@ -108,6 +108,8 @@ Refs #N / Fixes #N
 
 PR タイトル = subject（英語）。body の `---` 以降は PR 本文の日本語ブロックに流用可。
 
+**自動化**（意識不要）: `pre-commit` → WBS/README 同期 / `post-push` → PR + チェックボックス / CI → PR チェック同期。
+
 ## PR
 
 ### タイトル（英語のみ・必須）
@@ -123,7 +125,7 @@ PR タイトル = subject（英語）。body の `---` 以降は PR 本文の日
 
 [templates.md](templates.md) — **3 セクション**（Summary / Test plan / Related）。各セクション **英語 → `---` → 日本語**。
 
-Test plan は `- [ ]` チェックボックス。CI green 後は `bash scripts/sync-pr-checkboxes.sh` で自動 `[x]`（push hook でも実行）。
+Test plan は `- [ ]` チェックボックス。CI green 後は hook / CI job が自動 `[x]`。
 
 `gh pr create --fill` は使わない。雛形: `bash scripts/render-pr-body.sh manual <branch>`
 

@@ -68,3 +68,18 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
         run: npm run build
+
+  sync-pr-checkboxes:
+    name: sync-pr-checkboxes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: [backend, frontend]
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync CI checkboxes on PR body
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/sync-pr-checkboxes.sh ${{ github.event.pull_request.number }}
