@@ -29,10 +29,7 @@ if gh pr view --head "$BRANCH" --json number --jq .number >/dev/null 2>&1; then
   exit 0
 fi
 
-TITLE="$(git log "origin/${BASE}..HEAD" --format=%s -1 2>/dev/null || git log "${BASE}..HEAD" --format=%s -1 2>/dev/null || true)"
-if [[ -z "$TITLE" ]]; then
-  TITLE="chore: merge ${BRANCH} into ${BASE}"
-fi
+TITLE="$(bash "$ROOT/scripts/render-pr-title.sh" "$BASE" "$BRANCH")"
 
 BODY="$(bash "$ROOT/scripts/render-pr-body.sh" auto "$BRANCH" "$BASE")"
 

@@ -2,13 +2,12 @@
 
 エージェント向けの入口。ユーザーは短い依頼でよい。
 
-**詳細資料（背景・ファイル一覧・セットアップ）**: [`docs/local/cursor-agent-efficiency.md`](docs/local/cursor-agent-efficiency.md)（`docs/local/` は gitignore）
+**詳細資料（背景・ファイル一覧・セットアップ）**: [`docs/cursor-agent-efficiency.md`](docs/cursor-agent-efficiency.md)
 
 ## いまのフェーズ
 
 - **Phase 1** ✅ 完了（docs + モノレポ骨組み）
-- **Phase 2** ✅ 完了（2.2c Gemini は任意・未着手）
-- **Phase 3** 進行中 → タスクは `docs/wbs-roadmap.md` の **未完了 1 件だけ** 着手
+- **Phase 2〜** 進行中 → タスクは `docs/wbs-roadmap.md` の **未完了 1 件だけ** 着手
 
 ## 読む順（実装前）
 
@@ -17,7 +16,7 @@
 3. `docs/requirements.md` + `docs/design.md`
 4. 必要なら `docs/architecture.md` / `docs/api-specification.md`
 
-実装後の振り返りログ: [`docs/local/implementation-retrospective.md`](docs/local/implementation-retrospective.md)
+実装後の振り返りログ: [`docs/implementation-retrospective.md`](docs/implementation-retrospective.md)
 
 ## ローカル既定
 

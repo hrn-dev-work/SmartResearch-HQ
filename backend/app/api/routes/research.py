@@ -41,7 +41,8 @@ async def get_research_job(
         job = service.get_job(job_id)
     if job is None:
         raise HTTPException(
-            status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}}
+            status_code=404,
+            detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}},
         )
     return job
 
@@ -59,7 +60,8 @@ async def list_research_items(
         result = service.list_items(job_id, page, page_size)
     if result is None:
         raise HTTPException(
-            status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}}
+            status_code=404,
+            detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}},
         )
     return result
 
@@ -70,17 +72,12 @@ async def export_research_job(
     service: ResearchService = Depends(get_research_service),
 ) -> ExportJobResponse:
     if isinstance(service, ProductionResearchService):
-        try:
-            result = await service.export_job(job_id)
-        except ValueError as exc:
-            raise HTTPException(
-                status_code=400,
-                detail={"error": {"code": "SPREADSHEET_CONFIG", "message": str(exc)}},
-            ) from exc
+        result = await service.export_job(job_id)
     else:
         result = service.export_job(job_id)
     if result is None:
         raise HTTPException(
-            status_code=404, detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}}
+            status_code=404,
+            detail={"error": {"code": "NOT_FOUND", "message": str(job_id)}},
         )
     return result

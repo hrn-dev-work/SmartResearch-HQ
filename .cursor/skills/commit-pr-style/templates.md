@@ -65,9 +65,18 @@ Fixes #<issue>         # マージでイシューをクローズ（fix 系）
 
 ## Pull Request
 
-**タイトル**: コミット subject と同一（複数コミット PR はマージ後の要約 1 行）
+**タイトル**: **英語のみ**（Conventional Commits）。コミット subject が日本語でも **コピーしない**。
 
-**本文**: **3 セクション**（Summary / Test plan / Related）。英語が主、日本語は同じ行の _(…)_ か短い注記。Related のキーワード（`Closes` / `WBS:` 等）は英語のまま。
+| 状況 | タイトル |
+|------|----------|
+| 1 コミット、subject が英語 | subject と同一 |
+| 1 コミット、subject が日本語 | 内容を **英語 1 行** に要約 |
+| 複数コミット | 最新コミット名を使わず **英語 1 行要約** |
+| `phase2` / `phase3` 等 | `Phase N: <English summary>` |
+
+雛形: `bash scripts/render-pr-title.sh [base] [branch]`
+
+**本文**: **3 セクション**（Summary / Test plan / Related）。英語が主、日本語は同行の _(…)_。Related のキーワード（`Closes` / `WBS:` 等）は英語のまま。
 
 手動 PR の雛形: `bash scripts/render-pr-body.sh manual feat/your-branch`
 

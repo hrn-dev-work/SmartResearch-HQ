@@ -63,7 +63,7 @@ git checkout -b chore/git-workflow-setup
 git add .
 git commit -m "chore: Git ブランチ運用規約と GitHub テンプレを追加"
 git push -u origin HEAD
-gh pr create --base main --title "..." --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
+gh pr create --base main --title "$(bash scripts/render-pr-title.sh)" --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
 ```
 
 ---
@@ -153,7 +153,7 @@ Refs #42
 EOF
 )"
 git push -u origin HEAD
-gh pr create --repo hrn-dev-work/SmartResearch-HQ --title "feat(spreadsheet): Sheets export サービスの骨組みを追加 (WBS 2.3)" --body "$(cat <<'EOF'
+gh pr create --repo hrn-dev-work/SmartResearch-HQ --title "feat(spreadsheet): add Sheets export skeleton (WBS 2.3)" --body "$(cat <<'EOF'
 ## Summary
 
 - Add Sheets export service skeleton (WBS 2.3) _(Sheets export 骨組み)_
@@ -209,7 +209,7 @@ bash scripts/git-push-pr.sh
 手動 PR の例（自動を使わない場合）:
 
 ```bash
-gh pr create --base main --title "..." --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
+gh pr create --base main --title "$(bash scripts/render-pr-title.sh)" --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
 ```
 
 `gh pr create --fill` は使わない（コミット subject から英語のみの本文になりやすい）。
@@ -245,7 +245,7 @@ git pull --ff-only origin main
 git checkout -b phase2
 # ... 実装 ...
 git push -u origin phase2
-gh pr create --base main --title "..." --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
+gh pr create --base main --title "$(bash scripts/render-pr-title.sh)" --body "$(bash scripts/render-pr-body.sh manual feat/your-branch)"
 ```
 
 通常の機能追加は `feat/*` を `main` から切る。

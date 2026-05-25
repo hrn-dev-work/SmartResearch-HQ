@@ -15,14 +15,14 @@
 
 Phase 1 完了条件: docs 間の用語・マッチング方針・API パスが一致していること。
 
-## Phase 2: コアロジック（裏版） ✅
+## Phase 2: コアロジック（裏版） — 着手済み
 
 | ID | タスク | 成果物 | 状態 |
 |----|--------|--------|------|
 | 2.1 | Playwright Shopee クローラー | `backend/app/services/scraper/` | ✅ 初版 |
 | 2.2 | 候補マッチング（Amazon PA-API タイトル検索） | `backend/app/services/matching/` | ✅ 初版 |
 | 2.2b | 手動 ASIN decide API + DB | review route, `review_decisions.manual_asin` | ✅ |
-| 2.2c | Gemini マルチモーダル（任意） | `matching/gemini.py` | 任意・未着手 |
+| 2.2c | Gemini マルチモーダル（任意） | `matching/gemini.py` | 未着手 |
 | 2.3 | Google Sheets 連携 | `backend/app/services/spreadsheet/` | ✅ 初版 |
 | 2.4 | ARQ ワーカー + リトライ/DLQ | `backend/app/workers/` | ✅ 初版（enqueue + worker） |
 | 2.5 | Alembic マイグレーション | `backend/alembic/` | ✅ |
@@ -52,7 +52,7 @@ python -m app.cli run --url "https://shopee.sg/..." --limit 5
 arq app.workers.settings.WorkerSettings
 ```
 
-## Phase 3: UI / API（共通） — 完了
+## Phase 3: UI / API（共通）
 
 | ID | タスク | 成果物 | 状態 |
 |----|--------|--------|------|
@@ -60,8 +60,8 @@ arq app.workers.settings.WorkerSettings
 | 3.2 | レビュー UI | `frontend/src/app/review/[jobId]/` | ✅ 先行完了 |
 | 3.3 | API クライアント + 型 | `frontend/src/lib/api.ts` | ✅ 先行完了 |
 | 3.4 | ジョブ進捗ポーリング/SSE | hooks + API | ✅ MVP ポーリング |
-| 3.5 | FastAPI ↔ Redis 本接続 | docker-compose 起動検証 | ✅ 初版（health `redis`） |
-| 3.6 | 手動 ASIN 入力 UI | レビュー画面 §design 3.3 | ✅ |
+| 3.5 | FastAPI ↔ Redis 本接続 | docker-compose 起動検証 | 未着手 |
+| 3.6 | 手動 ASIN 入力 UI | レビュー画面 §design 3.3 | 未着手（Phase 2 API 後） |
 
 ## Phase 4: ポートフォリオ化（表版）
 

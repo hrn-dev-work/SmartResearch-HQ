@@ -18,7 +18,6 @@ alwaysApply: false
 
 ## 編集方針
 
-- **ローカル専用**（gitignore）: `docs/local/` — 個人メモ・反省会ログ。共有仕様は `docs/` 直下
 - requirements と design の **同じ段落の重複** は避け、片方に詳細・片方は要約 + リンク
 - `docs/プロジェクト計画書.md` は概要用。詳細仕様は上記 md を更新する
 - 仕様変更時は WBS の該当 Phase / ID を意識する（未完了タスクと齟齬がないか）

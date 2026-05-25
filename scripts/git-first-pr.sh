@@ -35,7 +35,7 @@ python3 scripts/sync-github-labels.py || true
 if gh pr view --head "$BRANCH" >/dev/null 2>&1; then
   gh pr view --head "$BRANCH" --json url -q .url
 else
-  gh pr create --base "$BASE" --title "chore: Git ブランチ運用・GitHub テンプレ・エージェント設定を追加" --body "$(cat <<'EOF'
+  gh pr create --base "$BASE" --title "chore: add git workflow, GitHub templates, and agent settings" --body "$(cat <<'EOF'
 ## Summary
 
 - Add git-workflow docs, commit-pr-style skill, CI, and GitHub templates _(Git 運用規約・テンプレ・スキル追加)_

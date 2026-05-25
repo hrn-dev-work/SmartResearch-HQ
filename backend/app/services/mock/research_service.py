@@ -1,6 +1,5 @@
-from uuid import UUID
-
 import re
+from uuid import UUID
 
 from app.core.status import JobStatus
 from app.schemas.research import (

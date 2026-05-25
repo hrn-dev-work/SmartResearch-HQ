@@ -14,13 +14,16 @@ import {
   getReviewItems,
 } from "@/lib/api";
 import { asinValidationMessage, normalizeAsin } from "@/lib/asin";
-import type { ResearchJob, ReviewItem } from "@/lib/types";
+import type { ReviewItem } from "@/lib/types";
 
 export default function ReviewPage() {
   const params = useParams();
   const jobId = params.jobId as string;
 
-  const [job, setJob] = useState<ResearchJob | null>(null);
+  return <ReviewPageBody key={jobId} jobId={jobId} />;
+}
+
+function ReviewPageBody({ jobId }: { jobId: string }) {
   const [items, setItems] = useState<ReviewItem[]>([]);
   const [itemsLoading, setItemsLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
@@ -28,22 +31,43 @@ export default function ReviewPage() {
   const [error, setError] = useState<string | null>(null);
 
   const {
-    job: polledJob,
+    job,
     loading: jobLoading,
     error: jobError,
     isPolling,
   } = useJobProgress(jobId);
 
-  useEffect(() => {
-    setJob(polledJob);
-  }, [polledJob]);
+  const displayError = error ?? jobError;
 
   useEffect(() => {
-    if (jobError) setError(jobError);
-  }, [jobError]);
+    if (!job || isJobInProgress(job.status)) return;
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const itemsData = await getReviewItems(jobId);
+        if (cancelled) return;
+        setItems(itemsData.items);
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err.message : "商品一覧の読み込みに失敗しました",
+          );
+        }
+      } finally {
+        if (!cancelled) setItemsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [job, jobId]);
 
   const loadItems = useCallback(async () => {
     setItemsLoading(true);
+    setError(null);
     try {
       const itemsData = await getReviewItems(jobId);
       setItems(itemsData.items);
@@ -53,11 +77,6 @@ export default function ReviewPage() {
       setItemsLoading(false);
     }
   }, [jobId]);
-
-  useEffect(() => {
-    if (!job || isJobInProgress(job.status)) return;
-    loadItems();
-  }, [job, loadItems]);
 
   async function handleSelect(item: ReviewItem, candidateId: string) {
     await decideReview(item.item_id, candidateId);
@@ -148,9 +167,9 @@ export default function ReviewPage() {
             {message}
           </p>
         )}
-        {error && (
+        {displayError && (
           <p className="mt-8 border-l-2 border-red-500 pl-3 text-sm text-red-600">
-            {error}
+            {displayError}
           </p>
         )}
 

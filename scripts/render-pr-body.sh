@@ -41,7 +41,6 @@ render_auto() {
 ## Summary
 
 - Auto-created on push to \`${BRANCH}\` — fill in before merge _(push 後に自動作成。マージ前に追記)_
-
 ${commits}
 
 ## Test plan

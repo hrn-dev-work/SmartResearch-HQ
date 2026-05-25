@@ -16,5 +16,10 @@ assignees: ""
 - [ ]
 
 ## Related
+<!-- 該当する行だけ残す -->
 - WBS: x.y — タスク名
+- Docs: [`requirements.md`](../docs/requirements.md) / [`design.md`](../docs/design.md)
+- PR: #
 - Branch: `feat/...`
+- Blocks: #
+- Blocked by: #
