@@ -62,9 +62,20 @@ service-account*.json
 # Generated from local .cursor/skills (scripts/sync-skill-prompt-table.py)
 docs/prompt-templates.md
 
-# Agent / personal notes (local only — see docs/local/README.md)
-docs/local/*
-!docs/local/README.md
+# Git / agent scripts — local only (public clone uses git-ship, ci-check, render-*, ensure-pr)
+scripts/sync-skill-prompt-table.py
+scripts/git-first-pr.sh
+scripts/git-push-pr.sh
+scripts/update-open-pr-bodies.sh
+scripts/sync-github-labels.py
+
+# Agent / Git playbook — local only (public clone には含めない。裏用)
+AGENTS.md
+docs/agent-setup.md
+docs/git-workflow.md
+
+# Local docs index and notes (see docs/local/README.md on developer machine)
+docs/local/
 frontend/AGENTS.md
 frontend/CLAUDE.md
 
