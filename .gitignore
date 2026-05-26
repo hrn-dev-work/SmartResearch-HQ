@@ -56,8 +56,11 @@ service-account*.json
 # Playwright browsers (local install)
 /playwright/.cache/
 
-# Cursor session markers (local only)
-.cursor/retrospective/.session-edited
+# Cursor agent config — local only (rules, skills, hooks; never push to public clone)
+.cursor/
+
+# Generated from local .cursor/skills (scripts/sync-skill-prompt-table.py)
+docs/prompt-templates.md
 
 # Agent / personal notes (local only — see docs/local/README.md)
 docs/local/*

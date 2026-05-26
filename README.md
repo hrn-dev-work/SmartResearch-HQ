@@ -76,6 +76,8 @@ bash scripts/ci-check.sh   # mirrors GitHub CI (Ruff + pytest + ESLint + build)
 
 Git workflow: [docs/git-workflow.md](docs/git-workflow.md) — branch → PR → CI → squash merge.
 
+Cursor / agent rules (`.cursor/`) are **local only** and not in the public clone — see [docs/agent-setup.md](docs/agent-setup.md).
+
 ---
 
 ## 開発環境
