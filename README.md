@@ -74,9 +74,7 @@ Format on save: `.vscode/settings.json` (Python → Ruff, TS → ESLint).
 bash scripts/ci-check.sh   # mirrors GitHub CI (Ruff + pytest + ESLint + build)
 ```
 
-Git workflow: [docs/git-workflow.md](docs/git-workflow.md) — branch → PR → CI → squash merge.
-
-Cursor / agent rules (`.cursor/`) are **local only** and not in the public clone — see [docs/agent-setup.md](docs/agent-setup.md).
+Git (contributors): branch → PR → CI → squash merge. Use `bash scripts/git-start-branch.sh`, `scripts/git-ship.sh`, `scripts/ci-check.sh`. Agent playbook (`AGENTS.md`, `docs/git-workflow.md`, `.cursor/`) is **local only** — not in the public clone.
 
 ---
 
@@ -110,7 +108,7 @@ bash scripts/install-git-hooks.sh # 自動: WBS ロードマップ・PR チェ�
 bash scripts/ci-check.sh
 ```
 
-ブランチ運用: [docs/git-workflow.md](docs/git-workflow.md)
+ブランチ運用: `scripts/git-ship.sh` / `scripts/ci-check.sh`（詳細はローカルの `docs/git-workflow.md`）
 
 ## Quick start (portfolio / Mock)
 
@@ -184,7 +182,6 @@ docker compose up -d postgres redis
 - [Database schema](docs/database-schema.md)
 - [API specification](docs/api-specification.md)
 - [WBS roadmap](docs/wbs-roadmap.md) — task status auto-synced from artifacts
-- [Git workflow](docs/git-workflow.md)
 
 ---
 
@@ -197,7 +194,6 @@ docker compose up -d postgres redis
 - [DB スキーマ](docs/database-schema.md)
 - [API 仕様](docs/api-specification.md)
 - [WBS・ロードマップ](docs/wbs-roadmap.md) — 成果物から状態を自動更新
-- [Git ブランチ運用](docs/git-workflow.md)
 
 ## Environment variables
 
