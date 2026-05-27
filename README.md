@@ -203,6 +203,8 @@ docker compose up -d postgres redis
 | `MATCHING_PROVIDER` | `amazon_search` (default) / `none` / `gemini` |
 | `AMAZON_PAAPI_*` | PA-API 5.0 (production) |
 | `GEMINI_API_KEY` | Only when using `gemini` (never commit) |
+| `GEMINI_MIN_INTERVAL_SEC` | Min seconds between Gemini calls (default `4`, free-tier RPM safe) |
+| `GEMINI_MAX_RETRIES` | Retries on 429/503 (default `3`) |
 | `NEXT_PUBLIC_API_URL` | Frontend → API (default `http://localhost:8000/api/v1`) |
 
 Copy from `.env.example` or run `bootstrap-local.sh`. `.env` is gitignored.
@@ -217,6 +219,8 @@ Copy from `.env.example` or run `bootstrap-local.sh`. `.env` is gitignored.
 | `MATCHING_PROVIDER` | `amazon_search`（既定） / `none` / `gemini` |
 | `AMAZON_PAAPI_*` | PA-API 5.0（production 時） |
 | `GEMINI_API_KEY` | `gemini` 利用時のみ（コミット禁止） |
+| `GEMINI_MIN_INTERVAL_SEC` | Gemini 呼び出し間隔（既定 `4` 秒・無料枠 RPM 対策） |
+| `GEMINI_MAX_RETRIES` | 429/503 時の再試行回数（既定 `3`） |
 | `NEXT_PUBLIC_API_URL` | フロント → API |
 
 ## Roadmap

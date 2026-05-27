@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
+    gemini_min_interval_sec: float = 4.0
+    gemini_max_retries: int = 3
     amazon_paapi_access_key: str = ""
     amazon_paapi_secret_key: str = ""
     amazon_paapi_partner_tag: str = ""

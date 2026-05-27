@@ -7,6 +7,7 @@ import asyncio
 
 from app.config import AppMode, get_settings
 from app.db.session import SessionLocal
+from app.services.production.errors import PipelineRetriableError
 from app.services.production.pipeline import create_job_record
 from app.services.production.research_service import ProductionResearchService
 from app.services.scraper.shopee_crawler import fetch_sold_items
@@ -37,7 +38,10 @@ async def cmd_run(args: argparse.Namespace) -> int:
         print(f"Created job {job_id}")
 
         service = ProductionResearchService(session)
-        await service.run_pipeline(job_id, max_items=args.limit)
+        try:
+            await service.run_pipeline(job_id, max_items=args.limit)
+        except PipelineRetriableError as exc:
+            print(f"Pipeline failed (retriable in worker): {exc.error_code} — {exc}")
 
         refreshed = await service.get_job(job_id)
         if refreshed is None:
