@@ -1,9 +1,11 @@
 import Link from "next/link";
 
+import { AboutDemoTrigger } from "@/components/AboutDemoTrigger";
+
 export function Header() {
   return (
     <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-4">
         <Link
           href="/"
           className="group flex items-center gap-3 transition-opacity duration-200 hover:opacity-80"
@@ -15,7 +17,10 @@ export function Header() {
             SmartResearch
           </span>
         </Link>
-        <span className="text-xs font-medium text-slate-500">Demo</span>
+        <div className="flex items-center gap-4">
+          <AboutDemoTrigger />
+          <span className="text-xs font-medium text-slate-500">Portfolio</span>
+        </div>
       </div>
     </header>
   );

@@ -1,274 +1,135 @@
 # SmartResearch-HQ
 
-Cross-border e-commerce product research and Shopee→Amazon matching with scraping, candidate matching, and human review.
+**[Demo App](URLをここに入力)** — live portfolio (Vercel + Render, `APP_MODE=portfolio`)
 
-| Edition | Purpose | This repo |
-|---------|---------|-----------|
-| **Portfolio** | Demo for hiring / proposals | Mock API + frontend + design docs |
-| **Production** | Real operations | Playwright, matching, Google Sheets (private) |
+Cross-border e-commerce research automation: scrape Shopee SOLD listings, match Amazon ASIN candidates, human review, export to spreadsheet. Built as a production-grade pipeline with a **public-safe demo edition** for hiring and client proposals.
 
 ---
 
-越境EC（Shopee 等）の商品リサーチ・名寄せを **スクレイピング + 候補マッチング + Human-in-the-loop** で自動化するシステム。
+## Why two modes in one codebase
 
-| 版 | 目的 | 本リポジトリ |
-|----|------|-------------|
-| **表**（ポートフォリオ） | 転職・提案用デモ | Mock API + フロント + 設計 docs |
-| **裏**（完全版） | 実運用・副収入 | Private で Playwright / マッチング / Sheets |
+| Mode | Audience | Runtime |
+|------|----------|---------|
+| **Portfolio** (this demo) | Recruiters, clients, reviewers | In-memory Mock — no Postgres, Redis, or API keys |
+| **Production** (private ops) | Real cross-border EC workflows | Playwright scraping, Redis + ARQ workers, pluggable matching (PA-API / Gemini), Google Sheets |
+
+The same FastAPI + Next.js monorepo switches behavior via `APP_MODE`. The portfolio build removes infrastructure cost and secret-handling risk while preserving the full UI flow (research → review → export). Production adds async job processing and live integrations without forking the frontend.
+
+Use the in-app **「このデモについて」** link in the header for a concise system overview.
+
+---
 
 ## Tech stack
 
-- **Frontend**: Next.js 16, TypeScript, Tailwind CSS
-- **Backend**: FastAPI, Pydantic v2
-- **Infra**: PostgreSQL 16, Redis 7 (`docker compose` for production verification)
-- **Phase 2+**: Playwright, Amazon PA-API title search, Google Sheets (Gemini optional)
+- **Frontend:** Next.js 16, TypeScript, Tailwind CSS
+- **Backend:** FastAPI, Pydantic v2
+- **Portfolio infra:** Vercel (UI) + Render (API) — see [deployment guide](docs/deployment-guide.md)
+- **Production infra:** PostgreSQL 16, Redis 7, Playwright, Google Sheets API
 
 ---
 
-## 技術スタック
-
-- **Frontend**: Next.js 16, TypeScript, Tailwind CSS
-- **Backend**: FastAPI, Pydantic v2
-- **Infra**: PostgreSQL 16, Redis 7（docker compose — production 検証用）
-- **Phase 2+**: Playwright, Amazon PA-API タイトル検索, Google Sheets（Gemini は任意）
-
-## Development setup
-
-### Prerequisites
-
-| Item | Version / notes |
-|------|-----------------|
-| OS | **WSL Ubuntu** on Windows. Avoid Git Bash + UNC paths (breaks venv) |
-| Python | **3.12** (`python3.12-venv` if needed) |
-| Node.js | **20 LTS** (same as CI) |
-| Editor | **Cursor** or VS Code — open `~/workspace/SmartResearch-HQ` from WSL |
-| Docker | Optional — for production verification (Postgres / Redis) |
-
-### First-time bootstrap
-
-```bash
-cd ~/workspace/SmartResearch-HQ
-bash scripts/bootstrap-local.sh   # .env / backend venv / frontend npm ci
-bash scripts/install-git-hooks.sh # auto: WBS roadmap, PR checkboxes
-```
-
-### Recommended extensions
-
-Cursor/VS Code will prompt for workspace extensions (`.vscode/extensions.json`).
-
-| Extension | Use |
-|-----------|-----|
-| **Ruff** | Python lint / format |
-| **Python** + **Pylance** | Types, venv |
-| **ESLint** | TS / React lint |
-| **Tailwind CSS IntelliSense** | Tailwind classes |
-| **Docker** | compose editing |
-| **GitHub Actions** | CI syntax |
-| **EditorConfig** | Indent / EOL |
-
-Format on save: `.vscode/settings.json` (Python → Ruff, TS → ESLint).
-
-### Quality checks (before push)
-
-```bash
-bash scripts/ci-check.sh   # mirrors GitHub CI (Ruff + pytest + ESLint + build)
-```
-
-Git (contributors): branch → PR → CI → squash merge. Use `bash scripts/git-start-branch.sh`, `scripts/git-ship.sh`, `scripts/ci-check.sh`. Agent playbook (`AGENTS.md`, `docs/git-workflow.md`, `.cursor/`) is **local only** — not in the public clone.
-
----
-
-## 開発環境
-
-### 前提
-
-| 項目 | バージョン / 備考 |
-|------|-------------------|
-| OS | **WSL Ubuntu**（Windows 上）。Git Bash + UNC パスは venv 破損の原因になるため使わない |
-| Python | **3.12**（`python3.12-venv` パッケージが必要な場合あり） |
-| Node.js | **20 LTS**（CI と同じ） |
-| エディタ | **Cursor** または VS Code。リポジトリを WSL 側 `~/workspace/SmartResearch-HQ` で開く |
-| Docker | 任意。`production` 検証（Postgres / Redis）時のみ |
-
-### 初回セットアップ
-
-```bash
-cd ~/workspace/SmartResearch-HQ
-bash scripts/bootstrap-local.sh   # .env / venv / npm ci
-bash scripts/install-git-hooks.sh # 自動: WBS ロードマップ・PR チェックボックス
-```
-
-### 推奨拡張機能
-
-`.vscode/extensions.json` 参照。保存時フォーマットは Ruff / ESLint。
-
-### push 前の品質チェック
-
-```bash
-bash scripts/ci-check.sh
-```
-
-ブランチ運用: `scripts/git-ship.sh` / `scripts/ci-check.sh`（詳細はローカルの `docs/git-workflow.md`）
-
-## Quick start (portfolio / Mock)
+## Quick start (local, portfolio)
 
 Postgres and Redis are **not** required.
 
 ```bash
 bash scripts/bootstrap-local.sh
-```
 
-**Backend**
-
-```bash
+# Terminal 1 — API
 cd backend && source .venv/bin/activate
 uvicorn app.main:app --reload --port 8000
-```
 
-`GET http://localhost:8000/api/v1/health` → `{ "status": "ok", "mode": "portfolio", ... }`
-
-**Frontend**
-
-```bash
+# Terminal 2 — UI
 cd frontend && npm run dev
 ```
 
-Open http://localhost:3000 → enter a Shopee URL → review Amazon candidates.
+Open http://localhost:3000 → enter a Shopee shop URL → review candidates → export.
 
-**Production check (optional)**
-
-```bash
-cp .env.example .env
-docker compose up -d postgres redis
-```
+Health: `GET http://localhost:8000/api/v1/health` → `{ "status": "ok", "mode": "portfolio", ... }`
 
 ---
 
-## クイックスタート（portfolio / Mock）
+## Deploy (portfolio)
 
-**Postgres / Redis は不要**です。上記コマンドと同じ。
+1. Apply [render.yaml](render.yaml) on Render (`APP_MODE=portfolio`).
+2. Deploy `frontend/` to Vercel; set `NEXT_PUBLIC_API_URL` to your Render API base + `/api/v1`.
+3. Set `ALLOWED_ORIGINS` on Render to your Vercel URL(s).
 
-- API: http://localhost:8000/api/v1/health
-- UI: http://localhost:3000 → Shopee URL 入力 → レビュー画面で候補選択
+Full checklist: **[docs/deployment-guide.md](docs/deployment-guide.md)**
+
+---
 
 ## Repository layout
 
 ```
-├── docs/           # Design docs (+ docs/local/ gitignored notes)
+├── docs/           # Design & architecture
 ├── frontend/       # Next.js dashboard & review UI
 ├── backend/        # FastAPI (Mock services in portfolio mode)
+├── render.yaml     # Render Blueprint (portfolio API)
 ├── docker-compose.yml
-└── scripts/        # bootstrap, CI, git hooks, automation
+└── scripts/        # bootstrap, CI, smoke tests
 ```
 
 ---
-
-## リポジトリ構成
-
-```
-├── docs/           # 設計ドキュメント
-├── frontend/       # Next.js ダッシュボード & レビュー UI
-├── backend/        # FastAPI（portfolio 時は Mock）
-├── docker-compose.yml
-└── scripts/        # bootstrap, CI, 自動化スクリプト
-```
 
 ## Documentation
 
-- [Project plan](docs/プロジェクト計画書.md)
-- [Requirements](docs/requirements.md)
-- [Design (UI / MVP)](docs/design.md)
-- [Architecture](docs/architecture.md)
-- [Database schema](docs/database-schema.md)
-- [API specification](docs/api-specification.md)
-- [WBS roadmap](docs/wbs-roadmap.md) — task status auto-synced from artifacts
+| Doc | Contents |
+|-----|----------|
+| [Project plan](docs/プロジェクト計画書.md) | Goals & scope |
+| [Architecture](docs/architecture.md) | Two-mode design, data flow |
+| [Design](docs/design.md) | UI principles |
+| [API specification](docs/api-specification.md) | REST contract |
+| [Deployment guide](docs/deployment-guide.md) | Vercel / Render env vars |
 
 ---
 
-## ドキュメント
+## Development
 
-- [プロジェクト計画書](docs/プロジェクト計画書.md)
-- [要件定義](docs/requirements.md)
-- [設計（UI・MVP）](docs/design.md)
-- [アーキテクチャ](docs/architecture.md)
-- [DB スキーマ](docs/database-schema.md)
-- [API 仕様](docs/api-specification.md)
-- [WBS・ロードマップ](docs/wbs-roadmap.md) — 成果物から状態を自動更新
+### Prerequisites
 
-## Environment variables
+| Item | Notes |
+|------|-------|
+| OS | **WSL Ubuntu** recommended on Windows (avoid Git Bash + UNC paths) |
+| Python | 3.12 |
+| Node.js | 20 LTS |
+| Docker | Optional — production verification only |
 
-| Variable | Description |
-|----------|-------------|
-| `APP_MODE` | `portfolio` (Mock) / `production` |
-| `MATCHING_PROVIDER` | `amazon_search` (default) / `none` / `gemini` |
-| `AMAZON_PAAPI_*` | PA-API 5.0 (production) |
-| `GEMINI_API_KEY` | Only when using `gemini` (never commit) |
-| `GEMINI_MIN_INTERVAL_SEC` | Min seconds between Gemini calls (default `4`, free-tier RPM safe) |
-| `GEMINI_MAX_RETRIES` | Retries on 429/503 (default `3`) |
-| `NEXT_PUBLIC_API_URL` | Frontend → API (default `http://localhost:8000/api/v1`) |
+```bash
+bash scripts/ci-check.sh   # Ruff + pytest + ESLint + build (mirrors CI)
+```
 
-Copy from `.env.example` or run `bootstrap-local.sh`. `.env` is gitignored.
+Production verification (optional): copy `.env.example` → `.env`, then `docker compose up -d postgres redis` with `APP_MODE=production`.
+
+### Key environment variables (portfolio)
+
+| Variable | Where | Description |
+|----------|-------|-------------|
+| `APP_MODE` | Backend | `portfolio` (Mock) or `production` |
+| `NEXT_PUBLIC_API_URL` | Frontend | API base URL, e.g. `http://localhost:8000/api/v1` |
+| `ALLOWED_ORIGINS` | Backend | Comma-separated CORS origins for deployed frontend |
+
+See `.env.example` for production-only variables (PA-API, Gemini, Sheets).
 
 ---
-
-## 環境変数
-
-| 変数 | 説明 |
-|------|------|
-| `APP_MODE` | `portfolio`（Mock） / `production` |
-| `MATCHING_PROVIDER` | `amazon_search`（既定） / `none` / `gemini` |
-| `AMAZON_PAAPI_*` | PA-API 5.0（production 時） |
-| `GEMINI_API_KEY` | `gemini` 利用時のみ（コミット禁止） |
-| `GEMINI_MIN_INTERVAL_SEC` | Gemini 呼び出し間隔（既定 `4` 秒・無料枠 RPM 対策） |
-| `GEMINI_MAX_RETRIES` | 429/503 時の再試行回数（既定 `3`） |
-| `NEXT_PUBLIC_API_URL` | フロント → API |
 
 ## Roadmap
 
-Phase checkboxes sync from [docs/wbs-roadmap.md](docs/wbs-roadmap.md) via `scripts/sync-wbs-roadmap.py` (runs on pre-commit).
-
-- [x] **Phase 1** — Design, monorepo, docs alignment
-- [x] **Phase 2** — Playwright, Amazon search, Sheets, workers
-- [x] **Phase 3** — Job polling, Redis health, manual ASIN UI
-- [ ] **Phase 4** — Public demo, Vercel deploy
+- [x] Phase 1 — Design, monorepo, docs
+- [x] Phase 2 — Scraping, matching, Sheets, workers
+- [x] Phase 3 — Job polling, manual ASIN UI
+- [x] Phase 4 — Portfolio deploy config, About demo UI, deployment docs
 
 ---
-
-## ロードマップ
-
-`pre-commit` で WBS 表と連動してチェックが自動更新されます。
-
-- [x] **Phase 1** — 設計・モノレポ・docs 整合
-- [x] **Phase 2** — Playwright / Amazon 検索 / Sheets / ワーカー
-- [x] **Phase 3** — 進捗ポーリング・Redis 本接続・手動 ASIN UI
-- [ ] **Phase 4** — 公開デモ・Vercel デプロイ
-
-## Automation (no manual steps)
-
-| Trigger | What runs |
-|---------|-----------|
-| `git commit` (pre-commit) | WBS roadmap + README phase checkboxes |
-| `git push` (post-push) | Create PR if missing; sync PR CI checkboxes |
-| `bash scripts/ci-check.sh` | Roadmap sync + local CI mirror |
-| GitHub CI (on PR) | `sync-pr-checkboxes` job when backend/frontend pass |
-
----
-
-## 自動化（手動不要）
-
-| タイミング | 内容 |
-|------------|------|
-| `git commit` | WBS ロードマップ + README フェーズチェック |
-| `git push` | PR 自動作成・CI チェックボックス同期 |
-| `ci-check.sh` | ロードマップ同期 + ローカル CI |
-| GitHub CI | PR 本文の CI チェックを自動 `[x]` |
 
 ## License
 
-Private / portfolio use. Portfolio edition omits scraping internals and proprietary prompts.
+Private / portfolio use. The portfolio edition omits scraping internals and proprietary prompts.
 
 ---
 
-## ライセンス
+越境 EC（Shopee 等）の商品リサーチ・名寄せを **スクレイピング + 候補マッチング + Human-in-the-loop** で自動化するシステムです。表（Portfolio）と裏（Production）の二刀流構成により、公開デモと実運用を同一リポジトリで維持しています。
 
-Private / Portfolio 用途に応じて運用。表版ではスクレイピング回避・プロンプト等のコア実装は非公開。
+- デモ: 上記 **[Demo App](URLをここに入力)** リンク（デプロイ後に URL を差し替え）
+- ローカル起動: 上記 Quick start 参照
+- デプロイ手順: [docs/deployment-guide.md](docs/deployment-guide.md)
