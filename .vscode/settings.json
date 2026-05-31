@@ -1,5 +1,22 @@
 {
   "git.path": "\\\\wsl.localhost\\Ubuntu\\usr\\bin\\git",
+  "git.autorefresh": true,
+  "files.eol": "\n",
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 500,
+  "remote.WSL.fileWatcher.polling": true,
+  "remote.WSL.useShellEnvironment": true,
+  "terminal.integrated.defaultProfile.windows": "Ubuntu (WSL)",
+  "terminal.integrated.profiles.windows": {
+    "Ubuntu (WSL)": {
+      "path": "C:\\Windows\\System32\\wsl.exe",
+      "args": ["-d", "Ubuntu", "-e", "bash", "-l"]
+    }
+  },
+  "terminal.integrated.automationProfile.windows": {
+    "path": "C:\\Windows\\System32\\wsl.exe",
+    "args": ["-d", "Ubuntu", "-e", "bash", "-l"]
+  },
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
   "python.terminal.activateEnvironment": true,
   "python.analysis.extraPaths": ["${workspaceFolder}/backend"],
