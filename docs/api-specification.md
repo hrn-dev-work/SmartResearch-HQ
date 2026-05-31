@@ -1,3 +1,225 @@
+# API specification (v1)
+
+Base URL: `/api/v1`  
+Content-Type: `application/json`
+
+## Common
+
+### Error response
+
+```json
+{
+  "error": {
+    "code": "SCRAPE_BLOCKED",
+    "message": "Human readable message",
+    "details": {}
+  }
+}
+```
+
+| HTTP | Use |
+|------|-----|
+| 400 | Validation |
+| 404 | Not found |
+| 409 | Invalid state transition |
+| 503 | External dependency unavailable |
+
+### Error codes (main)
+
+| code | Meaning |
+|------|---------|
+| `SCRAPE_BLOCKED` | CAPTCHA / IP block |
+| `AI_FAILED` | Candidate matching failed |
+| `INVALID_ASIN` | Invalid manual ASIN format |
+| `INVALID_STATE` | Invalid job state transition |
+
+---
+
+## `GET /health`
+
+```json
+{
+  "status": "ok",
+  "mode": "portfolio",
+  "matching_provider": "amazon_search"
+}
+```
+
+| Field | Values |
+|-------|--------|
+| `mode` | `portfolio` \| `production` |
+| `matching_provider` | `amazon_search` \| `none` \| `gemini` |
+| `redis` | production only: `ok` \| `unavailable`. Omitted in portfolio |
+
+---
+
+## `POST /research`
+
+Create a research job and enqueue work.
+
+**Request**
+
+```json
+{
+  "shopee_shop_url": "https://shopee.sg/shop/123456",
+  "seller_display_name": "Optional Shop Name"
+}
+```
+
+**Response 201**
+
+```json
+{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "PENDING",
+  "progress_pct": 0
+}
+```
+
+Portfolio may return `AWAITING_REVIEW` / `progress_pct: 100` immediately (Mock).
+
+---
+
+## `GET /research/{job_id}`
+
+Job summary and progress.
+
+**Response 200**
+
+```json
+{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "AI_INFERENCE",
+  "progress_pct": 45,
+  "seller": {
+    "shopee_shop_url": "https://shopee.sg/shop/123456",
+    "display_name": "Demo Shop"
+  },
+  "item_count": 12,
+  "error": null,
+  "created_at": "2026-05-17T12:00:00Z",
+  "updated_at": "2026-05-17T12:01:30Z"
+}
+```
+
+`AI_INFERENCE` = candidate matching in progress.
+
+---
+
+## `GET /research/{job_id}/items`
+
+Review screen payload. Paginated.
+
+**Query**: `?page=1&page_size=20`
+
+**Response 200**
+
+```json
+{
+  "items": [
+    {
+      "item_id": "item-uuid",
+      "shopee_item_id": "123456789",
+      "title": "Wireless Earbuds Pro",
+      "image_url": "https://cf.shopee.sg/file/...",
+      "shopee_item_url": "https://shopee.sg/product-i.123456.123456789",
+      "sold_count": 1523,
+      "candidates": [
+        {
+          "candidate_id": "cand-uuid",
+          "rank": 1,
+          "asin": "B0XXXXXX",
+          "amazon_url": "https://www.amazon.com/dp/B0XXXXXX",
+          "title": "Similar product on Amazon",
+          "confidence": 0.87
+        }
+      ],
+      "decision": null
+    }
+  ],
+  "page": 1,
+  "page_size": 20,
+  "total": 12
+}
+```
+
+---
+
+## `POST /review/{item_id}/decide`
+
+Pick a candidate, enter manual ASIN, or reject.
+
+### Pattern A: Select candidate
+
+```json
+{
+  "candidate_id": "cand-uuid"
+}
+```
+
+### Pattern B: Manual ASIN (`MATCHING_PROVIDER=none` or no candidates)
+
+```json
+{
+  "candidate_id": null,
+  "manual_asin": "B0XXXXXX"
+}
+```
+
+- `manual_asin`: 10 characters (leading `B` + 9 alphanumeric). Server builds `amazon_url`.
+- Do not send `candidate_id` and `manual_asin` together.
+
+### Pattern C: Reject
+
+```json
+{
+  "candidate_id": null,
+  "rejected": true
+}
+```
+
+**Response 200**
+
+```json
+{
+  "item_id": "item-uuid",
+  "status": "APPROVED",
+  "exported": false
+}
+```
+
+Reject → `"status": "REJECTED"`.
+
+---
+
+## `POST /research/{job_id}/export`
+
+Export approved items to spreadsheet (real API in production only).
+
+**Response 202**
+
+```json
+{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "exported_count": 10,
+  "skipped_count": 2
+}
+```
+
+---
+
+## Portfolio Mock behavior
+
+When `APP_MODE=portfolio`:
+
+- `POST /research` advances fixtures to `AWAITING_REVIEW` quickly.
+- Returns fixed Shopee images and three Amazon candidates.
+- `export` returns counts without external APIs.
+- `POST /review/{item_id}/decide` accepts `manual_asin` in Mock.
+- No Postgres / Redis / external matching APIs.
+
+---
+
 # API 仕様（v1）
 
 Base URL: `/api/v1`  

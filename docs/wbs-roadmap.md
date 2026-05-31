@@ -1,3 +1,95 @@
+# WBS and development roadmap
+
+Estimated effort: **30–40 hours** (AI-assisted development).
+
+> **Status column auto-updates**: When artifact paths exist in the repo, `scripts/sync-wbs-roadmap.py` marks ✅ (`pre-commit` / `ci-check.sh`). README Phase checkboxes stay in sync.
+
+## Phase 1: Requirements and design ✅
+
+| ID | Task | Deliverable | Status |
+|----|------|-------------|--------|
+| 1.1 | Architecture detail | `docs/architecture.md` | ✅ |
+| 1.2 | DB schema | `docs/database-schema.md` | ✅ |
+| 1.3 | API I/O | `docs/api-specification.md` | ✅ |
+| 1.4 | WBS | This document | ✅ |
+| 1.5 | Monorepo skeleton | frontend/, backend/, docker-compose | ✅ |
+| 1.6 | Project plan alignment | `docs/プロジェクト計画書.md` + doc consistency | ✅ |
+
+Phase 1 done when: terminology, matching policy, and API paths align across docs.
+
+## Phase 2: Core logic (production) — ✅ Done
+
+| ID | Task | Deliverable | Status |
+|----|------|-------------|--------|
+| 2.1 | Playwright Shopee crawler | `backend/app/services/scraper/` | ✅ |
+| 2.2 | Candidate matching (PA-API) | `backend/app/services/matching/` | ✅ |
+| 2.2b | Manual ASIN decide API + DB | review route, `review_decisions.manual_asin` | ✅ |
+| 2.2c | Gemini multimodal (optional) | `matching/gemini.py` | ✅ |
+| 2.3 | Google Sheets | `backend/app/services/spreadsheet/` | ✅ |
+| 2.4 | ARQ workers + retry/DLQ | `backend/app/workers/` | ✅ |
+| 2.5 | Alembic migrations | `backend/alembic/` | ✅ |
+| 2.6 | CLI entrypoint | `python -m app.cli` | ✅ |
+
+Phase 2 done (except 2.2c): scrape → match → DB → worker retry/DLQ → CLI path verified.
+
+### Phase 2 local verification (M2)
+
+See also: [production-local-setup.md](./production-local-setup.md).
+
+```bash
+bash scripts/smoke-m2.sh
+
+docker compose up -d postgres redis
+cd backend && source .venv/bin/activate
+pip install -r requirements.txt
+playwright install chromium
+python -m app.cli migrate
+python -m app.cli scrape --url "https://shopee.sg/..." --limit 5
+python -m app.cli run --url "https://shopee.sg/..." --limit 5
+arq app.workers.settings.WorkerSettings
+```
+
+## Phase 3: UI / API (shared)
+
+| ID | Task | Deliverable | Status |
+|----|------|-------------|--------|
+| 3.1 | Dashboard UI | `frontend/src/app/page.tsx` | ✅ |
+| 3.2 | Review UI | `frontend/src/app/review/[jobId]/` | ✅ |
+| 3.3 | API client + types | `frontend/src/lib/api.ts` | ✅ |
+| 3.4 | Job progress polling/SSE | hooks + API | ✅ MVP polling |
+| 3.5 | FastAPI ↔ Redis | docker-compose verification | ✅ v1 |
+| 3.6 | Manual ASIN UI | review screen §design 3.3 | ✅ v1 |
+
+## Phase 4: Portfolio (public demo)
+
+| ID | Task | Deliverable | Estimate |
+|----|------|-------------|----------|
+| 4.1 | Mock API polish | `MockResearchService` | ✅ |
+| 4.2 | README and screenshots | Root README | 1h |
+| 4.3 | Demo video (Loom, etc.) | External | 2h |
+| 4.4 | Vercel deploy + CORS / rate limit | Public URL | 2h |
+
+## Milestones
+
+```
+M1: Mock research from frontend (portfolio)              ← done
+M2: CLI scrape + amazon_search for one seller            ← scripts/smoke-m2.sh
+M3: Review → Sheets E2E
+M4: Public GitHub + demo URL
+```
+
+## Local start (portfolio)
+
+No Postgres / Redis. `.env` from `bootstrap-local.sh`.
+
+```bash
+bash scripts/bootstrap-local.sh
+# Terminal 1: backend uvicorn :8000
+# Terminal 2: frontend npm run dev :3000
+```
+
+---
+
 # WBS・開発ロードマップ
 
 想定総工数: **30〜40 時間**（AI 駆動開発前提）
