@@ -1,0 +1,8 @@
+feat(production): add local setup script and production docs
+
+Add start-production-local.sh for Docker, migrate, and env checklist.
+Document non-public production mode in production-local-setup.md.
+
+---
+
+裏版ローカル起動スクリプトと公開ドキュメントを追加。表デモとは別経路。

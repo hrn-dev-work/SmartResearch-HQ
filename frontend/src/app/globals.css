@@ -25,3 +25,7 @@ html[lang="ja"] {
   word-break: normal;
   overflow-wrap: anywhere;
 }
+
+dialog:not([open]) {
+  display: none !important;
+}

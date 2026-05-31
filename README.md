@@ -49,6 +49,19 @@ Health: `GET http://localhost:8000/api/v1/health` → `{ "status": "ok", "mode":
 
 ---
 
+## Quick start (local, production — private)
+
+**Not deployed publicly.** Requires Docker (Postgres + Redis), Playwright, and optionally Amazon PA-API keys. Gemini is optional.
+
+```bash
+bash scripts/start-production-local.sh
+# Edit .env: APP_MODE=production, AMAZON_PAAPI_* (see docs/production-local-setup.md)
+```
+
+Full checklist: **[docs/production-local-setup.md](docs/production-local-setup.md)** · M2 smoke: `bash scripts/smoke-m2.sh`
+
+---
+
 ## Deploy (portfolio)
 
 1. Apply [render.yaml](render.yaml) on Render (`APP_MODE=portfolio`).
@@ -135,5 +148,6 @@ Private / portfolio use. The portfolio edition omits scraping internals and prop
 
 - デモ: 上記 **[Demo App](https://smart-research-hq.vercel.app)** リンク
 - ローカル起動: 上記 Quick start 参照
+- 裏版（非公開）: [docs/production-local-setup.md](docs/production-local-setup.md)
 - デプロイ手順: [docs/deployment-guide.md](docs/deployment-guide.md)
 - 障害対応: [docs/deployment-troubleshooting.md](docs/deployment-troubleshooting.md)
