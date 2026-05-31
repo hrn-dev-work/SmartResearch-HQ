@@ -107,9 +107,19 @@ export default function DashboardPage() {
         </section>
 
         <aside className="mt-14 grid gap-6 border-t border-slate-200 pt-10 sm:grid-cols-3 sm:gap-8">
-          <Metric label={t.metricManualLabel} line={t.metricManualLine} />
-          <Metric label={t.metricToolLabel} line={t.metricToolLine} emphasized />
-          <Metric label={t.metricModeLabel} line={t.metricModeLine} />
+          <Metric
+            label={t.metricManual}
+            line={`${t.metricManualValue} ${t.metricManualUnit}`}
+          />
+          <Metric
+            label={t.metricTool}
+            line={`${t.metricToolValue} ${t.metricToolUnit}`}
+            emphasized
+          />
+          <Metric
+            label={t.metricMode}
+            line={`${t.metricModeValue} ${t.metricModeUnit}`}
+          />
         </aside>
       </main>
     </>
