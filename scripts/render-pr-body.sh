@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Render PR body: English block (Summary/Commits/Test plan/Related) → --- → Japanese block.
+# Render PR body: English block → --- → Japanese block.
 # Usage:
 #   bash scripts/render-pr-body.sh manual [branch]
 #   bash scripts/render-pr-body.sh auto <branch> [base]
@@ -7,6 +7,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
 MODE="${1:-manual}"
 BRANCH="${2:-feat/...}"
 BASE="${3:-main}"
@@ -28,6 +29,150 @@ format_commits() {
       echo "* ${subject}"
     fi
   done <<<"$log"
+}
+
+subject_to_bullet() {
+  local subject="$1"
+  if [[ "$subject" == *": "* ]]; then
+    echo "* ${subject#*: }"
+  else
+    echo "* ${subject}"
+  fi
+}
+
+infer_en_summary() {
+  local branch="$1"
+  case "$branch" in
+    docs/portfolio-deploy-live)
+      cat <<'EOF'
+* Publish live Demo App URL in README (`https://smart-research-hq.vercel.app`)
+* Add deployment troubleshooting doc (Vercel 404 cache, Deployment Protection, CORS)
+* Add agent-run, portfolio-vercel-deploy, and agent-push scripts for one-command deploy ops
+* Merge `main`: keep i18n frontend from #15; unify agent-push presets
+EOF
+      return
+      ;;
+    docs/frontend-structure-viz)
+      cat <<'EOF'
+* Add frontend structure guide (overview, benefits, usage) and Mermaid maps (routes, layers, imports, i18n)
+* Cross-link from architecture.md §5 directory tree (same PR — use check-staged-docs-crosslinks.sh)
+EOF
+      return
+      ;;
+    chore/docs-crosslink-guardrails)
+      cat <<'EOF'
+* Restore `validate-pr-body.sh` and add `check-staged-docs-crosslinks.sh` (WARN after `git-add-safe.sh`)
+* Extend `check-pr-tooling.sh` self-check; document docs bundle checklist in agent-git-playbook
+EOF
+      return
+      ;;
+    chore/docs-crosslink-guardrails)
+      cat <<'EOF'
+* Restore `validate-pr-body.sh` and add `check-staged-docs-crosslinks.sh` (WARN after `git-add-safe.sh`)
+* Extend `check-pr-tooling.sh` self-check; document docs bundle checklist in agent-git-playbook
+EOF
+      return
+      ;;
+    feat/production-local-setup)
+      cat <<'EOF'
+* Add production local setup script and documentation
+* Wire frontend JA/EN i18n, locale middleware, and UI layout fixes
+* Add dev viewport check and stop-next-dev scripts for WSL
+EOF
+      return
+      ;;
+    chore/gitignore-local-agent-tooling)
+      cat <<'EOF'
+* Gitignore local agent debug output and one-off merge scripts
+* Add bilingual agent-git-playbook and PR body sync tooling (gh-pr-branch, sync-pr-body)
+* Merge main: keep i18n UI, deploy guide, and portfolio mock API parity
+EOF
+      return
+      ;;
+  esac
+
+  local log
+  log="$(git log "origin/${BASE}..HEAD" --no-merges --format=%s 2>/dev/null || git log "${BASE}..HEAD" --no-merges --format=%s 2>/dev/null || true)"
+  if [[ -z "$log" ]]; then
+    echo "* (edit Summary before merge)"
+    return
+  fi
+  while IFS= read -r subject; do
+    [[ -z "$subject" ]] && continue
+    subject_to_bullet "$subject"
+  done <<<"$log"
+}
+
+infer_ja_summary() {
+  local branch="$1"
+  case "$branch" in
+    docs/portfolio-deploy-live)
+      cat <<'EOF'
+* README に本番デモ URL（`https://smart-research-hq.vercel.app`）を掲載
+* デプロイ障害切り分けドキュメントを追加（Vercel 404・Deployment Protection・CORS）
+* agent-run / portfolio-vercel-deploy / agent-push スクリプトを追加
+* main マージ: #15 の i18n UI を維持、agent-push の preset を統合
+EOF
+      return
+      ;;
+    docs/frontend-structure-viz)
+      cat <<'EOF'
+* フロント構造ガイド（概要・利点・使い方）と Mermaid 図（ルート・レイヤー・import・i18n）を追加
+* architecture.md §5 から相互リンク（同一 PR — `check-staged-docs-crosslinks.sh` で確認）
+EOF
+      return
+      ;;
+    chore/docs-crosslink-guardrails)
+      cat <<'EOF'
+* `validate-pr-body.sh` を復旧し `check-staged-docs-crosslinks.sh` を追加（`git-add-safe.sh` 後に WARN）
+* `check-pr-tooling.sh` の自己検査を拡張。agent-git-playbook に docs 束ねチェックリストを追記
+EOF
+      return
+      ;;
+    chore/docs-crosslink-guardrails)
+      cat <<'EOF'
+* `validate-pr-body.sh` を復旧し `check-staged-docs-crosslinks.sh` を追加（`git-add-safe.sh` 後に WARN）
+* `check-pr-tooling.sh` の自己検査を拡張。agent-git-playbook に docs 束ねチェックリストを追記
+EOF
+      return
+      ;;
+    feat/production-local-setup)
+      cat <<'EOF'
+* 本番ローカル起動スクリプトとドキュメントを追加
+* フロント JA/EN 多言語・middleware・UI レイアウト修正
+* WSL 向け dev 画面幅チェック・stop-next-dev スクリプトを追加
+EOF
+      return
+      ;;
+    chore/gitignore-local-agent-tooling)
+      cat <<'EOF'
+* エージェント用デバッグ出力・一回限り merge スクリプトを gitignore
+* 二言語 agent-git-playbook と PR 本文同期（sync-pr-body / gh-pr-branch）を追加
+* main マージ: i18n UI・デプロイ手順・portfolio Mock API 整合を維持
+EOF
+      return
+      ;;
+  esac
+
+  local ja_lines=""
+  while IFS= read -r block; do
+    [[ -z "$block" ]] && continue
+    ja_lines+=$'* '"${block}"$'\n'
+  done < <(
+    git log "origin/${BASE}..HEAD" --no-merges --format=%B 2>/dev/null |
+      awk '/^---$/{p=1;next} p && /^[a-zA-Z(]/{p=0} p && NF{sub(/^[ \t]+/,""); print}'
+  )
+
+  if [[ -n "$ja_lines" ]]; then
+    printf '%s' "$ja_lines" | sed '/^$/d' | while IFS= read -r line; do
+      echo "* ${line}"
+    done
+    return
+  fi
+
+  infer_en_summary "$branch" | while IFS= read -r line; do
+    echo "$line"
+  done
 }
 
 render_manual() {
@@ -75,13 +220,15 @@ EOF
 }
 
 render_auto() {
-  local commits
+  local commits en_summary ja_summary
   commits="$(format_commits)"
+  en_summary="$(infer_en_summary "$BRANCH")"
+  ja_summary="$(infer_ja_summary "$BRANCH")"
 
   cat <<EOF
 **Summary**
 
-* Auto-created on push to \`${BRANCH}\`. Fill in before merge.
+${en_summary}
 
 **Commits**
 
@@ -91,16 +238,18 @@ ${commits}
 
 * [${CI}] \`bash scripts/ci-check.sh\` passes
 * [${CI}] CI backend / frontend green
+* [ ] Live demo loads and research flow works (if deploy changed)
 
 **Related**
 
 * **Branch:** \`${BRANCH}\`
+* **Demo:** https://smart-research-hq.vercel.app
 
 ---
 
 **概要 (Summary)**
 
-* \`${BRANCH}\` への push 後に自動作成。マージ前に変更内容を追記すること。
+${ja_summary}
 
 **コミット (Commits)**
 
@@ -110,10 +259,12 @@ ${commits}
 
 * [${CI}] \`bash scripts/ci-check.sh\` が通る
 * [${CI}] CI backend / frontend green
+* [ ] デモ URL でリサーチフローが動作（デプロイ変更時）
 
 **関連 (Related)**
 
 * **ブランチ:** \`${BRANCH}\`
+* **デモ:** https://smart-research-hq.vercel.app
 EOF
 }
 
