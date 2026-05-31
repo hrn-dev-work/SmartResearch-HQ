@@ -6,14 +6,14 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { Header } from "@/components/Header";
+import { useLocale } from "@/components/LocaleProvider";
 import { StatusBadge } from "@/components/StatusBadge";
 import { isJobInProgress, useJobProgress } from "@/hooks/useJobProgress";
-import {
-  decideReview,
-  exportJob,
-  getReviewItems,
-} from "@/lib/api";
+import { decideReview, exportJob, getReviewItems } from "@/lib/api";
 import { asinValidationMessage, normalizeAsin } from "@/lib/asin";
+import { formatMessage } from "@/lib/format-message";
+import type { Messages } from "@/lib/messages/types";
+import { fieldInputSmClass, pageXClass } from "@/lib/ui-classes";
 import type { ReviewItem } from "@/lib/types";
 
 export default function ReviewPage() {
@@ -24,6 +24,9 @@ export default function ReviewPage() {
 }
 
 function ReviewPageBody({ jobId }: { jobId: string }) {
+  const { messages } = useLocale();
+  const t = messages.review;
+
   const [items, setItems] = useState<ReviewItem[]>([]);
   const [itemsLoading, setItemsLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
@@ -51,9 +54,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
         setItems(itemsData.items);
       } catch (err) {
         if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : "商品一覧の読み込みに失敗しました",
-          );
+          setError(err instanceof Error ? err.message : t.errorLoadItems);
         }
       } finally {
         if (!cancelled) setItemsLoading(false);
@@ -63,7 +64,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [job, jobId]);
+  }, [job, jobId, t.errorLoadItems]);
 
   const loadItems = useCallback(async () => {
     setItemsLoading(true);
@@ -72,27 +73,29 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
       const itemsData = await getReviewItems(jobId);
       setItems(itemsData.items);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "商品一覧の読み込みに失敗しました");
+      setError(err instanceof Error ? err.message : t.errorLoadItems);
     } finally {
       setItemsLoading(false);
     }
-  }, [jobId]);
+  }, [jobId, t.errorLoadItems]);
 
   async function handleSelect(item: ReviewItem, candidateId: string) {
     await decideReview(item.item_id, candidateId);
-    setMessage(`確定: ${item.title}`);
+    setMessage(formatMessage(t.confirmed, { title: item.title }));
     await loadItems();
   }
 
   async function handleReject(item: ReviewItem) {
     await decideReview(item.item_id, null, true);
-    setMessage(`却下: ${item.title}`);
+    setMessage(formatMessage(t.rejected, { title: item.title }));
     await loadItems();
   }
 
   async function handleManualAsin(item: ReviewItem, asin: string) {
     await decideReview(item.item_id, { manualAsin: asin });
-    setMessage(`ASIN ${asin} で確定: ${item.title}`);
+    setMessage(
+      formatMessage(t.confirmedAsin, { asin, title: item.title }),
+    );
     await loadItems();
   }
 
@@ -101,10 +104,13 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
     try {
       const res = await exportJob(jobId);
       setMessage(
-        `${res.exported_count} 件を出力（${res.skipped_count} 件スキップ）`,
+        formatMessage(t.exportResult, {
+          exported: res.exported_count,
+          skipped: res.skipped_count,
+        }),
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "出力に失敗しました");
+      setError(err instanceof Error ? err.message : t.errorExport);
     } finally {
       setExporting(false);
     }
@@ -116,26 +122,30 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
   return (
     <>
       <Header />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
-        <header className="flex flex-wrap items-start justify-between gap-6">
-          <div className="space-y-3">
+      <main
+        className={`mx-auto w-full max-w-3xl flex-1 py-10 sm:py-12 ${pageXClass}`}
+      >
+        <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 space-y-3">
             <Link
               href="/"
-              className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-900"
+              className="inline-block text-sm text-slate-500 transition-colors duration-200 hover:text-slate-900"
             >
-              ← 戻る
+              {t.back}
             </Link>
             <div>
               <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-                レビュー
+                {t.title}
               </h1>
               {job && (
-                <p className="mt-2 text-sm text-slate-500">
-                  {sellerLabel}
+                <p className="mt-2 text-pretty text-sm text-slate-500">
+                  <span className="break-all">{sellerLabel}</span>
                   {job.item_count > 0 && (
-                    <span className="text-slate-400">
-                      {" "}
-                      · {job.item_count} 件
+                    <span className="whitespace-nowrap text-slate-400">
+                      {" · "}
+                      {formatMessage(t.itemCount, {
+                        count: job.item_count,
+                      })}
                     </span>
                   )}
                 </p>
@@ -143,51 +153,56 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
             </div>
           </div>
           {job && (
-            <div className="flex flex-wrap items-center gap-3">
-              <StatusBadge status={job.status} />
-              {isPolling && (
-                <span className="text-sm text-slate-500">
-                  {job.progress_pct}% — 処理中…
-                </span>
-              )}
+            <div className="flex w-full min-w-0 flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <StatusBadge status={job.status} />
+                {isPolling && (
+                  <span className="whitespace-nowrap text-sm text-slate-500">
+                    {formatMessage(t.processing, { pct: job.progress_pct })}
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={handleExport}
                 disabled={exporting}
-                className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50"
+                className="w-full rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 sm:w-auto"
               >
-                {exporting ? "出力中…" : "スプレッドシートへ出力"}
+                {exporting ? t.exporting : t.export}
               </button>
             </div>
           )}
         </header>
 
         {message && (
-          <p className="mt-8 border-l-2 border-emerald-500 pl-3 text-sm text-emerald-700">
+          <p className="mt-8 text-pretty border-l-2 border-emerald-500 pl-3 text-sm text-emerald-700">
             {message}
           </p>
         )}
         {displayError && (
-          <p className="mt-8 border-l-2 border-red-500 pl-3 text-sm text-red-600">
+          <p className="mt-8 text-pretty border-l-2 border-red-500 pl-3 text-sm text-red-600">
             {displayError}
           </p>
         )}
 
-        <section className="mt-16">
-          {jobLoading || (itemsLoading && !isJobInProgress(job?.status ?? "PENDING")) ? (
-            <p className="text-sm text-slate-500">読み込み中…</p>
+        <section className="mt-12 sm:mt-16">
+          {jobLoading ||
+          (itemsLoading && !isJobInProgress(job?.status ?? "PENDING")) ? (
+            <p className="text-sm text-slate-500">{t.loading}</p>
           ) : job && isJobInProgress(job.status) ? (
             <p className="text-sm text-slate-500">
-              リサーチ処理中です（{job.progress_pct}%）。完了すると商品一覧が表示されます。
+              {formatMessage(t.processingHint, { pct: job.progress_pct })}
             </p>
           ) : items.length === 0 ? (
-            <p className="text-sm text-slate-500">レビュー対象がありません。</p>
+            <p className="text-sm text-slate-500">{t.empty}</p>
           ) : (
             <ul className="divide-y divide-slate-200">
               {items.map((item) => (
                 <li key={item.item_id} className="py-12 first:pt-0">
                   <ReviewItemRow
                     item={item}
+                    review={t}
+                    asinMsgs={messages.asin}
                     onSelect={(cid) => handleSelect(item, cid)}
                     onReject={() => handleReject(item)}
                     onManualAsin={(asin) => handleManualAsin(item, asin)}
@@ -204,11 +219,15 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
 
 function ReviewItemRow({
   item,
+  review: t,
+  asinMsgs,
   onSelect,
   onReject,
   onManualAsin,
 }: {
   item: ReviewItem;
+  review: Messages["review"];
+  asinMsgs: Messages["asin"];
   onSelect: (candidateId: string) => void;
   onReject: () => void;
   onManualAsin: (asin: string) => Promise<void>;
@@ -219,7 +238,7 @@ function ReviewItemRow({
   const [submitting, setSubmitting] = useState(false);
 
   async function handleManualSubmit() {
-    const message = asinValidationMessage(manualAsin);
+    const message = asinValidationMessage(manualAsin, asinMsgs);
     if (message) {
       setManualError(message);
       return;
@@ -230,7 +249,9 @@ function ReviewItemRow({
       await onManualAsin(normalizeAsin(manualAsin));
       setManualAsin("");
     } catch (err) {
-      setManualError(err instanceof Error ? err.message : "確定に失敗しました");
+      setManualError(
+        err instanceof Error ? err.message : t.errorDecide,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -238,12 +259,10 @@ function ReviewItemRow({
 
   return (
     <article
-      className={`grid gap-10 lg:grid-cols-2 ${decided ? "opacity-60" : ""}`}
+      className={`grid gap-8 sm:gap-10 lg:grid-cols-2 ${decided ? "opacity-60" : ""}`}
     >
       <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-          Shopee
-        </p>
+        <p className="text-xs font-medium text-slate-500">{t.shopee}</p>
         <div className="mt-4 flex gap-4">
           <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-slate-100">
             <Image
@@ -260,7 +279,9 @@ function ReviewItemRow({
             </h2>
             {item.sold_count != null && (
               <p className="mt-2 text-sm text-slate-500">
-                販売数 {item.sold_count.toLocaleString()}
+                {formatMessage(t.soldCount, {
+                  count: item.sold_count.toLocaleString(),
+                })}
               </p>
             )}
             {item.shopee_item_url ? (
@@ -270,7 +291,7 @@ function ReviewItemRow({
                 rel="noopener noreferrer"
                 className="mt-2 inline-block text-sm text-slate-500 underline-offset-2 transition-colors duration-200 hover:text-slate-900 hover:underline"
               >
-                Shopee で開く
+                {t.openShopee}
               </a>
             ) : null}
           </div>
@@ -278,35 +299,34 @@ function ReviewItemRow({
       </div>
 
       <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-          Amazon 候補
-        </p>
+        <p className="text-xs font-medium text-slate-500">{t.amazonCandidates}</p>
         <ul className="mt-4 space-y-1">
           {item.candidates.length === 0 ? (
-            <li className="py-2 text-sm text-slate-500">
-              候補がありません。ASIN を入力してください。
-            </li>
+            <li className="py-2 text-sm text-slate-500">{t.noCandidates}</li>
           ) : (
             item.candidates.map((c) => (
               <li
                 key={c.candidate_id}
-                className="flex items-center justify-between gap-4 rounded-md py-3 transition-colors duration-200 hover:bg-slate-100/80"
+                className="flex flex-col gap-3 rounded-md py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:hover:bg-slate-100/80"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-slate-900">
+                  <p className="text-pretty text-sm font-medium text-slate-900">
                     {c.title}
                   </p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    {c.asin} · 一致度 {(c.confidence * 100).toFixed(0)}%
+                  <p className="mt-0.5 whitespace-nowrap text-xs text-slate-500">
+                    {formatMessage(t.confidence, {
+                      asin: c.asin,
+                      pct: (c.confidence * 100).toFixed(0),
+                    })}
                   </p>
                 </div>
                 <button
                   type="button"
                   disabled={decided}
                   onClick={() => onSelect(c.candidate_id)}
-                  className="shrink-0 rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+                  className="w-full shrink-0 rounded-md bg-slate-900 px-3 py-2 text-xs font-medium text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 sm:w-auto sm:py-1.5"
                 >
-                  選択
+                  {t.select}
                 </button>
               </li>
             ))
@@ -316,11 +336,11 @@ function ReviewItemRow({
           <div className="mt-8 border-t border-slate-200 pt-6">
             <label
               htmlFor={`asin-${item.item_id}`}
-              className="text-xs font-medium uppercase tracking-wider text-slate-500"
+              className="text-xs font-medium text-slate-500"
             >
-              手動 ASIN
+              {t.manualAsin}
             </label>
-            <div className="mt-3 flex flex-wrap items-end gap-3">
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
               <input
                 id={`asin-${item.item_id}`}
                 type="text"
@@ -333,15 +353,15 @@ function ReviewItemRow({
                   setManualError(null);
                 }}
                 placeholder="B0XXXXXXXXX"
-                className="w-full max-w-xs border-b border-slate-200 bg-transparent py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none"
+                className={`${fieldInputSmClass} sm:flex-1`}
               />
               <button
                 type="button"
                 disabled={submitting || manualAsin.length === 0}
                 onClick={handleManualSubmit}
-                className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-900 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-40"
+                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-900 transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-40 sm:w-auto"
               >
-                {submitting ? "送信中…" : "この ASIN で確定"}
+                {submitting ? t.submitting : t.confirmAsin}
               </button>
             </div>
             {manualError && (
@@ -355,10 +375,10 @@ function ReviewItemRow({
             onClick={onReject}
             className="mt-4 text-sm text-slate-500 underline-offset-2 transition-colors duration-200 hover:text-slate-900 hover:underline"
           >
-            該当なし — 却下
+            {t.reject}
           </button>
         ) : (
-          <p className="mt-4 text-sm text-slate-500">確定済み</p>
+          <p className="mt-4 text-sm text-slate-500">{t.decided}</p>
         )}
       </div>
     </article>

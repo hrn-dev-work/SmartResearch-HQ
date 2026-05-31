@@ -1,6 +1,6 @@
 # SmartResearch-HQ
 
-**[Demo App](URLをここに入力)** — live portfolio (Vercel + Render, `APP_MODE=portfolio`)
+**[Demo App](https://smart-research-hq.vercel.app)** — live portfolio (Vercel + Render, `APP_MODE=portfolio`)
 
 Cross-border e-commerce research automation: scrape Shopee SOLD listings, match Amazon ASIN candidates, human review, export to spreadsheet. Built as a production-grade pipeline with a **public-safe demo edition** for hiring and client proposals.
 
@@ -55,7 +55,10 @@ Health: `GET http://localhost:8000/api/v1/health` → `{ "status": "ok", "mode":
 2. Deploy `frontend/` to Vercel; set `NEXT_PUBLIC_API_URL` to your Render API base + `/api/v1`.
 3. Set `ALLOWED_ORIGINS` on Render to your Vercel URL(s).
 
-Full checklist: **[docs/deployment-guide.md](docs/deployment-guide.md)**
+Full checklist: **[docs/deployment-guide.md](docs/deployment-guide.md)**  
+Troubleshooting (404, CORS, CLI): **[docs/deployment-troubleshooting.md](docs/deployment-troubleshooting.md)**
+
+One-command redeploy: `bash scripts/portfolio-vercel-deploy.sh redeploy`
 
 ---
 
@@ -130,6 +133,7 @@ Private / portfolio use. The portfolio edition omits scraping internals and prop
 
 越境 EC（Shopee 等）の商品リサーチ・名寄せを **スクレイピング + 候補マッチング + Human-in-the-loop** で自動化するシステムです。表（Portfolio）と裏（Production）の二刀流構成により、公開デモと実運用を同一リポジトリで維持しています。
 
-- デモ: 上記 **[Demo App](URLをここに入力)** リンク（デプロイ後に URL を差し替え）
+- デモ: 上記 **[Demo App](https://smart-research-hq.vercel.app)** リンク
 - ローカル起動: 上記 Quick start 参照
 - デプロイ手順: [docs/deployment-guide.md](docs/deployment-guide.md)
+- 障害対応: [docs/deployment-troubleshooting.md](docs/deployment-troubleshooting.md)
