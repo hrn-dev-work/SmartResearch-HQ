@@ -12,6 +12,9 @@ bash "$ROOT/scripts/validate-public-docs.sh"
 
 bash "$ROOT/scripts/sync-wbs-roadmap.sh" --quiet || true
 
+echo "== security workflow guardrails =="
+bash "$ROOT/scripts/validate-security-workflows.sh"
+
 echo "== secret audit =="
 bash "$ROOT/scripts/secret-audit.sh"
 
