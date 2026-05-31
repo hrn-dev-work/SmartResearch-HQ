@@ -26,12 +26,15 @@ export const ja = {
     submit: "リサーチを開始",
     submitting: "開始中…",
     errorStart: "リサーチの開始に失敗しました",
-    metricManualLabel: "手作業",
-    metricManualLine: "5–10分/商品",
-    metricToolLabel: "本ツール",
-    metricToolLine: "約10秒/商品（目安）",
-    metricModeLabel: "モード",
-    metricModeLine: "Mock（portfolio）",
+    metricManual: "手作業",
+    metricManualValue: "5–10分",
+    metricManualUnit: "/ 商品",
+    metricTool: "本ツール",
+    metricToolValue: "〜10秒",
+    metricToolUnit: "/ 商品（目安）",
+    metricMode: "モード",
+    metricModeValue: "Mock",
+    metricModeUnit: "portfolio",
   },
   review: {
     back: "← 戻る",
@@ -84,11 +87,17 @@ export const ja = {
     subtitle: "SmartResearch-HQ — Portfolio モード",
     close: "閉じる",
     purposeHeading: "システムの目的",
-    purposeBody:
-      "越境EC（Shopee 等）の商品リサーチと名寄せを、取得・候補提示・人の確認で進め、確定後にスプレッドシートへ出力します。",
-    archHeading: "表と裏の切り替え",
-    archIntro:
-      "同一コードで Portfolio（表・デモ）と Production（裏・本番）を切り替えます。現在は Portfolio です。",
+    purposeBodyBefore: "越境 EC（Shopee 等）における手作業の商品リサーチ・名寄せを、",
+    purposeEmphasis:
+      "スクレイピング + 候補マッチング + Human-in-the-loop",
+    purposeBodyAfter:
+      "で支援し、レビュー後にスプレッドシートへ出力する業務効率化システムです。",
+    archHeading: "二刀流アーキテクチャ（表 / 裏）",
+    archIntroBefore: "同一コードベースで ",
+    archIntroMid: " と ",
+    archIntroAfter: " を切り替えます。いま操作しているのは表版です。",
+    archPortfolio: "Portfolio（表）",
+    archProduction: "Production（裏）",
     archBulletMock:
       "Postgres / Redis 不使用 — インメモリ Mock（APP_MODE=portfolio）",
     archBulletFixture:

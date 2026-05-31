@@ -6,6 +6,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# shellcheck source=gh-pr-branch.sh
+source "$ROOT/scripts/gh-pr-branch.sh"
 
 export GH_TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-}}"
 REPO="${GITHUB_REPOSITORY:-hrn-dev-work/SmartResearch-HQ}"
@@ -15,7 +17,7 @@ PR_NUM=""
 if [[ "$TARGET" =~ ^[0-9]+$ ]]; then
   PR_NUM="$TARGET"
 else
-  PR_NUM="$(gh pr view --head "$TARGET" --repo "$REPO" --json number -q .number 2>/dev/null || true)"
+  PR_NUM="$(gh_pr_number_for_branch "$TARGET" "$REPO")"
 fi
 
 if [[ -z "$PR_NUM" ]]; then

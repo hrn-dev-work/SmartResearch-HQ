@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # gh helpers for older CLI (no `gh pr view --head`). Source: . scripts/gh-pr-branch.sh
 
+# PR number for a head branch, or empty.
 gh_pr_number_for_branch() {
   local branch="$1"
   local repo="${2:-}"
@@ -16,6 +17,7 @@ gh_pr_number_for_branch() {
     return
   fi
 
+  # Fallback: owner:branch (fork-style head ref)
   local owner
   owner="$(gh repo view ${repo:+--repo "$repo"} --json owner -q .owner.login 2>/dev/null || true)"
   if [[ -n "$owner" ]]; then
@@ -57,6 +59,7 @@ gh_pr_url_for_branch() {
   echo "$url"
 }
 
+# Create PR via REST (avoids GraphQL projectCards deprecation on some gh versions).
 gh_pr_create_rest() {
   local base="$1"
   local branch="$2"

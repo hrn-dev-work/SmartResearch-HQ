@@ -2,7 +2,7 @@
 
 Public demo runs **without** PostgreSQL, Redis, or API keys. Set only the variables below in each platform’s dashboard.
 
-See also: [render.yaml](../render.yaml) (backend Blueprint), [README](../README.md), [deployment-troubleshooting.md](deployment-troubleshooting.md).
+See also: [render.yaml](../render.yaml) (backend Blueprint), [README](../README.md).
 
 ---
 
@@ -28,17 +28,6 @@ Project root: **`frontend/`** (set as Root Directory in Vercel project settings)
 Redeploy after changing `NEXT_PUBLIC_*` (values are baked in at build time).
 
 **Build defaults (typical):** Next.js, `npm run build`, default output.
-
-### Public access (portfolio demo)
-
-Share the **Production URL** only (e.g. `https://smart-research-hq.vercel.app`). Do **not** share hash preview URLs (`https://smart-research-xxxxx-….vercel.app`) with recruiters — they may require Vercel login.
-
-1. **Settings → Deployment Protection** → turn **Vercel Authentication** **OFF** → Save  
-   (Optional: leave protection on for Preview only; Production should stay public.)
-2. After a bad deploy, the browser may cache a **404**. Test in a **private/incognito** window or hard-reload (Ctrl+F5 / Cmd+Shift+R).
-3. Aliasing to the production domain can lag a few minutes after deploy; use **Visit** on the latest Production deployment if the alias still fails.
-
-**One-command ops:** `bash scripts/portfolio-vercel-deploy.sh redeploy` (frontend). Troubleshooting: [deployment-troubleshooting.md](deployment-troubleshooting.md).
 
 ---
 
@@ -69,8 +58,6 @@ Production-only variables (Postgres, Redis, PA-API, Gemini, Sheets) are **not** 
 ## Post-deploy checklist
 
 - [ ] Render `/api/v1/health` returns OK
-- [ ] **Production URL** opens in a private/incognito window (no Vercel login)
-- [ ] Deployment Protection: Vercel Authentication **off** for public demo (or Preview-only)
 - [ ] Vercel app loads and can start a research job
 - [ ] Browser network tab: API calls go to Render URL (not `localhost`)
 - [ ] No CORS errors (`ALLOWED_ORIGINS` matches Vercel URL exactly, including `https://`)
@@ -101,7 +88,7 @@ ALLOWED_ORIGINS=https://your-app.vercel.app uvicorn app.main:app --port 8000
 
 公開デモは **PostgreSQL・Redis・API キー不要**。各プラットフォームのダッシュボードで、下表の環境変数だけ設定する。
 
-関連: [render.yaml](../render.yaml)（バックエンド Blueprint）、[README](../README.md)、[deployment-troubleshooting.md](deployment-troubleshooting.md)。
+関連: [render.yaml](../render.yaml)（バックエンド Blueprint）、[README](../README.md)。
 
 ---
 
@@ -127,17 +114,6 @@ ALLOWED_ORIGINS=https://your-app.vercel.app uvicorn app.main:app --port 8000
 `NEXT_PUBLIC_*` はビルド時に埋め込まれるため、変更後は **再デプロイ** が必要。
 
 **ビルド（典型）:** Next.js、`npm run build`、出力はデフォルト。
-
-### 公開アクセス（ポートフォリオデモ）
-
-共有するのは **Production URL のみ**（例: `https://smart-research-hq.vercel.app`）。ハッシュ付き Preview URL（`https://smart-research-xxxxx-….vercel.app`）は Vercel ログインが必要なことがあり、採用担当者には渡さない。
-
-1. **Settings → Deployment Protection** → **Vercel Authentication** を **OFF** → Save  
-   （Preview のみ保護、Production は公開、でも可）
-2. デプロイ失敗時の **404 がブラウザにキャッシュ** されることがある。**シークレット / プライベートウィンドウ** またはスーパーリロード（Ctrl+F5 / Cmd+Shift+R）で確認
-3. 本番ドメインへのエイリアス反映に **数分** かかることがある。alias がダメなら最新 Production デプロイの **Visit** で確認
-
-**ワンコマンド:** `bash scripts/portfolio-vercel-deploy.sh redeploy`（フロント）。障害対応: [deployment-troubleshooting.md](deployment-troubleshooting.md)
 
 ---
 
@@ -168,8 +144,6 @@ Portfolio モードでは Postgres / Redis / PA-API / Gemini / Sheets は **不�
 ## デプロイ後チェックリスト
 
 - [ ] Render の `/api/v1/health` が OK
-- [ ] **Production URL** がシークレットウィンドウで開く（Vercel ログイン不要）
-- [ ] Deployment Protection: 公開デモなら Vercel Authentication **OFF**（または Preview のみ保護）
 - [ ] Vercel で画面が開き、リサーチを開始できる
 - [ ] 開発者ツールの Network で API が Render 向き（`localhost` ではない）
 - [ ] CORS エラーなし（`ALLOWED_ORIGINS` が Vercel URL と完全一致、`https://` 含む）

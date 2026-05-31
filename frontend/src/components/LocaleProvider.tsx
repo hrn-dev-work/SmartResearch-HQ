@@ -1,10 +1,9 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 
-import { getMessages } from "@/lib/messages";
-import type { Messages } from "@/lib/messages/types";
 import type { Locale } from "@/lib/locale";
+import type { Messages } from "@/lib/messages";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -15,15 +14,16 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({
   locale,
+  messages,
   children,
 }: {
   locale: Locale;
+  messages: Messages;
   children: React.ReactNode;
 }) {
+  const value = useMemo(() => ({ locale, messages }), [locale, messages]);
   return (
-    <LocaleContext.Provider value={{ locale, messages: getMessages(locale) }}>
-      {children}
-    </LocaleContext.Provider>
+    <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
   );
 }
 

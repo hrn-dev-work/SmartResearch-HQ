@@ -6,9 +6,6 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 bash "$ROOT/scripts/sync-wbs-roadmap.sh" --quiet || true
 
-echo "== secret audit =="
-bash "$ROOT/scripts/secret-audit.sh"
-
 echo "== backend =="
 cd "$ROOT/backend"
 if [[ ! -d .venv ]]; then

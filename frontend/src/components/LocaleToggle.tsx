@@ -18,7 +18,7 @@ export function LocaleToggle() {
 
   return (
     <div
-      className="flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-md border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium"
+      className="flex items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium"
       role="group"
       aria-label="Language"
     >
