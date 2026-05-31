@@ -4,6 +4,19 @@ When **your WSL terminal works** but the **Cursor agent Shell returns nothing**,
 
 ---
 
+## Why WSL `ls` / `git` does not see agent-written files
+
+| Cause | Symptom | Fix |
+|-------|---------|-----|
+| **Folder opened from Windows UNC** (`\\wsl.localhost\...`) | Cursor shows files; WSL terminal on old branch or stale tree | **Command Palette → `WSL: Reopen Folder in WSL`** — path becomes `~/workspace/SmartResearch-HQ` |
+| **`main` not pulled** after remote merge | `MISSING: docs/agents/engineering-principles.md` in ship preflight | WSL: `git fetch origin && git checkout main && git pull --ff-only origin main` |
+| **Agent on wrong branch** | Files exist on `origin/main` but not in checkout | `git checkout main && git pull` |
+| **Windows Git vs WSL Git** | Source Control phantom `M`, empty `git diff` in WSL | `.vscode/settings.json` → `git.path` = WSL git (already set in this repo) |
+
+Quick check: `bash scripts/verify-wsl-workspace.sh` — lists missing paths and fix commands.
+
+---
+
 ## Fix order
 
 1. **Command Palette** → `WSL: Reopen Folder in WSL` (workspace path must be `~/workspace/...`, not only `\\wsl.localhost\...`).
@@ -28,11 +41,21 @@ See also: [agent-git-playbook.md](agent-git-playbook.md).
 
 ---
 
----
-
 # Cursor エージェント Shell が空になるとき（WSL）
 
 手元の WSL ターミナルは動くのに **エージェントの Shell だけ空** のときの手順。
+
+## WSL でファイルが見えない理由
+
+| 原因 | 症状 | 対処 |
+|------|------|------|
+| **Windows UNC でフォルダを開いている** | Cursor にはあるが WSL の checkout が古い | **`WSL: Reopen Folder in WSL`** — `~/workspace/SmartResearch-HQ` で開く |
+| **リモート merge 後に pull していない** | ship preflight で `engineering-principles.md` 欠落 | `git fetch origin && git checkout main && git pull --ff-only origin main` |
+| **作業ブランチが古い** | `origin/main` にだけ存在 | `git checkout main && git pull` |
+
+確認: `bash scripts/verify-wsl-workspace.sh`
+
+---
 
 ## 手順
 
