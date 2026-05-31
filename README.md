@@ -2,6 +2,8 @@
 
 **[Demo App](https://smart-research-hq.vercel.app)** — live portfolio (Vercel + Render, `APP_MODE=portfolio`)
 
+Public markdown conventions: [docs/doc-conventions.md](docs/doc-conventions.md).
+
 Cross-border e-commerce research automation: scrape Shopee SOLD listings, match Amazon ASIN candidates, human review, export to spreadsheet. Built as a production-grade pipeline with a **public-safe demo edition** for hiring and client proposals.
 
 ---
