@@ -14,102 +14,38 @@ jobs:
   ensure-pull-request:
     runs-on: ubuntu-latest
     steps:
-      - name: Create PR if missing
-        uses: actions/github-script@v9
-        # Org policy may block GITHUB_TOKEN from creating PRs; use PAT secret when set.
+      - uses: actions/checkout@v6
         with:
-          github-token: ${{ secrets.GH_PR_SYNC_TOKEN || github.token }}
-          script: |
-            const branch = context.ref.replace('refs/heads/', '');
-            if (branch === 'main' || branch === 'master') {
-              return;
-            }
+          fetch-depth: 0
 
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const base = 'main';
-            const head = `${owner}:${branch}`;
+      - name: Create PR if missing (bilingual template)
+        env:
+          GH_TOKEN: ${{ secrets.GH_PR_SYNC_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          BASE="main"
 
-            const { data: existing } = await github.rest.pulls.list({
-              owner,
-              repo,
-              head,
-              state: 'open',
-              per_page: 1,
-            });
+          if gh pr list --head "$BRANCH" --state open --json number -q '.[0].number' | grep -q .; then
+            echo "Open PR already exists for $BRANCH"
+            exit 0
+          fi
 
-            if (existing.length > 0) {
-              core.info(`Open PR already exists: #${existing[0].number}`);
-              return;
-            }
+          AHEAD="$(git rev-list --count "origin/${BASE}..HEAD" 2>/dev/null || echo 0)"
+          if [[ "$AHEAD" -eq 0 ]]; then
+            echo "No commits ahead of $BASE — skip PR"
+            exit 0
+          fi
 
-            let compare;
-            try {
-              compare = await github.rest.repos.compareCommits({
-                owner,
-                repo,
-                base,
-                head: branch,
-              });
-            } catch (error) {
-              core.setFailed(`Cannot compare ${base}...${branch}: ${error.message}`);
-              return;
-            }
+          TITLE="$(bash scripts/render-pr-title.sh "$BASE" "$BRANCH")"
+          BODY="$(bash scripts/render-pr-body.sh auto "$BRANCH" "$BASE")"
+          bash scripts/validate-pr-body.sh --stdin <<<"$BODY"
 
-            const commits = compare.data.commits ?? [];
-            if (commits.length === 0) {
-              core.info('No commits ahead of main — skip PR');
-              return;
-            }
+          gh pr create --base "$BASE" --head "$BRANCH" --title "$TITLE" --body "$BODY" || {
+            echo "WARN: gh pr create failed (token or branch). Create locally: bash scripts/git-ship.sh pr"
+            exit 0
+          }
 
-            const title =
-              commits[commits.length - 1].commit.message.split('\n')[0] ||
-              `Merge ${branch} into ${base}`;
-
-            const commitLines = commits
-              .slice(-15)
-              .map((c) => `- ${c.commit.message.split('\n')[0]}`)
-              .join('\n');
-
-            const body = [
-              '## Summary',
-              '',
-              `- Auto-created on push to \`${branch}\` — fill in before merge _(push 後に自動作成)_`,
-              '',
-              commitLines,
-              '',
-              '## Test plan',
-              '',
-              '- [ ] `bash scripts/ci-check.sh`',
-              '- [ ] CI `backend` / `frontend` green',
-              '',
-              '## Related',
-              '',
-              `- Branch: \`${branch}\``,
-            ].join('\n');
-
-            try {
-              const { data: pr } = await github.rest.pulls.create({
-                owner,
-                repo,
-                title,
-                head: branch,
-                base,
-                body,
-              });
-              core.info(`Created PR #${pr.number}: ${pr.html_url}`);
-            } catch (error) {
-              const msg = error?.response?.data?.message ?? error?.message ?? String(error);
-              if (
-                error?.status === 403 &&
-                /not permitted to create or approve pull requests/i.test(msg)
-              ) {
-                core.warning(
-                  'Actions cannot create PRs with the default token. ' +
-                    'Add Actions secret GH_PR_SYNC_TOKEN (fine-grained PAT: pull_requests write), ' +
-                    'or create the PR locally: bash scripts/git-ship.sh pr'
-                );
-                return;
-              }
-              throw error;
-            }
+          PR_NUM="$(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number')"
+          bash scripts/sync-pr-checkboxes.sh "$PR_NUM" || true
+          echo "Created PR #$PR_NUM with bilingual body"
