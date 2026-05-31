@@ -16,6 +16,7 @@ from app.schemas.research import (
     SellerSummary,
 )
 from app.services.production.pipeline import create_job_record, run_job_pipeline
+from app.services.review.decision_marker import decision_marker
 from app.services.spreadsheet.exporter import SpreadsheetConfigError, build_export_row, export_rows
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -113,16 +114,13 @@ class ProductionResearchService:
         items = result.scalars().all()
         responses: list[ReviewItemResponse] = []
         for item in items:
-            decision_id = None
-            if item.decision and item.decision.chosen_candidate_id:
-                decision_id = item.decision.chosen_candidate_id
-            elif item.decision and item.decision.manual_asin:
-                decision_id = item.decision.id
             responses.append(
                 ReviewItemResponse(
                     item_id=item.id,
+                    shopee_item_id=item.shopee_item_id,
                     title=item.title,
                     image_url=item.image_url,
+                    shopee_item_url=item.shopee_item_url,
                     sold_count=item.sold_count,
                     candidates=[
                         AmazonCandidateResponse(
@@ -135,7 +133,7 @@ class ProductionResearchService:
                         )
                         for c in sorted(item.candidates, key=lambda x: x.rank)
                     ],
-                    decision=decision_id,
+                    decision=decision_marker(item.decision),
                 )
             )
         return ReviewItemsPageResponse(items=responses, page=page, page_size=page_size, total=total)
@@ -236,6 +234,7 @@ class ProductionResearchService:
                 build_export_row(
                     shopee_title=item.title,
                     shopee_item_id=item.shopee_item_id,
+                    shopee_item_url=item.shopee_item_url,
                     amazon_asin=asin,
                     amazon_url=amazon_url,
                     sold_count=item.sold_count,

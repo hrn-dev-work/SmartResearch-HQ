@@ -263,6 +263,16 @@ function ReviewItemRow({
                 販売数 {item.sold_count.toLocaleString()}
               </p>
             )}
+            {item.shopee_item_url ? (
+              <a
+                href={item.shopee_item_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-block text-sm text-slate-500 underline-offset-2 transition-colors duration-200 hover:text-slate-900 hover:underline"
+              >
+                Shopee で開く
+              </a>
+            ) : null}
           </div>
         </div>
       </div>

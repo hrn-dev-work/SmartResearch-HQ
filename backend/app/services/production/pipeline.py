@@ -95,6 +95,7 @@ async def run_job_pipeline(session: AsyncSession, job_id: UUID, *, max_items: in
             JobItem(
                 job_id=job.id,
                 shopee_item_id=item.shopee_item_id,
+                shopee_item_url=item.shopee_item_url,
                 title=item.title,
                 image_url=item.image_url or "https://placehold.co/400x400?text=No+Image",
                 sold_count=item.sold_count,

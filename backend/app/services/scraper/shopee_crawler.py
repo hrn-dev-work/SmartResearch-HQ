@@ -24,7 +24,24 @@ class ShopeeSoldItem:
     image_url: str
     sold_count: int | None
     price_display: str | None
+    shopee_item_url: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
+
+
+def build_shopee_item_url(shop_url: str, item_id: str, shop_id: str | None = None) -> str:
+    """Build a product URL from shop context and item id (best-effort)."""
+    parsed = urlparse(shop_url)
+    if not parsed.scheme or not parsed.netloc:
+        return ""
+    base = f"{parsed.scheme}://{parsed.netloc}"
+    resolved_shop_id = shop_id
+    if not resolved_shop_id:
+        match = re.search(r"/shop/(\d+)", shop_url)
+        if match:
+            resolved_shop_id = match.group(1)
+    if resolved_shop_id:
+        return f"{base}/product-i.{resolved_shop_id}.{item_id}"
+    return f"{base}/product/{item_id}"
 
 
 class ScrapeBlockedError(Exception):
@@ -54,6 +71,7 @@ def _parse_item_dict(raw: dict[str, Any]) -> ShopeeSoldItem | None:
         image = image[0]
     sold = basic.get("sold") or basic.get("historical_sold") or raw.get("sold")
     price = basic.get("price") or raw.get("price")
+    shop_id = raw.get("shopid") or basic.get("shopid") or raw.get("shop_id")
     price_display = None
     if isinstance(price, int):
         price_display = f"{price / 100000:.2f}"
@@ -65,7 +83,10 @@ def _parse_item_dict(raw: dict[str, Any]) -> ShopeeSoldItem | None:
         image_url=_image_url_from_id(str(image)) if image else "",
         sold_count=int(sold) if sold is not None else None,
         price_display=price_display,
-        metadata={"raw_keys": list(raw.keys())[:20]},
+        metadata={
+            "raw_keys": list(raw.keys())[:20],
+            "shop_id": str(shop_id) if shop_id is not None else None,
+        },
     )
 
 
@@ -153,6 +174,11 @@ async def fetch_sold_items(
             await browser.close()
 
     items = list(collected.values())[:max_items]
+    for item in items:
+        shop_id = item.metadata.get("shop_id")
+        item.shopee_item_url = build_shopee_item_url(
+            shop_url, item.shopee_item_id, str(shop_id) if shop_id else None
+        )
     if not items:
         raise ScrapeBlockedError(
             "No items extracted — page may have changed, require login, or block automation"

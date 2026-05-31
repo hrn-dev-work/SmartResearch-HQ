@@ -14,8 +14,9 @@ const STYLES: Record<JobStatus, string> = {
 
 const LABELS: Partial<Record<JobStatus, string>> = {
   AWAITING_REVIEW: "レビュー待ち",
-  AI_INFERENCE: "AI 推論中",
+  AI_INFERENCE: "候補マッチング中",
   SCRAPING: "取得中",
+  EXPORTED: "出力済み",
 };
 
 export function StatusBadge({ status }: { status: JobStatus }) {
