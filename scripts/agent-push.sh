@@ -57,6 +57,10 @@ elif [[ "$CURRENT" != "$BRANCH" ]]; then
 fi
 
 bash "$ROOT/scripts/git-add-safe.sh"
+# Preset commit messages must stay tracked (may match a broad local exclude).
+if [[ -d "$ROOT/scripts/commit-msgs" ]]; then
+  git add -f scripts/commit-msgs/*.txt 2>/dev/null || true
+fi
 
 if git diff --cached --quiet; then
   echo "Nothing staged to commit."

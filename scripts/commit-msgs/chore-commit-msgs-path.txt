@@ -1,0 +1,9 @@
+chore(scripts): track commit-msgs path for agent-push presets
+
+Move preset message files to scripts/commit-msgs/ so git-add-safe does not
+skip them. Clarify troubleshooting doc: agents run commands, not users.
+
+---
+
+agent-push のプリセット msg を scripts/commit-msgs/ に移動。
+troubleshooting に「エージェントが実行」を明記。
