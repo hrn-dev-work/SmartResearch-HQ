@@ -24,7 +24,7 @@ if [[ -n "$PRESET" && "$PRESET" != --* ]]; then
   case "$PRESET" in
     portfolio-docs-deploy)
       BRANCH="docs/portfolio-deploy-live"
-      MSG_FILE="$ROOT/scripts/.commit-msgs/portfolio-docs-deploy.txt"
+      MSG_FILE="$ROOT/scripts/commit-msgs/portfolio-docs-deploy.txt"
       ;;
     *)
       echo "Unknown preset: $PRESET" >&2

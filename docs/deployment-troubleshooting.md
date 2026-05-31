@@ -13,7 +13,7 @@ Symptoms and fixes from the first public deploy (2026-05). See also [deployment-
 | Push docs / deploy notes | `bash scripts/agent-push.sh portfolio-docs-deploy` |
 | Agent runs any script + log file | `bash scripts/agent-run.sh -- bash scripts/...` |
 
-After `agent-run`, read `agent-cmd-output.txt` and `agent-cmd-exit.txt` in repo root.
+After `agent-run`, read `agent-cmd-output.txt` and `agent-cmd-exit.txt` in repo root. **Agents run these commands** — do not ask the user to paste them.
 
 ---
 
@@ -93,7 +93,7 @@ Root URL alone returns `{"detail":"Not Found"}` — that is expected.
 | ドキュメントを push | `bash scripts/agent-push.sh portfolio-docs-deploy` |
 | エージェント用（ログファイル出力） | `bash scripts/agent-run.sh -- bash scripts/...` |
 
-`agent-run` 後はリポジトリ直下の `agent-cmd-output.txt` / `agent-cmd-exit.txt` を読む。
+`agent-run` 後はリポジトリ直下の `agent-cmd-output.txt` / `agent-cmd-exit.txt` を読む。**エージェントが実行する**（ユーザーにコマンド実行を頼まない）。
 
 ---
 
