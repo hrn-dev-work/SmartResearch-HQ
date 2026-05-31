@@ -13,6 +13,7 @@ if [[ $# -gt 0 ]]; then
       git add -- "$path"
     fi
   done
+  bash scripts/check-staged-branch-scope.sh
   exit 0
 fi
 
@@ -28,3 +29,4 @@ while IFS= read -r line; do
     fi
   fi
 done < <(git status --porcelain)
+bash scripts/check-staged-branch-scope.sh
