@@ -5,7 +5,6 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 bash "$ROOT/scripts/sync-wbs-roadmap.sh" --quiet || true
-python3 "$ROOT/scripts/sync-api-types.py" --quiet || true
 
 echo "== backend =="
 cd "$ROOT/backend"
@@ -14,6 +13,7 @@ if [[ ! -d .venv ]]; then
 fi
 # shellcheck disable=SC1091
 source .venv/bin/activate
+python "$ROOT/scripts/sync-api-types.py" --quiet || true
 python -m pip install -q -r requirements-dev.txt
 ruff check .
 ruff format --check .

@@ -18,3 +18,9 @@ export function normalizeLocale(value: string | undefined | null): Locale {
 export function geoToLocale(country: string | null | undefined): Locale {
   return country?.toUpperCase() === "JP" ? "ja" : "en";
 }
+
+/** Set locale cookie in the browser (call from client event handlers only). */
+export function writeLocaleCookie(locale: Locale): void {
+  if (typeof document === "undefined") return;
+  document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; SameSite=Lax`;
+}
