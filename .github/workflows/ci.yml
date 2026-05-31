@@ -27,6 +27,9 @@ jobs:
       - name: Baseline secret checks
         run: bash scripts/secret-audit.sh
 
+      - name: Public markdown bilingual structure
+        run: bash scripts/validate-public-docs.sh
+
       - name: Gitleaks scan (required)
         uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
@@ -101,6 +104,22 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
         run: npm run build
+
+      - name: E2E (Playwright)
+        working-directory: ${{ github.workspace }}
+        env:
+          SKIP_FRONTEND_BUILD: "1"
+          NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+        run: bash scripts/run-frontend-e2e.sh
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
 
   sync-pr-checkboxes:
     name: sync-pr-checkboxes
