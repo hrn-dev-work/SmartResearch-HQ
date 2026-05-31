@@ -52,7 +52,7 @@ validate_body() {
     return 1
   fi
 
-  if ! grep -qxF '---' <<<"$body"; then
+  if ! grep -qxF -- '---' <<<"$body"; then
     echo "missing horizontal rule '---' between English and Japanese blocks" >&2
     return 1
   fi
