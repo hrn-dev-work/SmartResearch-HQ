@@ -94,6 +94,7 @@ One-command redeploy: `bash scripts/portfolio-vercel-deploy.sh redeploy`
 
 | Doc | Contents |
 |-----|----------|
+| [CONTEXT.md](CONTEXT.md) | Domain glossary & agent traps |
 | [Project plan](docs/プロジェクト計画書.md) | Goals & scope |
 | [Architecture](docs/architecture.md) | Two-mode design, data flow |
 | [Design](docs/design.md) | UI principles |
@@ -240,6 +241,7 @@ bash scripts/start-production-local.sh
 
 | ドキュメント | 内容 |
 |--------------|------|
+| [CONTEXT.md](CONTEXT.md) | ドメイン用語・エージェント向け注意 |
 | [プロジェクト計画書](docs/プロジェクト計画書.md) | 目的・スコープ |
 | [アーキテクチャ](docs/architecture.md) | 二刀流設計・データフロー |
 | [設計書](docs/design.md) | UI 原則 |

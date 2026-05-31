@@ -109,12 +109,12 @@ See [api-specification.md](./api-specification.md).
 
 Maps to requirements.md §4. **Rationale and design impact** only; requirements stay in requirements doc.
 
-### D1. Portfolio first
+### D1. Portfolio first ([ADR 0001](../adr/0001-portfolio-first-dual-mode.md))
 
 - **Why**: Public demo E2E is top priority; scraping/prompts may stay private.
 - **Impact**: `MockResearchService` can jump to `AWAITING_REVIEW`. Optional “Demo” badge. No Postgres / Redis.
 
-### D2. No authentication
+### D2. No authentication ([ADR 0002](../adr/0002-no-authentication-mvp.md))
 
 - **Why**: Portfolio viewers; add Auth0 etc. before real ops.
 - **Impact**: No Authorization header. CORS dev origins only until Phase 4 production.
@@ -124,12 +124,12 @@ Maps to requirements.md §4. **Rationale and design impact** only; requirements 
 - **Why**: Simple input UX; bulk later.
 - **Impact**: Single form on dashboard. Paste URL, not drag-drop required for MVP.
 
-### D4. Review required
+### D4. Review required ([ADR 0003](../adr/0003-review-required-human-in-loop.md))
 
 - **Why**: Wrong ASIN is business risk; human-in-the-loop is the value prop.
 - **Impact**: Explicit Select / Reject per candidate. No auto-export.
 
-### D5. Pluggable matching (not Gemini-dependent)
+### D5. Pluggable matching (not Gemini-dependent) ([ADR 0004](../adr/0004-pluggable-candidate-matching.md))
 
 - **Why**: Gemini quota limits; matching provider must be swappable.
 - **Impact**: `MATCHING_PROVIDER=amazon_search|none|gemini`. PA-API 5.0 primary (architecture §4.2). Fixed schema with `confidence`. Manual ASIN UI when `none` (§3.3).
@@ -139,7 +139,7 @@ Maps to requirements.md §4. **Rationale and design impact** only; requirements 
 - **Why**: Defer SSE cost to Phase 3.
 - **Impact**: Review page fetches on mount. Later `useJobProgress` hook.
 
-### D7. Portfolio Sheets = log only
+### D7. Portfolio Sheets = log only ([ADR 0005](../adr/0005-portfolio-sheets-export-log-only.md))
 
 - **Why**: No service account in public repo.
 - **Impact**: Export button stays; toast shows count only.
@@ -258,12 +258,12 @@ Maps to requirements.md §4. **Rationale and design impact** only; requirements 
 
 requirements.md §4 と対応。ここでは **根拠と設計への影響** のみ記載し、要件の重複記述は避ける。
 
-### D1. 表版（portfolio）先行
+### D1. 表版（portfolio）先行 ([ADR 0001](../adr/0001-portfolio-first-dual-mode.md))
 
 - **根拠**: 公開リポジトリでデモ完走が最優先。スクレイピング・プロンプトは非公開可。
 - **設計影響**: `MockResearchService` が即 `AWAITING_REVIEW` まで進める。UI に「Demo」バッジ表示可。Postgres / Redis 不要。
 
-### D2. 認証なし
+### D2. 認証なし ([ADR 0002](../adr/0002-no-authentication-mvp.md))
 
 - **根拠**: ポートフォリオ閲覧者向け。実運用前に Auth0 等を検討。
 - **設計影響**: API に Authorization ヘッダー不要。CORS は開発 origin のみ（本番は Phase 4）。
@@ -273,12 +273,12 @@ requirements.md §4 と対応。ここでは **根拠と設計への影響** の
 - **根拠**: 入力 UX を単純化。バルクは Phase 3 以降。
 - **設計影響**: ダッシュボードは単一フォーム。ドラッグ&ドロップは MVP では必須としない（URL 貼り付け中心）。
 
-### D4. レビュー必須
+### D4. レビュー必須 ([ADR 0003](../adr/0003-review-required-human-in-loop.md))
 
 - **根拠**: ASIN 誤マッチはビジネスリスク。Human-in-the-loop が価値提案の核。
 - **設計影響**: 候補ごとに明示的 Select / Reject。自動エクスポートなし。
 
-### D5. マッチングはプラガブル（Gemini 非依存）
+### D5. マッチングはプラガブル（Gemini 非依存） ([ADR 0004](../adr/0004-pluggable-candidate-matching.md))
 
 - **根拠**: Gemini API クォータ制約。Human-in-the-loop が価値の核であり、候補生成方式は差し替え可能にする。
 - **設計影響**: `MATCHING_PROVIDER=amazon_search|none|gemini`。Amazon 検索は PA-API 5.0 を第一候補（architecture §4.2）。候補は `confidence` 数値付き固定スキーマ。`none` 時は §3.3 手動 ASIN UI。
@@ -288,7 +288,7 @@ requirements.md §4 と対応。ここでは **根拠と設計への影響** の
 - **根拠**: SSE 実装コストを Phase 3 に延期。
 - **設計影響**: レビュー画面は mount 時 1 回 fetch。将来 `useJobProgress` hook 追加。
 
-### D7. portfolio で Sheets はログ相当
+### D7. portfolio で Sheets はログ相当 ([ADR 0005](../adr/0005-portfolio-sheets-export-log-only.md))
 
 - **根拠**: サービスアカウントを表版に載せない。
 - **設計影響**: Export ボタンは残し、トーストで件数表示のみ。
