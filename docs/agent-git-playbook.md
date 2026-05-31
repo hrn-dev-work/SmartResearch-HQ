@@ -13,7 +13,7 @@ For Cursor agents and maintainers. Public clone: use `scripts/git-ship.sh` and t
 | **PR作成まで** = `bash scripts/git-pr-complete.sh` | Single canonical script |
 | Never `git add AGENTS.md` / `.cursor/` | gitignored — use `bash scripts/git-add-safe.sh` |
 | UI copy in **`messages/ja.ts` + `en.ts`** | Type is `messages/types.ts` (`DeepString`) |
-| Open PR: **`gh pr list --head <branch>`** | `gh pr view --head` is not supported on older gh |
+| Open PR: **`gh pr list --head <branch> --state open`** | Merged PRs must not block new PRs; no `gh pr view --head` |
 | PR create: **`ensure-pr.sh`** (REST fallback) | Avoids `projectCards` GraphQL errors |
 | After push: **`sync-pr-body.sh`** | Commits list + CI checkboxes stay current |
 | Docs for operators: **English → `---` → 日本語** | Same as PR body convention |
@@ -82,7 +82,7 @@ gh pr edit <num> --title "$(bash scripts/render-pr-title.sh)"
 | **PR作成まで** = `bash scripts/git-pr-complete.sh` | 入口を一本化 |
 | `git add` に **gitignore ファイルを含めない** | `bash scripts/git-add-safe.sh` を使う |
 | UI 文言は **`messages/ja.ts` と `en.ts`** | 型は `messages/types.ts` |
-| PR 参照は **`gh pr list --head <branch>`** | 古い gh は `pr view --head` 非対応 |
+| PR 参照は **`gh pr list --head <branch> --state open`** | マージ済み PR が新規作成を阻害しない |
 | PR 作成は **`ensure-pr.sh`**（REST フォールバック） | projectCards GraphQL エラー回避 |
 | push 後は **`sync-pr-body.sh`** | PR 本文の Commits / CI チェックを更新 |
 | 運用ドキュメントは **英語 → `---` → 日本語** | PR 本文と同じ |
