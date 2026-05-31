@@ -14,6 +14,26 @@ BASE="${3:-main}"
 
 CI="$(bash "$ROOT/scripts/pr-ci-checkbox.sh" "$BRANCH" 2>/dev/null || echo " ")"
 
+demo_test_plan_en() {
+  local mark
+  mark="$(bash "$ROOT/scripts/pr-deploy-demo-checkbox.sh" "$BRANCH" "$BASE" 2>/dev/null || echo "N/A")"
+  if [[ "$mark" == "N/A" ]]; then
+    echo '* [N/A] Live demo / research flow — skipped (no deploy changes in this PR)'
+  else
+    echo '* [ ] Live demo loads and research flow works — verify https://smart-research-hq.vercel.app'
+  fi
+}
+
+demo_test_plan_ja() {
+  local mark
+  mark="$(bash "$ROOT/scripts/pr-deploy-demo-checkbox.sh" "$BRANCH" "$BASE" 2>/dev/null || echo "N/A")"
+  if [[ "$mark" == "N/A" ]]; then
+    echo '* [N/A] デモ URL リサーチフロー — 対象外（本 PR はデプロイ変更なし）'
+  else
+    echo '* [ ] デモ URL でリサーチフローが動作すること（デプロイ変更あり）'
+  fi
+}
+
 format_commits() {
   local log
   log="$(git log "origin/${BASE}..HEAD" --format=%s 2>/dev/null || git log "${BASE}..HEAD" --format=%s 2>/dev/null || true)"
@@ -56,13 +76,6 @@ EOF
       cat <<'EOF'
 * Add frontend structure guide (overview, benefits, usage) and Mermaid maps (routes, layers, imports, i18n)
 * Cross-link from architecture.md §5 directory tree (same PR — use check-staged-docs-crosslinks.sh)
-EOF
-      return
-      ;;
-    chore/docs-crosslink-guardrails)
-      cat <<'EOF'
-* Restore `validate-pr-body.sh` and add `check-staged-docs-crosslinks.sh` (WARN after `git-add-safe.sh`)
-* Extend `check-pr-tooling.sh` self-check; document docs bundle checklist in agent-git-playbook
 EOF
       return
       ;;
@@ -119,13 +132,6 @@ EOF
       cat <<'EOF'
 * フロント構造ガイド（概要・利点・使い方）と Mermaid 図（ルート・レイヤー・import・i18n）を追加
 * architecture.md §5 から相互リンク（同一 PR — `check-staged-docs-crosslinks.sh` で確認）
-EOF
-      return
-      ;;
-    chore/docs-crosslink-guardrails)
-      cat <<'EOF'
-* `validate-pr-body.sh` を復旧し `check-staged-docs-crosslinks.sh` を追加（`git-add-safe.sh` 後に WARN）
-* `check-pr-tooling.sh` の自己検査を拡張。agent-git-playbook に docs 束ねチェックリストを追記
 EOF
       return
       ;;
@@ -220,10 +226,12 @@ EOF
 }
 
 render_auto() {
-  local commits en_summary ja_summary
+  local commits en_summary ja_summary demo_en demo_ja
   commits="$(format_commits)"
   en_summary="$(infer_en_summary "$BRANCH")"
   ja_summary="$(infer_ja_summary "$BRANCH")"
+  demo_en="$(demo_test_plan_en)"
+  demo_ja="$(demo_test_plan_ja)"
 
   cat <<EOF
 **Summary**
@@ -238,7 +246,7 @@ ${commits}
 
 * [${CI}] \`bash scripts/ci-check.sh\` passes
 * [${CI}] CI backend / frontend green
-* [ ] Live demo loads and research flow works (if deploy changed)
+${demo_en}
 
 **Related**
 
@@ -259,7 +267,7 @@ ${commits}
 
 * [${CI}] \`bash scripts/ci-check.sh\` が通る
 * [${CI}] CI backend / frontend green
-* [ ] デモ URL でリサーチフローが動作（デプロイ変更時）
+${demo_ja}
 
 **関連 (Related)**
 

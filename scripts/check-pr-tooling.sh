@@ -15,6 +15,7 @@ required=(
   scripts/sync-pr-body.sh
   scripts/update-pr-body-from-file.sh
   scripts/gh-pr-branch.sh
+  scripts/pr-deploy-demo-checkbox.sh
 )
 
 echo "== pr tooling: required scripts =="
@@ -30,7 +31,7 @@ echo "== pr tooling: forbidden gh api body=@ (runtime only) =="
 bad="$(grep -R --include='*.sh' -nE '[[:space:]]-f[[:space:]]+"?body=@' scripts/ 2>/dev/null \
   | grep -vE 'check-pr-tooling\.sh:|validate-pr-body\.sh:' \
   | grep -vE ':[0-9]+:[[:space:]]*#' || true)"
-if [[ -n "" ]]; then
+if [[ -n "$bad" ]]; then
   echo "ERROR: use gh_api_patch_pr_body (python3 JSON), not -f body=@file:" >&2
   echo "$bad" >&2
   exit 1
