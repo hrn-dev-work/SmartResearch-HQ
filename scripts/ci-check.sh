@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
-# Local CI mirroecho "== pr tooling =="
-bash "$ROOT/scripts/check-pr-tooling.sh"
-
-echo "== public docs =="
-bash "$ROOT/scripts/validate-public-docs.sh"
-
-r (.github/workflows/ci.yml). Usage: bash scripts/ci-check.sh
+# Local CI mirror (.github/workflows/ci.yml). Usage: bash scripts/ci-check.sh
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
+echo "== pr tooling =="
+bash "$ROOT/scripts/check-pr-tooling.sh"
+
+echo "== public docs (EN --- JA) =="
+bash "$ROOT/scripts/validate-public-docs.sh"
+
 bash "$ROOT/scripts/sync-wbs-roadmap.sh" --quiet || true
+
+echo "== secret audit =="
+bash "$ROOT/scripts/secret-audit.sh"
 
 echo "== backend =="
 cd "$ROOT/backend"
@@ -46,6 +49,6 @@ ensure_npm
 npm ci
 python3 "$ROOT/scripts/sync-api-types.py" --check
 npm run lint
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 npm run build
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api/v1 npm run build
 
 echo "CI checks passed."
