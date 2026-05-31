@@ -73,7 +73,7 @@ export default function DashboardPage() {
                 >
                   {t.displayNameLabel}
                 </label>
-                <span className="shrink-0 text-sm text-slate-500">
+                <span className="shrink-0 whitespace-nowrap text-sm text-slate-500">
                   {t.displayNameOptional}
                 </span>
               </div>

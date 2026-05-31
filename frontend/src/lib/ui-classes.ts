@@ -7,7 +7,7 @@ export const fieldInputSmClass =
 
 /** Readable body copy — avoids awkward mid-phrase wraps (JA/EN). */
 export const bodyCopyClass =
-  "max-w-xl text-pretty text-base leading-relaxed text-slate-500";
+  "max-w-[36rem] text-pretty text-base leading-relaxed text-slate-500 [text-wrap:pretty]";
 
 /** Page horizontal padding across breakpoints. */
 export const pageXClass = "px-4 sm:px-6";
