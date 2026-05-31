@@ -26,6 +26,10 @@ if [[ -n "$PRESET" && "$PRESET" != --* ]]; then
       BRANCH="docs/portfolio-deploy-live"
       MSG_FILE="$ROOT/scripts/commit-msgs/portfolio-docs-deploy.txt"
       ;;
+    production-local-setup)
+      BRANCH="feat/production-local-setup"
+      MSG_FILE="$ROOT/scripts/commit-msgs/feat-production-local-setup.txt"
+      ;;
     *)
       echo "Unknown preset: $PRESET" >&2
       exit 2

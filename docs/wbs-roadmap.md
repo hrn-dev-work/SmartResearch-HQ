@@ -34,6 +34,8 @@ Phase 2 完了条件（2.2c 除く）: スクレイプ → マッチング → D
 
 ### Phase 2 ローカル検証（M2）
 
+See also: [production-local-setup.md](./production-local-setup.md) (裏版ローカル起動).
+
 ```bash
 # 一括スモーク（推奨）
 bash scripts/smoke-m2.sh
