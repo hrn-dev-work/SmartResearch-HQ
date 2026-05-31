@@ -9,6 +9,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# shellcheck source=gh-pr-branch.sh
+source "$ROOT/scripts/gh-pr-branch.sh"
 
 MODE="${1:-pr}"
 BASE="${2:-main}"
@@ -22,7 +24,9 @@ if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
 fi
 
 if [[ "$MODE" == "pr-url" ]]; then
-  if gh pr view --head "$BRANCH" --json url -q .url 2>/dev/null; then
+  URL="$(gh_pr_url_for_branch "$BRANCH")"
+  if [[ -n "$URL" ]]; then
+    echo "$URL"
     exit 0
   fi
   MODE="pr"
@@ -40,7 +44,11 @@ case "$MODE" in
   pr)
     bash "$ROOT/scripts/ensure-pr.sh" "$BASE"
     bash "$ROOT/scripts/post-workflow.sh" || true
-    URL="$(gh pr view --head "$BRANCH" --json url,number,title -q '"\(.url) (#\(.number) \(.title))"' 2>/dev/null || true)"
+    PR_NUM="$(gh_pr_number_for_branch "$BRANCH")"
+    if [[ -n "$PR_NUM" ]]; then
+      URL="$(gh pr view "$PR_NUM" --json url,number,title -q '"\(.url) (#\(.number) \(.title))"' 2>/dev/null || true)"
+    fi
+    [[ -z "${URL:-}" ]] && URL="$(gh_pr_url_for_branch "$BRANCH")"
     if [[ -n "$URL" ]]; then
       echo "PR: ${URL}"
     else

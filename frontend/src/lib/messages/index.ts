@@ -1,8 +1,9 @@
 import type { Locale } from "@/lib/locale";
 import { en } from "@/lib/messages/en";
-import { ja, type Messages } from "@/lib/messages/ja";
+import { ja } from "@/lib/messages/ja";
+import type { Messages } from "@/lib/messages/types";
 
-export type { Messages } from "@/lib/messages/ja";
+export type { Messages } from "@/lib/messages/types";
 export { interpolate } from "@/lib/messages/interpolate";
 
 const CATALOG: Record<Locale, Messages> = { ja, en };

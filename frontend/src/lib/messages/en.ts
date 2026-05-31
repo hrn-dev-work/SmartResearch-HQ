@@ -1,4 +1,4 @@
-import type { Messages } from "@/lib/messages/ja";
+import type { Messages } from "@/lib/messages/types";
 
 export const en: Messages = {
   meta: {

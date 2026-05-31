@@ -6,6 +6,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# shellcheck source=gh-pr-branch.sh
+source "$ROOT/scripts/gh-pr-branch.sh"
 
 BASE="${1:-main}"
 BRANCH="$(git branch --show-current)"
@@ -24,17 +26,17 @@ if ! gh auth status >/dev/null 2>&1; then
   exit 0
 fi
 
-if gh pr view --head "$BRANCH" --json number --jq .number >/dev/null 2>&1; then
+PR_NUM="$(gh_pr_number_for_branch "$BRANCH")"
+if [[ -n "$PR_NUM" ]]; then
   bash "$ROOT/scripts/sync-pr-body.sh" "$BRANCH" "$BASE" || true
-  gh pr view --head "$BRANCH" --web 2>/dev/null || gh pr view --head "$BRANCH"
+  gh pr view "$PR_NUM" --web 2>/dev/null || gh pr view "$PR_NUM"
   exit 0
 fi
 
 TITLE="$(bash "$ROOT/scripts/render-pr-title.sh" "$BASE" "$BRANCH")"
-
 BODY="$(bash "$ROOT/scripts/render-pr-body.sh" auto "$BRANCH" "$BASE")"
 
 gh pr create --base "$BASE" --head "$BRANCH" --title "$TITLE" --body "$BODY"
-PR_NUM="$(gh pr view --head "$BRANCH" --json number -q .number)"
+PR_NUM="$(gh_pr_number_for_branch "$BRANCH")"
 bash "$ROOT/scripts/sync-pr-checkboxes.sh" "$PR_NUM" || true
-echo "PR created for ${BRANCH} -> ${BASE}"
+echo "PR created for ${BRANCH} -> ${BASE} (#${PR_NUM})"

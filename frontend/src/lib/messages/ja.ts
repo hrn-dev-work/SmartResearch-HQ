@@ -112,5 +112,3 @@ export const ja = {
     prodBulletSheets: "Google Sheets API による一括エクスポート",
   },
 } as const;
-
-export type Messages = typeof ja;
