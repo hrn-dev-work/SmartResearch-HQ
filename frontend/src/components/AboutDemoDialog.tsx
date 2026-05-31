@@ -32,11 +32,7 @@ export function AboutDemoDialog({ open, onClose }: AboutDemoDialogProps) {
     <dialog
       ref={dialogRef}
       onClose={onClose}
-<<<<<<< HEAD
-      className="fixed inset-0 z-50 m-auto flex w-[min(100%,32rem)] max-h-[min(90vh,36rem)] flex-col overflow-y-auto rounded-md border border-slate-200 bg-white p-0 text-slate-900 backdrop:bg-slate-900/20 open:flex"
-=======
       className="fixed inset-0 z-50 m-auto flex w-[min(100%,32rem)] max-h-[min(90vh,36rem)] flex-col overflow-y-auto rounded-md border border-slate-200 bg-white p-0 text-slate-900 backdrop:bg-slate-900/20"
->>>>>>> origin/main
     >
       <div className="border-b border-slate-200 px-5 py-4 sm:px-6 sm:py-5">
         <div className="flex items-start justify-between gap-4">
