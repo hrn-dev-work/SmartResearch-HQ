@@ -60,12 +60,22 @@ export function AboutDemoDialog({ open, onClose }: AboutDemoDialogProps) {
           <h3 className="text-sm font-medium text-slate-900">
             {a.purposeHeading}
           </h3>
-          <p>{a.purposeBody}</p>
+          <p>
+            {a.purposeBodyBefore}
+            <strong className="font-medium text-slate-800">{a.purposeEmphasis}</strong>
+            {a.purposeBodyAfter}
+          </p>
         </section>
 
         <section className="space-y-2">
           <h3 className="text-sm font-medium text-slate-900">{a.archHeading}</h3>
-          <p>{a.archIntro}</p>
+          <p>
+            {a.archIntroBefore}
+            <strong className="font-medium text-slate-800">{a.archPortfolio}</strong>
+            {a.archIntroMid}
+            <strong className="font-medium text-slate-800">{a.archProduction}</strong>
+            {a.archIntroAfter}
+          </p>
           <ul className="list-disc space-y-1.5 pl-5">
             <li>{a.archBulletMock}</li>
             <li>{a.archBulletFixture}</li>
