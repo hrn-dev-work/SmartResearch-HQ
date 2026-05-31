@@ -60,12 +60,15 @@ gh pr edit <num> --title "$(bash scripts/render-pr-title.sh)"
 
 ---
 
-## Checklist before merge
+## Checklist before merge (user on GitHub)
+
+Agents stop at **PR URL**; squash merge is **not** run via `gh pr merge`.
 
 - [ ] `bash scripts/ci-check.sh` green
 - [ ] `frontend`: JA / EN toggle smoke-tested
 - [ ] PR body synced (`sync-pr-body.sh`) and valid (`validate-pr-body.sh <pr>`)
 - [ ] `ALLOWED_ORIGINS` / Vercel env documented if deploy changed
+- [ ] `gh pr checks` green on GitHub (agent may report; user clicks Merge)
 
 ---
 
@@ -150,6 +153,7 @@ Pre-push self-check: `bash scripts/check-pr-tooling.sh` (also runs at start of `
 
 | 依頼 | コマンド |
 |------|----------|
+| 文脈確認（エージェント最初） | `bash scripts/git-agent-context.sh`（`pin` / `--strict`） |
 | プッシュまで | `bash scripts/git-ship.sh push` |
 | PR作成まで | `bash scripts/git-pr-complete.sh` |
 | マージ途中 | `bash scripts/resolve-merge-main-keep-i18n.sh` |
@@ -163,8 +167,11 @@ Pre-push self-check: `bash scripts/check-pr-tooling.sh` (also runs at start of `
 3. エージェントは `wsl.exe -d Ubuntu bash -lc '...'` を使う
 4. それでもダメならユーザーに手元ターミナルで `git-pr-complete.sh`（エージェントの代替案内）
 
-## マージ前チェック
+## マージ前チェック（ユーザー・GitHub）
+
+エージェントは **PR作成まで**（`git-pr-complete.sh`）で止め、PR URL と checks を報告する。squash マージはユーザー。
 
 - [ ] `ci-check.sh` 成功
 - [ ] フロント JA/EN 確認
 - [ ] PR 本文同期済み（`sync-pr-body.sh`）かつ `validate-pr-body.sh <pr>` 成功
+- [ ] GitHub 上で required checks green → ユーザーが Merge

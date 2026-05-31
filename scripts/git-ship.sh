@@ -12,6 +12,8 @@ cd "$ROOT"
 # shellcheck source=gh-pr-branch.sh
 source "$ROOT/scripts/gh-pr-branch.sh"
 
+bash "$ROOT/scripts/git-agent-context.sh" --strict
+
 MODE="${1:-pr}"
 BASE="${2:-main}"
 BRANCH="$(git branch --show-current)"

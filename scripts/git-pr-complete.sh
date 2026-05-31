@@ -7,6 +7,8 @@ cd "$(dirname "$0")/.."
 # shellcheck source=gh-pr-branch.sh
 source scripts/gh-pr-branch.sh
 
+bash scripts/git-agent-context.sh --strict
+
 BASE="${GIT_PR_BASE:-main}"
 BRANCH="$(git branch --show-current)"
 COMMIT_SUBJECT="${1:-}"
