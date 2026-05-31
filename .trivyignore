@@ -1,0 +1,5 @@
+# Local dev fixtures — not production secrets (see .gitleaks.toml)
+docker-compose.yml
+backend/app/config.py
+.env.example
+backend/tests/

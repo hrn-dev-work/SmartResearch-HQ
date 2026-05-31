@@ -1,0 +1,11 @@
+docs(deploy): publish live demo URL and portfolio access notes
+
+Document Vercel Deployment Protection, browser 404 cache, and Render
+ALLOWED_ORIGINS. Add Demo App link to README. Gitignore local deploy logs.
+Add agent-run and portfolio deploy/push scripts for one-command ops.
+
+---
+
+公開デモ URL とデプロイ後チェックを docs に反映。README の Demo App リンク更新。
+Vercel/Render デプロイの再発防止スクリプト（agent-run, portfolio-vercel-deploy,
+agent-push）を追加。

@@ -1,0 +1,22 @@
+# Gitleaks config — extends defaults; allowlists local-dev fixtures only.
+# https://github.com/gitleaks/gitleaks
+
+title = "SmartResearch-HQ"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Local dev credentials (not production secrets)"
+
+paths = [
+  '''^\.env\.example$''',
+  '''^docker-compose\.yml$''',
+  '''^backend/app/config\.py$''',
+  '''^backend/tests/''',
+]
+
+regexes = [
+  '''smartresearch''',
+  '''test-key''',
+]

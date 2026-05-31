@@ -1,0 +1,11 @@
+name: SmartResearch-HQ CodeQL
+
+paths:
+  - backend/app
+  - frontend/src
+
+paths-ignore:
+  - backend/tests
+  - frontend/node_modules
+  - "**/*.test.ts"
+  - "**/*.test.tsx"

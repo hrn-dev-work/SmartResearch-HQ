@@ -1,0 +1,8 @@
+chore(scripts): force-add commit-msgs for agent-push presets
+
+Ensure scripts/commit-msgs/*.txt are staged even when check-ignore skips the
+directory. Add tracked preset message files.
+
+---
+
+agent-push が commit-msgs を確実に add するよう修正。プリセット msg をリポジトリに含める。

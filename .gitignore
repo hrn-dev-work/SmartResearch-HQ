@@ -86,3 +86,10 @@ frontend/CLAUDE.md
 
 # Agent debug output (local)
 .ci-investigation-gh.txt
+
+# Portfolio deploy (Vercel CLI + Render) — local logs only (scripts are committed)
+.vercel/
+agent-vercel-deploy.log
+agent-cmd-exit.txt
+agent-cmd-output.txt
+.git-commit-msg-tmp.txt
