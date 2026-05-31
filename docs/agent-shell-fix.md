@@ -4,6 +4,46 @@ When **your WSL terminal works** but the **Cursor agent Shell returns nothing**,
 
 ---
 
+## Root causes (verified on this repo)
+
+| # | Cause | Symptom | Why |
+|---|--------|---------|-----|
+| 1 | **Pipe capture bug** | `wsl … git status \| head` → empty Shell stdout; same command writes bytes to a file | Cursor Shell on Windows often drops **piped** WSL stdout (non-TTY). Simple `echo` and file redirects still work. |
+| 2 | **UNC vs WSL filesystem view** | Editor shows files; WSL checkout is old branch / missing paths | Workspace opened as `\\wsl.localhost\...` without **Reopen in WSL** — two views of the same repo. |
+| 3 | **PowerShell host + quoting** | Intermittent failures, broken heredocs in `wsl -lc '…'` one-liners | Agent Shell runs PowerShell; nested quotes in long git/gh commands fail silently or truncate. |
+| 4 | **No exit code in tool result** | Message: *"The shell command returned no exit status"* | Agent cannot tell success from failure when stdout is empty — must read `agent-cmd-exit.txt` or `.git/logs/HEAD`. |
+| 5 | **Subagent backend drop** | *"Execution backend unavailable"* mid-workflow | Long PR flows lose shell access; use file logs + parent agent Read tool. |
+| 6 | **Windows path redirects** | `Out-File` to `%TEMP%` or UNC fails; log file not created | Redirect logs **inside WSL** to repo root (`agent-cmd-output.txt`). |
+
+**Not the main cause here:** sandbox blocking (allowlisted `wsl.exe` / git usually runs outside sandbox). GitHub API rate limits are separate from shell capture.
+
+---
+
+## Mandatory agent pattern (git / PR)
+
+Do **not** rely on raw `wsl.exe … git status` stdout for multi-step flows.
+
+```bash
+# PR作成まで (logged)
+wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && bash scripts/agent-git-pr-complete.sh'
+
+# Any long script
+wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && bash scripts/agent-run.sh -- bash scripts/ci-check.sh'
+```
+
+After every run, **Read**:
+
+- `agent-cmd-output.txt` — full log (PR URL, errors, git output)
+- `agent-cmd-exit.txt` — exit code
+
+Probe when unsure:
+
+```bash
+bash scripts/agent-shell-probe.sh
+```
+
+---
+
 ## Why WSL `ls` / `git` does not see agent-written files
 
 | Cause | Symptom | Fix |
@@ -21,19 +61,9 @@ Quick check: `bash scripts/verify-wsl-workspace.sh` — lists missing paths and 
 
 1. **Command Palette** → `WSL: Reopen Folder in WSL` (workspace path must be `~/workspace/...`, not only `\\wsl.localhost\...`).
 2. **Cursor Settings** → Agents → enable **Legacy Terminal Tool** → restart Cursor.
-3. Agent commands must use:
-
-```bash
-wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && git status; echo EXIT:$?'
-```
-
-4. If stdout is still empty, write proof to a tracked file and **Read** it:
-
-```bash
-wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && git status > agent-cmd-output.txt 2>&1; git rev-parse --short HEAD >> agent-cmd-output.txt'
-```
-
-5. Verify success without trusting empty Shell: read `.git/logs/HEAD` or `agent-cmd-output.txt`.
+3. Use **`agent-run.sh`** or **`agent-git-pr-complete.sh`** (not bare piped git).
+4. If stdout is still empty, **Read** `agent-cmd-output.txt` (written inside WSL, gitignored).
+5. Verify success without trusting Shell: `.git/logs/HEAD` or `agent-cmd-exit.txt`.
 
 **Do not** use PowerShell `git -C \\wsl.localhost\...` for commits or pushes.
 
@@ -45,24 +75,43 @@ See also: [agent-git-playbook.md](agent-git-playbook.md).
 
 手元の WSL ターミナルは動くのに **エージェントの Shell だけ空** のときの手順。
 
+## 根本原因（本リポジトリで確認済み）
+
+| # | 原因 | 症状 | 理由 |
+|---|------|------|------|
+| 1 | **パイプ出力の取りこぼし** | `git status \| head` が Shell 上は空、ファイルリダイレクトは成功 | Windows 上の Cursor Shell が WSL の **パイプ stdout** をキャプチャできないことがある |
+| 2 | **UNC と WSL の二重ビュー** | エディタにファイルがあるが WSL checkout が古い | `\\wsl.localhost\...` のまま開いている |
+| 3 | **PowerShell + クォート** | 長い `wsl -lc '…'` が途中で壊れる | heredoc / ネスト引用を一行に詰めない |
+| 4 | **終了コード不明** | *no exit status* | 空 stdout では成否が分からない → ログファイル必須 |
+| 5 | **サブエージェント backend 停止** | *Execution backend unavailable* | 長時間フローはファイルログ + Read で確認 |
+| 6 | **Windows 側リダイレクト** | `%TEMP%` や UNC への Out-File 失敗 | ログは WSL 内リポジトリ直下へ |
+
+## エージェント必須パターン（git / PR）
+
+```bash
+wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && bash scripts/agent-git-pr-complete.sh'
+```
+
+実行後は **`agent-cmd-output.txt`** と **`agent-cmd-exit.txt`** を Read する。
+
+診断: `bash scripts/agent-shell-probe.sh`
+
 ## WSL でファイルが見えない理由
 
 | 原因 | 症状 | 対処 |
 |------|------|------|
-| **Windows UNC でフォルダを開いている** | Cursor にはあるが WSL の checkout が古い | **`WSL: Reopen Folder in WSL`** — `~/workspace/SmartResearch-HQ` で開く |
-| **リモート merge 後に pull していない** | ship preflight で `engineering-principles.md` 欠落 | `git fetch origin && git checkout main && git pull --ff-only origin main` |
+| **Windows UNC でフォルダを開いている** | Cursor にはあるが WSL の checkout が古い | **`WSL: Reopen Folder in WSL`** |
+| **リモート merge 後に pull していない** | ship preflight でファイル欠落 | `git fetch origin && git checkout main && git pull --ff-only origin main` |
 | **作業ブランチが古い** | `origin/main` にだけ存在 | `git checkout main && git pull` |
 
 確認: `bash scripts/verify-wsl-workspace.sh`
-
----
 
 ## 手順
 
 1. **`WSL: Reopen Folder in WSL`**
 2. **Legacy Terminal Tool** を ON → Cursor 再起動
-3. コマンドは `wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && …'`
-4. 出力が空なら `agent-cmd-output.txt` にリダイレクトして Read
-5. `.git/logs/HEAD` で push/commit の成否を確認
+3. **`agent-run.sh` / `agent-git-pr-complete.sh`** を使う（生の piped git に依存しない）
+4. 出力が空なら **`agent-cmd-output.txt`** を Read
+5. `.git/logs/HEAD` / `agent-cmd-exit.txt` で push/commit を確認
 
 PowerShell の UNC 経由 `git` は使わない。
