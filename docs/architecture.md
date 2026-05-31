@@ -93,7 +93,7 @@ Fallback when PA-API unavailable: `MATCHING_PROVIDER=none` for manual ASIN revie
 ```
 SmartResearch-HQ/
 ├── docs/                 # Design docs (this directory)
-├── frontend/             # Next.js
+├── frontend/             # Next.js（[構造ガイド](./frontend-structure-guide.md) / [Mermaid 図](./frontend-structure.md)）
 ├── backend/              # FastAPI + workers
 │   └── app/services/
 │       ├── matching/     # Pluggable matching
