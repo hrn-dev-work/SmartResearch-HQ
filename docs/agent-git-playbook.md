@@ -91,6 +91,16 @@ bash scripts/validate-pr-body.sh --file /tmp/body.md
 
 ---
 
+## Public doc incidents (learned)
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| README English-only merged (PR #34) | No CI/pre-commit on public md | validate-public-docs.sh + doc-conventions.md |
+
+See doc-conventions.md.
+
+---
+
 ## PR body incidents (learned)
 
 | Symptom | Cause | Fix |
