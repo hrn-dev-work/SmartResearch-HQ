@@ -18,6 +18,7 @@ For Cursor agents and maintainers. Public clone: use `scripts/git-ship.sh` and t
 | After push: **`sync-pr-body.sh`** | Commits list + CI checkboxes stay current |
 | PR body format: **`validate-pr-body.sh`** | EN `**Section**` → `---` → JA; rejects `## Summary` legacy |
 | Docs for operators: **English → `---` → 日本語** | Same as PR body convention |
+| Install git hooks once per clone | bash scripts/install-git-hooks.sh — see docs/git-hooks.md |
 
 ---
 
@@ -133,6 +134,7 @@ Pre-push self-check: `bash scripts/check-pr-tooling.sh` (also runs at start of `
 | push 後は **`sync-pr-body.sh`** | PR 本文の Commits / CI チェックを更新 |
 | PR 本文は **`validate-pr-body.sh`** | 英日二段・`**Section**` 必須（`## Summary` 禁止） |
 | 運用ドキュメントは **英語 → `---` → 日本語** | PR 本文と同じ |
+| clone ごとに git フック | bash scripts/install-git-hooks.sh — docs/git-hooks.md 参照 |
 | **`check-pr-tooling.sh`** | push/CI 前に PR 本文ツールの自己検査 |
 
 ## PR 本文インシデント（教訓）
