@@ -1,4 +1,23 @@
 #!/usr/bin/env bash
+# Resolve PR #14 merge conflicts: keep main i18n UI + both agent-push presets.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+if [[ ! -f .git/MERGE_HEAD ]]; then
+  echo "No merge in progress. Run: git checkout docs/portfolio-deploy-live && git merge origin/main" >&2
+  exit 1
+fi
+
+# main (#15 i18n UI) wins for frontend conflicts
+git checkout --theirs \
+  frontend/src/app/globals.css \
+  frontend/src/app/page.tsx \
+  frontend/src/components/AboutDemoDialog.tsx \
+  frontend/src/lib/ui-classes.ts
+
+# agent-push: keep both presets (portfolio from branch, production from main)
+cat > scripts/agent-push.sh <<'SCRIPT'
+#!/usr/bin/env bash
 # Agent-friendly git push: branch, safe-add, commit, push. No heredoc on CLI.
 #
 # Usage:
@@ -92,3 +111,37 @@ bash "$ROOT/scripts/git-ship.sh" push
 echo "branch: $(git branch --show-current)"
 echo "hash: $(git rev-parse --short HEAD)"
 git status -sb
+SCRIPT
+chmod +x scripts/agent-push.sh
+
+git add \
+  frontend/src/app/globals.css \
+  frontend/src/app/page.tsx \
+  frontend/src/components/AboutDemoDialog.tsx \
+  frontend/src/lib/ui-classes.ts \
+  scripts/agent-push.sh
+
+if [[ -n "$(git diff --name-only --diff-filter=U)" ]]; then
+  echo "Still unmerged:" >&2
+  git diff --name-only --diff-filter=U >&2
+  exit 1
+fi
+
+git commit -F - <<'EOF'
+merge main: keep i18n UI from main and deploy presets on agent-push
+
+Resolve PR #14 conflicts with main (#15): adopt main frontend i18n/layout,
+combine portfolio-docs-deploy and production-local-setup in agent-push.sh.
+
+---
+
+PR #14 と main (#15) のコンフリクト解消。フロント i18n は main を採用、
+agent-push は両 preset を維持。
+EOF
+
+bash scripts/ci-check.sh
+git push origin docs/portfolio-deploy-live
+bash scripts/sync-pr-body.sh docs/portfolio-deploy-live main || true
+
+echo "PR_URL=$(gh pr view 14 --json url -q .url 2>/dev/null || gh pr list --head docs/portfolio-deploy-live --json url -q '.[0].url')"
+echo "MERGEABLE=$(gh pr view 14 --json mergeable -q .mergeable 2>/dev/null || echo unknown)"
