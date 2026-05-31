@@ -12,6 +12,8 @@ Tracked markdown in this repository (README, `docs/*.md`, `frontend/README.md`) 
 
 **Cursor rule (local):** `.cursor/rules/docs-editing.mdc` points here; this file is the git-tracked canonical copy.
 
+**Related:** [git-hooks.md](git-hooks.md) — install local pre-commit hooks that run validate-public-docs.sh when public md is staged.
+
 ---
 
 ## Checklist when editing public md
@@ -51,6 +53,8 @@ git で追跡する Markdown（README、`docs/*.md`、`frontend/README.md`）は
 **対象外:** `.github/ISSUE_TEMPLATE/*.md`（先頭の `---` は YAML front matter）。UI 文言は `frontend/src/lib/messages/`。
 
 **Cursor ルール（ローカル）:** `.cursor/rules/docs-editing.mdc` は本書へのリンク。正本は **このファイル**（git 追跡）。
+
+**関連:** [git-hooks.md](git-hooks.md) — public md を stage した pre-commit で validate-public-docs.sh を実行するローカル設定。
 
 ---
 
