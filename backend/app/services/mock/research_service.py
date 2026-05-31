@@ -1,4 +1,5 @@
 import re
+from datetime import UTC, datetime
 from uuid import UUID
 
 from app.core.status import JobStatus
@@ -60,7 +61,47 @@ class MockResearchService:
         job = fixtures.get_job(job_id)
         if job is None:
             return None
+
         items, _ = fixtures.get_items(job_id, 1, 1000)
-        exported = sum(1 for i in items if i.decision is not None)
-        skipped = len(items) - exported
-        return ExportJobResponse(job_id=job_id, exported_count=exported, skipped_count=skipped)
+        now = datetime.now(UTC)
+        exported_item_ids: list[UUID] = []
+        skipped = 0
+
+        for item in items:
+            if item.decision is None:
+                skipped += 1
+                continue
+            if fixtures.is_rejected(item.item_id):
+                skipped += 1
+                continue
+            if fixtures.is_exported(item.item_id):
+                skipped += 1
+                continue
+
+            manual = fixtures.manual_asin_for(item.item_id)
+            if manual:
+                exported_item_ids.append(item.item_id)
+                continue
+
+            chosen = next(
+                (c for c in item.candidates if c.candidate_id == item.decision),
+                None,
+            )
+            if chosen is None:
+                skipped += 1
+                continue
+
+            exported_item_ids.append(item.item_id)
+
+        if exported_item_ids:
+            fixtures.mark_exported(exported_item_ids, now)
+            fixtures.set_job_status(job_id, JobStatus.EXPORTED)
+
+        return ExportJobResponse(
+            job_id=job_id,
+            exported_count=len(exported_item_ids),
+            skipped_count=skipped,
+        )
+
+    def run_pipeline(self, job_id: UUID, *, max_items: int = 20) -> None:
+        raise NotImplementedError("MockResearchService does not run production pipeline")

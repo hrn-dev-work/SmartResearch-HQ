@@ -24,7 +24,14 @@ OPTIONAL_IDS = frozenset({"2.2c", "4.3"})
 
 # Extra checks when the artifact cell has no filesystem path.
 CUSTOM_CHECKS: dict[str, list[str]] = {
-    "2.2c": ["backend/app/services/matching/gemini.py"],
+    "2.2c": [
+        "backend/app/services/matching/gemini.py:GeminiConfigError",
+        "backend/app/services/matching/gemini.py:gemini_min_interval_sec",
+    ],
+    "2.4": [
+        "backend/app/workers/settings.py:on_job_failure",
+        "backend/app/workers/dlq.py",
+    ],
     "3.4": ["frontend/src/hooks/useJobProgress.ts"],
     "3.5": [
         "backend/app/core/redis.py",

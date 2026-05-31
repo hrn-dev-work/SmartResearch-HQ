@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
+    gemini_min_interval_sec: float = 4.0
+    gemini_max_retries: int = 3
     amazon_paapi_access_key: str = ""
     amazon_paapi_secret_key: str = ""
     amazon_paapi_partner_tag: str = ""
@@ -35,6 +37,22 @@ class Settings(BaseSettings):
     google_sheets_credentials_path: str = "./credentials.json"
     google_sheet_id: str = ""
     max_scrape_items: int = 20
+    # Comma-separated CORS origins (e.g. Vercel preview + production URLs)
+    allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+
+
+def cors_origins(settings: Settings | None = None) -> list[str]:
+    """Parse ALLOWED_ORIGINS; always include local dev defaults."""
+    settings = settings or get_settings()
+    defaults = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    extra = [o.strip() for o in settings.allowed_origins.split(",") if o.strip()]
+    seen: set[str] = set()
+    out: list[str] = []
+    for origin in [*defaults, *extra]:
+        if origin not in seen:
+            seen.add(origin)
+            out.append(origin)
+    return out
 
 
 @lru_cache

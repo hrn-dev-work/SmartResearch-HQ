@@ -14,6 +14,7 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 SHEET_HEADER = [
     "Shopee Title",
+    "Shopee Item URL",
     "Shopee Item ID",
     "Amazon ASIN",
     "Amazon URL",
@@ -30,6 +31,7 @@ def build_export_row(
     *,
     shopee_title: str,
     shopee_item_id: str,
+    shopee_item_url: str,
     amazon_asin: str,
     amazon_url: str,
     sold_count: int | None,
@@ -37,6 +39,7 @@ def build_export_row(
 ) -> dict[str, Any]:
     return {
         "shopee_title": shopee_title,
+        "shopee_item_url": shopee_item_url,
         "shopee_item_id": shopee_item_id,
         "amazon_asin": amazon_asin,
         "amazon_url": amazon_url,
@@ -48,6 +51,7 @@ def build_export_row(
 def _row_to_values(row: dict[str, Any]) -> list[Any]:
     return [
         row["shopee_title"],
+        row["shopee_item_url"],
         row["shopee_item_id"],
         row["amazon_asin"],
         row["amazon_url"],

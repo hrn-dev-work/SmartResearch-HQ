@@ -1,5 +1,6 @@
 import type {
   CreateResearchResponse,
+  ExportJobResponse,
   ResearchJob,
   ReviewItemsPage,
 } from "./types";
@@ -82,11 +83,8 @@ export async function decideReview(
   });
 }
 
-export async function exportJob(jobId: string): Promise<{
-  exported_count: number;
-  skipped_count: number;
-}> {
-  return request(`/research/${jobId}/export`, { method: "POST" });
+export async function exportJob(jobId: string): Promise<ExportJobResponse> {
+  return request<ExportJobResponse>(`/research/${jobId}/export`, { method: "POST" });
 }
 
 export async function checkHealth(): Promise<{

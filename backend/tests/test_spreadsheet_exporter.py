@@ -13,12 +13,14 @@ def test_build_export_row():
     row = build_export_row(
         shopee_title="Sample Item",
         shopee_item_id="12345",
+        shopee_item_url="https://shopee.sg/product-i.1.12345",
         amazon_asin="B012345678",
         amazon_url="https://www.amazon.com/dp/B012345678",
         sold_count=42,
         exported_at=exported_at,
     )
     assert row["amazon_asin"] == "B012345678"
+    assert row["shopee_item_url"].startswith("https://shopee.sg/")
     assert row["sold_count"] == 42
     assert row["exported_at"] == "2026-05-25T12:00:00+00:00"
 
@@ -34,5 +36,6 @@ def test_append_rows_sync_validates_sheet_id(tmp_path):
 
 
 def test_sheet_header_columns():
+    assert "Shopee Item URL" in SHEET_HEADER
     assert "Amazon ASIN" in SHEET_HEADER
-    assert len(SHEET_HEADER) == 6
+    assert len(SHEET_HEADER) == 7

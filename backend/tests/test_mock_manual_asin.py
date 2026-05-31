@@ -27,7 +27,7 @@ def test_decide_manual_asin_in_portfolio_mode() -> None:
 
     updated, _ = fixtures.get_items(job_id, 1, 20)
     decided = next(i for i in updated if i.item_id == item_id)
-    assert decided.decision == item_id
+    assert decided.decision is not None
 
 
 def test_decide_manual_asin_invalid_format_in_portfolio_mode() -> None:

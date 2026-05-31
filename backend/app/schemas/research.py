@@ -48,8 +48,10 @@ class AmazonCandidateResponse(BaseModel):
 
 class ReviewItemResponse(BaseModel):
     item_id: UUID
+    shopee_item_id: str = ""
     title: str
     image_url: str
+    shopee_item_url: str = ""
     sold_count: int | None
     candidates: list[AmazonCandidateResponse]
     decision: UUID | None

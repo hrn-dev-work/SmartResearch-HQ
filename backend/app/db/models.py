@@ -62,6 +62,7 @@ class JobItem(Base):
         UUID(as_uuid=True), ForeignKey("research_jobs.id"), nullable=False
     )
     shopee_item_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    shopee_item_url: Mapped[str] = mapped_column(Text, nullable=False, default="")
     title: Mapped[str] = mapped_column(Text, nullable=False)
     image_url: Mapped[str] = mapped_column(Text, nullable=False)
     sold_count: Mapped[int | None] = mapped_column(Integer)

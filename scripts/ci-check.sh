@@ -5,6 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 bash "$ROOT/scripts/sync-wbs-roadmap.sh" --quiet || true
+python3 "$ROOT/scripts/sync-api-types.py" --quiet || true
 
 echo "== backend =="
 cd "$ROOT/backend"
@@ -37,6 +38,7 @@ echo "== frontend =="
 cd "$ROOT/frontend"
 ensure_npm
 npm ci
+python3 "$ROOT/scripts/sync-api-types.py" --check
 npm run lint
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 npm run build
 

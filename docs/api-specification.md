@@ -121,8 +121,10 @@ portfolio 時は即 `AWAITING_REVIEW` / `progress_pct: 100` を返す場合あ�
   "items": [
     {
       "item_id": "item-uuid",
+      "shopee_item_id": "123456789",
       "title": "Wireless Earbuds Pro",
       "image_url": "https://cf.shopee.sg/file/...",
+      "shopee_item_url": "https://shopee.sg/product-i.123456.123456789",
       "sold_count": 1523,
       "candidates": [
         {

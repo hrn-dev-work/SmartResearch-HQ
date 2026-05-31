@@ -8,16 +8,24 @@ from app.schemas.research import (
     ReviewItemResponse,
     SellerSummary,
 )
+from app.services.scraper.shopee_crawler import build_shopee_item_url
 
 # In-memory demo store (portfolio mode)
 _jobs: dict[UUID, ResearchJobResponse] = {}
 _items: dict[UUID, list[ReviewItemResponse]] = {}
-# item_id -> "candidate:{uuid}" | "manual:{asin}" | "rejected"
-_decisions: dict[UUID, str] = {}
+# item_id -> API decision marker (candidate_id or synthetic decision UUID)
+_decision_markers: dict[UUID, UUID] = {}
+_rejected_items: set[UUID] = set()
+_manual_asins: dict[UUID, str] = {}
+_exported_at: dict[UUID, datetime] = {}
 
 
 def _now() -> datetime:
     return datetime.now(UTC)
+
+
+def _demo_item_url(shop_url: str, item_id: str) -> str:
+    return build_shopee_item_url(shop_url, item_id, shop_id="123456")
 
 
 def seed_demo_job(shopee_url: str, display_name: str | None) -> UUID:
@@ -41,18 +49,20 @@ def seed_demo_job(shopee_url: str, display_name: str | None) -> UUID:
 
     demo_items: list[ReviewItemResponse] = []
     samples = [
-        ("Wireless Bluetooth Earbuds Pro", "B0DEMO001", 0.91),
-        ("USB-C Fast Charging Cable 2m", "B0DEMO002", 0.84),
-        ("Portable Mini Fan Rechargeable", "B0DEMO003", 0.76),
+        ("10001", "Wireless Bluetooth Earbuds Pro", "B0DEMO001", 0.91),
+        ("10002", "USB-C Fast Charging Cable 2m", "B0DEMO002", 0.84),
+        ("10003", "Portable Mini Fan Rechargeable", "B0DEMO003", 0.76),
     ]
-    for title, asin, confidence in samples:
+    for shopee_item_id, title, asin, confidence in samples:
         item_id = uuid4()
         cand_id = uuid4()
         demo_items.append(
             ReviewItemResponse(
                 item_id=item_id,
+                shopee_item_id=shopee_item_id,
                 title=title,
                 image_url="https://picsum.photos/seed/shopee/400/400",
+                shopee_item_url=_demo_item_url(shopee_url, shopee_item_id),
                 sold_count=1200,
                 candidates=[
                     AmazonCandidateResponse(
@@ -75,13 +85,14 @@ def seed_demo_job(shopee_url: str, display_name: str | None) -> UUID:
                 decision=None,
             )
         )
-    # Item with no candidates (manual ASIN demo)
     no_match_id = uuid4()
     demo_items.append(
         ReviewItemResponse(
             item_id=no_match_id,
+            shopee_item_id="10004",
             title="Vintage Camera Lens Adapter Ring",
             image_url="https://picsum.photos/seed/shopee-nomatch/400/400",
+            shopee_item_url=_demo_item_url(shopee_url, "10004"),
             sold_count=340,
             candidates=[],
             decision=None,
@@ -100,21 +111,48 @@ def get_items(job_id: UUID, page: int, page_size: int) -> tuple[list[ReviewItemR
     start = (page - 1) * page_size
     end = start + page_size
     page_items = all_items[start:end]
-    # attach decisions
     enriched = []
     for item in page_items:
-        decision = item.item_id if item.item_id in _decisions else None
-        enriched.append(item.model_copy(update={"decision": decision}))
+        marker = _decision_markers.get(item.item_id)
+        enriched.append(item.model_copy(update={"decision": marker}))
     return enriched, len(all_items)
 
 
 def save_candidate_decision(item_id: UUID, candidate_id: UUID) -> None:
-    _decisions[item_id] = f"candidate:{candidate_id}"
+    _decision_markers[item_id] = candidate_id
+    _rejected_items.discard(item_id)
 
 
 def save_manual_asin_decision(item_id: UUID, asin: str) -> None:
-    _decisions[item_id] = f"manual:{asin.upper()}"
+    _decision_markers[item_id] = uuid4()
+    _manual_asins[item_id] = asin.upper()
+    _rejected_items.discard(item_id)
 
 
 def save_rejected_decision(item_id: UUID) -> None:
-    _decisions[item_id] = "rejected"
+    _decision_markers[item_id] = uuid4()
+    _rejected_items.add(item_id)
+
+
+def mark_exported(item_ids: list[UUID], exported_at: datetime) -> None:
+    for item_id in item_ids:
+        _exported_at[item_id] = exported_at
+
+
+def set_job_status(job_id: UUID, status: JobStatus) -> None:
+    job = _jobs.get(job_id)
+    if job is None:
+        return
+    _jobs[job_id] = job.model_copy(update={"status": status, "updated_at": _now()})
+
+
+def is_rejected(item_id: UUID) -> bool:
+    return item_id in _rejected_items
+
+
+def is_exported(item_id: UUID) -> bool:
+    return item_id in _exported_at
+
+
+def manual_asin_for(item_id: UUID) -> str | None:
+    return _manual_asins.get(item_id)

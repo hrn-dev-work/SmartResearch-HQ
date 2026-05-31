@@ -17,23 +17,28 @@
 
 Phase 1 完了条件: docs 間の用語・マッチング方針・API パスが一致していること。
 
-## Phase 2: コアロジック（裏版） — 着手済み
+## Phase 2: コアロジック（裏版） — ✅ 完了
 
 | ID | タスク | 成果物 | 状態 |
 |----|--------|--------|------|
-| 2.1 | Playwright Shopee クローラー | `backend/app/services/scraper/` | ✅ 初版 |
-| 2.2 | 候補マッチング（Amazon PA-API タイトル検索） | `backend/app/services/matching/` | ✅ 初版 |
+| 2.1 | Playwright Shopee クローラー | `backend/app/services/scraper/` | ✅ |
+| 2.2 | 候補マッチング（Amazon PA-API タイトル検索） | `backend/app/services/matching/` | ✅ |
 | 2.2b | 手動 ASIN decide API + DB | review route, `review_decisions.manual_asin` | ✅ |
-| 2.2c | Gemini マルチモーダル（任意） | `matching/gemini.py` | 未着手 |
-| 2.3 | Google Sheets 連携 | `backend/app/services/spreadsheet/` | ✅ 初版 |
-| 2.4 | ARQ ワーカー + リトライ/DLQ | `backend/app/workers/` | ✅ 初版（enqueue + worker） |
+| 2.2c | Gemini マルチモーダル（任意） | `matching/gemini.py` | ✅ |
+| 2.3 | Google Sheets 連携 | `backend/app/services/spreadsheet/` | ✅ |
+| 2.4 | ARQ ワーカー + リトライ/DLQ | `backend/app/workers/` | ✅ |
 | 2.5 | Alembic マイグレーション | `backend/alembic/` | ✅ |
 | 2.6 | CLI エントリポイント | `python -m app.cli` | ✅ |
+
+Phase 2 完了条件（2.2c 除く）: スクレイプ → マッチング → DB 永続化 → ワーカーリトライ/DLQ → CLI 検証パスが揃っていること。
 
 ### Phase 2 ローカル検証（M2）
 
 ```bash
-# 1. インフラ
+# 一括スモーク（推奨）
+bash scripts/smoke-m2.sh
+
+# 手動ステップ
 docker compose up -d postgres redis
 
 # 2. 依存関係 + Playwright ブラウザ
@@ -79,7 +84,7 @@ arq app.workers.settings.WorkerSettings
 ```
 M1: フロントから Mock リサーチ完了（portfolio）              ← 到達済み
     起動: bash scripts/bootstrap-local.sh → uvicorn + npm run dev
-M2: CLI で 1 セラー実スクレイプ + amazon_search
+M2: CLI で 1 セラー実スクレイプ + amazon_search   ← scripts/smoke-m2.sh
 M3: レビュー → Sheets 出力 E2E
 M4: 公開 GitHub + デモ URL
 ```

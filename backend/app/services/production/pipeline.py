@@ -9,10 +9,19 @@ from app.core.status import JobStatus
 from app.db.models import AmazonCandidate, JobItem, ResearchJob, Seller
 from app.services.matching import get_candidate_matcher
 from app.services.matching.amazon_search import AmazonSearchConfigError
+from app.services.matching.gemini import GeminiConfigError
+from app.services.production.errors import MatchingPipelineError, ScrapePipelineError
 from app.services.scraper.shopee_crawler import ScrapeBlockedError, fetch_sold_items
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+_RETRYABLE_STATUSES = frozenset(
+    {
+        JobStatus.SCRAPE_FAILED.value,
+        JobStatus.AI_FAILED.value,
+    }
+)
 
 
 async def _set_job_status(
@@ -29,13 +38,19 @@ async def _set_job_status(
     job.error_code = error_code
     job.error_message = error_message
     job.updated_at = datetime.now(UTC)
-    if status in (
-        JobStatus.AWAITING_REVIEW,
-        JobStatus.SCRAPE_FAILED,
-        JobStatus.AI_FAILED,
-    ):
-        if status == JobStatus.AWAITING_REVIEW:
-            job.completed_at = datetime.now(UTC)
+    if status == JobStatus.AWAITING_REVIEW:
+        job.completed_at = datetime.now(UTC)
+    await session.flush()
+
+
+async def _reset_job_for_retry(session: AsyncSession, job: ResearchJob) -> None:
+    if job.status not in _RETRYABLE_STATUSES:
+        return
+    await session.execute(delete(JobItem).where(JobItem.job_id == job.id))
+    job.progress_pct = 0
+    job.error_code = None
+    job.error_message = None
+    job.completed_at = None
     await session.flush()
 
 
@@ -52,6 +67,10 @@ async def run_job_pipeline(session: AsyncSession, job_id: UUID, *, max_items: in
     if job is None:
         raise ValueError(f"Job not found: {job_id}")
 
+    if job.status == JobStatus.AWAITING_REVIEW.value:
+        return
+
+    await _reset_job_for_retry(session, job)
     shop_url = job.seller.shopee_shop_url
 
     await _set_job_status(session, job, status=JobStatus.SCRAPING, progress_pct=10)
@@ -69,13 +88,14 @@ async def run_job_pipeline(session: AsyncSession, job_id: UUID, *, max_items: in
             error_message=str(exc),
         )
         await session.commit()
-        return
+        raise ScrapePipelineError(str(exc)) from exc
 
     for index, item in enumerate(scraped):
         session.add(
             JobItem(
                 job_id=job.id,
                 shopee_item_id=item.shopee_item_id,
+                shopee_item_url=item.shopee_item_url,
                 title=item.title,
                 image_url=item.image_url or "https://placehold.co/400x400?text=No+Image",
                 sold_count=item.sold_count,
@@ -101,7 +121,7 @@ async def run_job_pipeline(session: AsyncSession, job_id: UUID, *, max_items: in
                     shopee_title=db_item.title,
                     image_url=db_item.image_url,
                 )
-            except AmazonSearchConfigError as exc:
+            except (AmazonSearchConfigError, GeminiConfigError) as exc:
                 await _set_job_status(
                     session,
                     job,
@@ -122,7 +142,7 @@ async def run_job_pipeline(session: AsyncSession, job_id: UUID, *, max_items: in
                     error_message=str(exc),
                 )
                 await session.commit()
-                return
+                raise MatchingPipelineError(str(exc)) from exc
 
         for rank, match in enumerate(candidates[:3], start=1):
             session.add(
