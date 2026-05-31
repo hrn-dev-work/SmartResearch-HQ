@@ -3,18 +3,19 @@ import { HeaderComponent } from "../components/header.component";
 import { BasePage } from "./base.page";
 
 export class ReviewPage extends BasePage {
+  readonly path: string;
   readonly header: HeaderComponent;
   readonly title: Locator;
   readonly exportButton: Locator;
-  constructor(page: Page, private readonly jobId: string) {
+  constructor(page: Page, jobId: string) {
     super(page);
+    this.path = `/review/${jobId}`;
     this.header = new HeaderComponent(page);
     this.title = page.getByRole("heading", { name: /^レビュー$|^Review$/i });
     this.exportButton = page.getByRole("button", {
       name: /スプレッドシートに出力|Export to spreadsheet/i,
     });
   }
-  get path(): string { return `/review/${this.jobId}`; }
   static forJob(page: Page, jobId: string) { return new ReviewPage(page, jobId); }
   statusBanner(): Locator { return this.page.locator("p.border-l-2.border-emerald-500"); }
   async expectLoaded(): Promise<void> { await this.title.waitFor({ state: "visible" }); }
