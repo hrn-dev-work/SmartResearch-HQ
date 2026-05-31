@@ -16,6 +16,7 @@ For Cursor agents and maintainers. Public clone: use `scripts/git-ship.sh` and t
 | Open PR: **`gh pr list --head <branch> --state open`** | Merged PRs must not block new PRs; no `gh pr view --head` |
 | PR create: **`ensure-pr.sh`** (REST fallback) | Avoids `projectCards` GraphQL errors |
 | After push: **`sync-pr-body.sh`** | Commits list + CI checkboxes stay current |
+| PR body format: **`validate-pr-body.sh`** | EN `**Section**` → `---` → JA; rejects `## Summary` legacy |
 | Docs for operators: **English → `---` → 日本語** | Same as PR body convention |
 
 ---
@@ -62,10 +63,45 @@ gh pr edit <num> --title "$(bash scripts/render-pr-title.sh)"
 
 - [ ] `bash scripts/ci-check.sh` green
 - [ ] `frontend`: JA / EN toggle smoke-tested
-- [ ] PR body synced (`sync-pr-body.sh`)
+- [ ] PR body synced (`sync-pr-body.sh`) and valid (`validate-pr-body.sh <pr>`)
 - [ ] `ALLOWED_ORIGINS` / Vercel env documented if deploy changed
 
 ---
+
+## PR body (bilingual template)
+
+**Required shape** (see `.cursor/skills/commit-pr-style/templates.md`):
+
+1. English block: `**Summary**`, `**Commits**`, `**Test plan**`, `**Related**`
+2. Horizontal rule: `---`
+3. Japanese block: `**概要 (Summary)**`, `**コミット (Commits)**`, …
+
+**Do not** use GitHub Action legacy format (`## Summary`, single language).
+
+```bash
+# Generate + push to GitHub
+bash scripts/sync-pr-body.sh "$(git branch --show-current)" main
+
+# Validate only
+bash scripts/validate-pr-body.sh 14
+bash scripts/validate-pr-body.sh --file /tmp/body.md
+```
+
+`.github/workflows/auto-pr.yml` uses the same `render-pr-body.sh` + `validate-pr-body.sh` on create.
+
+---
+
+## PR body incidents (learned)
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `## Summary` only, no Japanese | Old `auto-pr.yml` inline template | `sync-pr-body.sh` + updated workflow |
+| Body is `@/tmp/...` on GitHub | `gh api -f body=@file` | `gh_api_patch_pr_body` (python3 JSON) |
+| `gh pr edit` / `gh pr view` GraphQL error | Projects classic deprecation | REST via `gh_pr_edit_body_safe` |
+| `scripts/gh-pr-branch.sh` missing | Mistaken cleanup as one-off script | Listed in `.gitignore` comment + `check-pr-tooling.sh` |
+| Agent shell empty output | Cursor on UNC path | WSL reopen + `wsl.exe bash -lc` + log to file |
+
+Pre-push self-check: `bash scripts/check-pr-tooling.sh` (also runs at start of `ci-check.sh`).
 
 ---
 
@@ -85,7 +121,18 @@ gh pr edit <num> --title "$(bash scripts/render-pr-title.sh)"
 | PR 参照は **`gh pr list --head <branch> --state open`** | マージ済み PR が新規作成を阻害しない |
 | PR 作成は **`ensure-pr.sh`**（REST フォールバック） | projectCards GraphQL エラー回避 |
 | push 後は **`sync-pr-body.sh`** | PR 本文の Commits / CI チェックを更新 |
+| PR 本文は **`validate-pr-body.sh`** | 英日二段・`**Section**` 必須（`## Summary` 禁止） |
 | 運用ドキュメントは **英語 → `---` → 日本語** | PR 本文と同じ |
+| **`check-pr-tooling.sh`** | push/CI 前に PR 本文ツールの自己検査 |
+
+## PR 本文インシデント（教訓）
+
+| 症状 | 原因 | 対策 |
+|------|------|------|
+| `## Summary` のみ | 旧 auto-pr テンプレ | `sync-pr-body.sh` + workflow 更新 |
+| 本文が `@/tmp/...` | `gh api -f body=@file` | python3 JSON（`gh_api_patch_pr_body`） |
+| `gh pr edit` GraphQL エラー | Projects classic 廃止 | REST（`gh_pr_edit_body_safe`） |
+| `gh-pr-branch.sh` 欠落 | 誤って one-off 削除 | `.gitignore` コメント + `check-pr-tooling.sh` |
 
 ## 依頼 → コマンド
 
@@ -108,4 +155,4 @@ gh pr edit <num> --title "$(bash scripts/render-pr-title.sh)"
 
 - [ ] `ci-check.sh` 成功
 - [ ] フロント JA/EN 確認
-- [ ] PR 本文同期済み
+- [ ] PR 本文同期済み（`sync-pr-body.sh`）かつ `validate-pr-body.sh <pr>` 成功

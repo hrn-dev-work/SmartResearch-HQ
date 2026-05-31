@@ -1,3 +1,127 @@
+# SmartResearch-HQ — Requirements specification
+
+> UI, design, and MVP decisions: [design.md](./design.md). This document is the single source for **what** to build.  
+> Overview: [プロジェクト計画書.md](./プロジェクト計画書.md).
+
+## 1. Purpose and scope
+
+Extract Shopee SOLD products for cross-border EC, run **pluggable candidate matching** (default: title-based Amazon search), human review, then export to spreadsheet.
+
+> **Pluggable candidate matching**  
+> Matching logic is decoupled from the core system so providers can be added, swapped, or extended later.
+
+| Edition | Purpose | In this repository |
+|---------|---------|-------------------|
+| Portfolio | Hiring / demo | Mock API + frontend + design docs |
+| Production | Real operations | Playwright / matching / Sheets (may stay private) |
+
+## 2. Functional requirements
+
+### 2.1 Start research
+
+- User submits Shopee shop URL (required) and optional display name; system creates a research job.
+- API: `POST /api/v1/research` ([api-specification.md](./api-specification.md))
+
+### 2.2 Job progress and state
+
+- State machine: `PENDING → SCRAPING → AI_INFERENCE → AWAITING_REVIEW → APPROVED/REJECTED → EXPORTED` ([architecture.md](./architecture.md) §3).
+- `AI_INFERENCE` means **candidate matching in progress** (not Gemini-only).
+- Frontend shows status via `GET /research/{job_id}` (MVP polling; SSE later).
+
+### 2.3 Review (human-in-the-loop)
+
+- Per Shopee item: pick one of up to ~3 Amazon candidates or reject.
+- When `MATCHING_PROVIDER=none` or no candidates: **manual ASIN** entry ([api-specification.md](./api-specification.md) §decide).
+- APIs: `GET /research/{job_id}/items`, `POST /review/{item_id}/decide`
+
+### 2.4 Export
+
+- Export approved items per job to spreadsheet.
+- Portfolio mode: no external API; returns counts only.
+
+### 2.5 Persistence
+
+- Jobs, items, candidates, reviews in PostgreSQL ([database-schema.md](./database-schema.md)).
+- Portfolio: in-memory Mock (production uses DB in Phase 2).
+
+### 2.6 Candidate matching (production)
+
+- Switched by `MATCHING_PROVIDER` ([architecture.md](./architecture.md) §4).
+- **Default** `amazon_search`: normalize Shopee title, PA-API keyword search.
+- **Alternative** `none`: no auto candidates (manual review only).
+- **Optional** `gemini`: multimodal (quota constraints → later).
+
+## 3. Non-functional requirements
+
+### 3.1 Performance
+
+| Item | Requirement |
+|------|-------------|
+| API (sync) | Health / list endpoints &lt; 500ms p95 (local) |
+| Scraping | Target minutes per seller (depends on catalog size) |
+| **Matching** | **Target &lt; 3s per item** (provisional; one `amazon_search` call) |
+| Frontend | First review list paint &lt; 2s (Mock / same region) |
+
+### 3.2 Resilience
+
+- CAPTCHA / IP block: worker-level failure; API stays up.
+- Matching failure: `AI_FAILED` + audit log (including Gemini JSON parse failures).
+- Scraping: respect ToS; avoid excessive requests.
+
+### 3.3 Security
+
+- Keys and service accounts in environment variables only. No production secrets in the public portfolio repo.
+
+### 3.4 Operations
+
+- Job status consistent in DB and API.
+- Failed jobs: DLQ after retry limit (production Phase 2).
+- `GET /health` returns `mode` and `matching_provider`.
+
+## 4. MVP scope (seven decisions)
+
+Boundary for MVP do / don’t. Rationale in [design.md §11](./design.md#11-mvpスコープ7つの意思決定); summarized here as requirements.
+
+| # | Decision | MVP requirement |
+|---|----------|-----------------|
+| 1 | **Portfolio first** | Default `APP_MODE=portfolio`; E2E demo on Mock |
+| 2 | **No auth** | Single-tenant demo; login / RBAC out of scope |
+| 3 | **Shop URL only** | No bulk CSV / multi-seller batch |
+| 4 | **Review required** | No automatic ASIN selection; all items human-reviewed |
+| 5 | **Pluggable matching** | Default `amazon_search`; Gemini optional; fixed candidate schema |
+| 6 | **Polling for progress** | SSE / WebSocket out of scope (Phase 3) |
+| 7 | **Sheets in portfolio** | Log-equivalent response only; real Sheets API in production |
+
+## 5. Screen requirements (summary)
+
+| Screen | Path | Requirement |
+|--------|------|-------------|
+| Research start | `/` | URL input, submit, errors |
+| Review | `/review/[jobId]` | Item list, pick candidate, reject, manual ASIN, export |
+
+Visual requirements (de-AI UI, typography, spacing): [design.md §2](./design.md#2-uiデザイン原則).
+
+## 6. Related documents
+
+- [プロジェクト計画書.md](./プロジェクト計画書.md)
+- [architecture.md](./architecture.md)
+- [api-specification.md](./api-specification.md)
+- [database-schema.md](./database-schema.md)
+- [wbs-roadmap.md](./wbs-roadmap.md)
+- [design.md](./design.md)
+
+## 7. WBS mapping
+
+| WBS | Covered in this doc |
+|-----|---------------------|
+| Requirements spec | This document |
+| §3.1 matching latency target | §3.1 |
+| §4 MVP + design §11 | §4 + design §11 |
+| Non-Gemini matching policy | §2.6 + architecture §4 |
+| Manual ASIN | §2.3 + api-spec decide |
+
+---
+
 # SmartResearch-HQ — 要件定義書
 
 > 詳細設計・UI方針・MVP意思決定の本文は [design.md](./design.md) を参照。本書は要件の単一ソース（What）とする。  

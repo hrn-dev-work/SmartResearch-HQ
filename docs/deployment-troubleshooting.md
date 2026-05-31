@@ -97,6 +97,45 @@ Root URL alone returns `{"detail":"Not Found"}` — that is expected.
 
 ---
 
+## Vercel CLI
+
+| 事象 | 対処 |
+|------|------|
+| `isn't linked to a project` | `cd frontend && npx vercel link --yes --project smart-research-hq` |
+| `vercel link` が `.env.local` を上書き | 復元: `echo 'NEXT_PUBLIC_API_URL=https://smartresearch-api.onrender.com/api/v1' > frontend/.env.local` |
+| `--name` が効かず旧プロジェクトにデプロイ | `.vercel/` を削除して再 link、またはダッシュボードで新規プロジェクト |
+| `git stash` 後に `.vercel/project.json` がない | `vercel link` または `bash scripts/portfolio-vercel-deploy.sh redeploy` |
+
+---
+
+## Render
+
+| 事象 | 対処 |
+|------|------|
+| API は OK だがブラウザで CORS | **smartresearch-api → Environment → `ALLOWED_ORIGINS`** = `https://smart-research-hq.vercel.app`（origin 完全一致、末尾スラッシュなし） |
+| CORS の設定場所 | サービスの **Environment**（Environment Group ではない） |
+| 初回 API が約 30 秒 | 無料枠のコールドスタート — 正常 |
+
+ヘルスチェック URL（フルパス）:
+
+```
+https://smartresearch-api.onrender.com/api/v1/health
+```
+
+ルート URL だけだと `{"detail":"Not Found"}` — 想定どおり。
+
+---
+
+## Git（ローカル）
+
+| 事象 | 対処 |
+|------|------|
+| `pull` が `scripts/dev.sh` でブロック | `origin/main` で削除済み。`rm -f scripts/dev.sh` して pull、または `bash scripts/portfolio-vercel-deploy.sh full` |
+| Windows でエージェント Shell が空 | `bash scripts/agent-run.sh -- …` で `agent-cmd-output.txt` を読む |
+| `main` から直接 push | `bash scripts/agent-push.sh portfolio-docs-deploy` またはブランチを切る |
+
+---
+
 ## Vercel: Ready なのに 404
 
 | 原因 | 対処 |
@@ -107,15 +146,6 @@ Root URL alone returns `{"detail":"Not Found"}` — that is expected.
 | **Root Directory と CLI の実行場所が二重** | Root 空 + `frontend/` から CLI、または Root `frontend` + リポジトリルートから CLI |
 
 **目安:** Function Invocations が **0** のまま全パス 404 → ルーティング未生成（Framework Other 等）。
-
----
-
-## Render / Git
-
-- CORS → **`ALLOWED_ORIGINS`** = `https://smart-research-hq.vercel.app`（サービスの Environment）
-- API ヘルス → `/api/v1/health` まで付ける
-- `scripts/dev.sh` で pull 失敗 → ローカルファイル削除後 pull
-- エージェントの Shell 空出力 → **`bash scripts/agent-run.sh -- …`**
 
 ---
 

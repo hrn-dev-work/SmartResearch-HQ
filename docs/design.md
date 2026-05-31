@@ -1,3 +1,151 @@
+# SmartResearch-HQ — Design specification
+
+Requirements (what): [requirements.md](./requirements.md). This document covers how (architecture notes, UI, MVP decisions).  
+Overview: [プロジェクト計画書.md](./プロジェクト計画書.md).
+
+## 1. System structure
+
+Canonical: [architecture.md](./architecture.md). Do not change dual-mode (`APP_MODE`) Mock / production switch.
+
+## 2. UI design principles
+
+### 2.1 De-AI aesthetic
+
+- Avoid generic card stacks (`border` + `shadow-md` everywhere).
+- Hierarchy via **8px spacing** and **type scale jumps** (e.g. 14 → 16 → 24 → 32px).
+- Content over decoration. Lists and forms: flat white + `border-slate-200` dividers.
+
+### 2.2 Color
+
+| Use | Example classes |
+|-----|-------------------|
+| Page background | `bg-slate-50` |
+| Content surface | `bg-white` |
+| Headings | `text-slate-900` |
+| Secondary text | `text-slate-500` |
+| Accent | `text-slate-900` / buttons `bg-slate-900` (no loud colors) |
+
+### 2.3 Interaction
+
+- Clickables: `transition-colors duration-200` (optional `active:scale-[0.98]`).
+- Focus: `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2`.
+
+### 2.4 Density
+
+- Section spacing `space-y-12` minimum. Target clean SaaS (Vercel / Linear style).
+
+### 2.5 Copy (de-AI tone)
+
+- Avoid: “seamlessly”, “innovative”, “comprehensive solution”, “one-stop”.
+- Prefer: short verb-led sentences (e.g. “Paste a Shopee URL to start research”).
+- Same for English UI. No hype or emoji overload.
+
+### 2.6 UI languages (required)
+
+Same as global rule `~/.cursor/rules/ui-i18n-locale.mdc`.
+
+| Item | Policy |
+|------|--------|
+| Strings | `frontend/src/lib/messages/ja.ts` / `en.ts` (no inline UI copy) |
+| Default locale | Japan → `ja`, else → `en` (middleware IP country) |
+| User override | Header **JA \| EN** toggle; cookie persists over geo default |
+| DB | **Do not store UI locale** (cookie only) |
+
+## 3. Screens
+
+### 3.1 Research start (`/`)
+
+- Hero: one title line + one description line.
+- Form: URL (required), display name (optional), one primary button.
+- Optional text metrics sidebar (minimal card chrome).
+
+### 3.2 Review (`/review/[jobId]`)
+
+- Header: back link, job name, status badge, export.
+- Row: source left (image + title), candidates right (radio-like selection).
+- Decided rows: muted (`opacity-60`).
+
+### 3.3 Manual ASIN (`MATCHING_PROVIDER=none` or empty candidates)
+
+- ASIN field + confirm button below candidate list.
+- Expect 10 chars (B + 9 alphanumeric). Inline validation errors.
+- API: `POST /review/{item_id}/decide` with `manual_asin` ([api-specification.md](./api-specification.md)).
+
+## 4. Components
+
+- Shared: `Header`, `StatusBadge`.
+- Page logic may stay co-located in pages. No over-abstraction for MVP.
+
+## 5. API integration (frontend)
+
+- Single HTTP layer: `frontend/src/lib/api.ts`.
+- Types in `frontend/src/lib/types.ts` synced with API spec.
+
+## 6. Errors and empty states
+
+- Errors: `text-red-600` + `border-l-2 border-red-500 pl-3` (not full red banners).
+- Loading: text “Loading…” + optional `animate-pulse` skeleton.
+- No candidates: “No candidates. Enter an ASIN.” when `none`.
+
+## 7. Future (out of MVP)
+
+- SSE progress, auth, dark mode, bulk import.
+
+## 8. Data model
+
+See [database-schema.md](./database-schema.md).
+
+## 9. API
+
+See [api-specification.md](./api-specification.md).
+
+## 10. Deploy
+
+- Frontend: Vercel
+- API: Railway / Fly.io, etc. (architecture §8)
+- Phase 4: production CORS origins, rate limits on public API
+
+## 11. MVP scope (seven decisions)
+
+Maps to requirements.md §4. **Rationale and design impact** only; requirements stay in requirements doc.
+
+### D1. Portfolio first
+
+- **Why**: Public demo E2E is top priority; scraping/prompts may stay private.
+- **Impact**: `MockResearchService` can jump to `AWAITING_REVIEW`. Optional “Demo” badge. No Postgres / Redis.
+
+### D2. No authentication
+
+- **Why**: Portfolio viewers; add Auth0 etc. before real ops.
+- **Impact**: No Authorization header. CORS dev origins only until Phase 4 production.
+
+### D3. Shop URL only
+
+- **Why**: Simple input UX; bulk later.
+- **Impact**: Single form on dashboard. Paste URL, not drag-drop required for MVP.
+
+### D4. Review required
+
+- **Why**: Wrong ASIN is business risk; human-in-the-loop is the value prop.
+- **Impact**: Explicit Select / Reject per candidate. No auto-export.
+
+### D5. Pluggable matching (not Gemini-dependent)
+
+- **Why**: Gemini quota limits; matching provider must be swappable.
+- **Impact**: `MATCHING_PROVIDER=amazon_search|none|gemini`. PA-API 5.0 primary (architecture §4.2). Fixed schema with `confidence`. Manual ASIN UI when `none` (§3.3).
+
+### D6. Progress polling
+
+- **Why**: Defer SSE cost to Phase 3.
+- **Impact**: Review page fetches on mount. Later `useJobProgress` hook.
+
+### D7. Portfolio Sheets = log only
+
+- **Why**: No service account in public repo.
+- **Impact**: Export button stays; toast shows count only.
+
+---
+
 # SmartResearch-HQ — 設計書
 
 要件の What は [requirements.md](./requirements.md)。本書は How（アーキテクチャ補足・UI・MVP意思決定の詳細）を扱う。  
