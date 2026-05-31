@@ -9,7 +9,7 @@ cd "$ROOT"
 
 chmod +x .githooks/pre-commit .githooks/post-push
 chmod +x scripts/ensure-pr.sh scripts/post-workflow.sh scripts/sync-wbs-roadmap.sh
-chmod +x scripts/sync-pr-checkboxes.sh scripts/pr-ci-checkbox.sh scripts/render-pr-body.sh
+chmod +x scripts/sync-pr-checkboxes.sh scripts/sync-pr-body.sh scripts/pr-ci-checkbox.sh scripts/render-pr-body.sh
 chmod +x scripts/render-pr-title.sh scripts/render-commit-msg.sh 2>/dev/null || true
 chmod +x scripts/git-ship.sh scripts/git-start-branch.sh 2>/dev/null || true
 

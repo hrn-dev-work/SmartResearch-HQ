@@ -35,6 +35,10 @@ htmlcov/
 
 # Agent / Cursor debug output (local)
 merge-result.txt
+tmp-*.txt
+agent-cmd-output.txt
+combined_output.txt
+.merge-result.txt
 .git-status-tmp.txt
 pytest-out.txt
 stash-pop.txt

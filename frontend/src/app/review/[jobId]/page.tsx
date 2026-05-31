@@ -6,14 +6,12 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { Header } from "@/components/Header";
+import { useLocale } from "@/components/LocaleProvider";
 import { StatusBadge } from "@/components/StatusBadge";
 import { isJobInProgress, useJobProgress } from "@/hooks/useJobProgress";
-import {
-  decideReview,
-  exportJob,
-  getReviewItems,
-} from "@/lib/api";
+import { decideReview, exportJob, getReviewItems } from "@/lib/api";
 import { asinValidationMessage, normalizeAsin } from "@/lib/asin";
+import { interpolate } from "@/lib/messages";
 import type { ReviewItem } from "@/lib/types";
 
 export default function ReviewPage() {
@@ -24,6 +22,8 @@ export default function ReviewPage() {
 }
 
 function ReviewPageBody({ jobId }: { jobId: string }) {
+  const { messages } = useLocale();
+  const t = messages.review;
   const [items, setItems] = useState<ReviewItem[]>([]);
   const [itemsLoading, setItemsLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
@@ -51,9 +51,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
         setItems(itemsData.items);
       } catch (err) {
         if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : "商品一覧の読み込みに失敗しました",
-          );
+          setError(err instanceof Error ? err.message : t.errorLoadItems);
         }
       } finally {
         if (!cancelled) setItemsLoading(false);
@@ -63,7 +61,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [job, jobId]);
+  }, [job, jobId, t.errorLoadItems]);
 
   const loadItems = useCallback(async () => {
     setItemsLoading(true);
@@ -72,27 +70,29 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
       const itemsData = await getReviewItems(jobId);
       setItems(itemsData.items);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "商品一覧の読み込みに失敗しました");
+      setError(err instanceof Error ? err.message : t.errorLoadItems);
     } finally {
       setItemsLoading(false);
     }
-  }, [jobId]);
+  }, [jobId, t.errorLoadItems]);
 
   async function handleSelect(item: ReviewItem, candidateId: string) {
     await decideReview(item.item_id, candidateId);
-    setMessage(`確定: ${item.title}`);
+    setMessage(interpolate(t.confirmed, { title: item.title }));
     await loadItems();
   }
 
   async function handleReject(item: ReviewItem) {
     await decideReview(item.item_id, null, true);
-    setMessage(`却下: ${item.title}`);
+    setMessage(interpolate(t.rejected, { title: item.title }));
     await loadItems();
   }
 
   async function handleManualAsin(item: ReviewItem, asin: string) {
     await decideReview(item.item_id, { manualAsin: asin });
-    setMessage(`ASIN ${asin} で確定: ${item.title}`);
+    setMessage(
+      interpolate(t.confirmedAsin, { asin, title: item.title }),
+    );
     await loadItems();
   }
 
@@ -101,10 +101,13 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
     try {
       const res = await exportJob(jobId);
       setMessage(
-        `${res.exported_count} 件を出力（${res.skipped_count} 件スキップ）`,
+        interpolate(t.exportResult, {
+          exported: res.exported_count,
+          skipped: res.skipped_count,
+        }),
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "出力に失敗しました");
+      setError(err instanceof Error ? err.message : t.errorExport);
     } finally {
       setExporting(false);
     }
@@ -123,19 +126,18 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
               href="/"
               className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-900"
             >
-              ← 戻る
+              {t.back}
             </Link>
             <div>
               <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-                レビュー
+                {t.title}
               </h1>
               {job && (
                 <p className="mt-2 text-sm text-slate-500">
                   {sellerLabel}
                   {job.item_count > 0 && (
                     <span className="text-slate-400">
-                      {" "}
-                      · {job.item_count} 件
+                      {interpolate(t.itemCount, { count: job.item_count })}
                     </span>
                   )}
                 </p>
@@ -147,7 +149,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
               <StatusBadge status={job.status} />
               {isPolling && (
                 <span className="text-sm text-slate-500">
-                  {job.progress_pct}% — 処理中…
+                  {interpolate(t.processing, { pct: job.progress_pct })}
                 </span>
               )}
               <button
@@ -156,7 +158,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
                 disabled={exporting}
                 className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50"
               >
-                {exporting ? "出力中…" : "スプレッドシートへ出力"}
+                {exporting ? t.exporting : t.export}
               </button>
             </div>
           )}
@@ -174,14 +176,15 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
         )}
 
         <section className="mt-16">
-          {jobLoading || (itemsLoading && !isJobInProgress(job?.status ?? "PENDING")) ? (
-            <p className="text-sm text-slate-500">読み込み中…</p>
+          {jobLoading ||
+          (itemsLoading && !isJobInProgress(job?.status ?? "PENDING")) ? (
+            <p className="text-sm text-slate-500">{t.loading}</p>
           ) : job && isJobInProgress(job.status) ? (
             <p className="text-sm text-slate-500">
-              リサーチ処理中です（{job.progress_pct}%）。完了すると商品一覧が表示されます。
+              {interpolate(t.processingHint, { pct: job.progress_pct })}
             </p>
           ) : items.length === 0 ? (
-            <p className="text-sm text-slate-500">レビュー対象がありません。</p>
+            <p className="text-sm text-slate-500">{t.empty}</p>
           ) : (
             <ul className="divide-y divide-slate-200">
               {items.map((item) => (
@@ -213,13 +216,15 @@ function ReviewItemRow({
   onReject: () => void;
   onManualAsin: (asin: string) => Promise<void>;
 }) {
+  const { messages } = useLocale();
+  const t = messages.review;
   const decided = item.decision !== null;
   const [manualAsin, setManualAsin] = useState("");
   const [manualError, setManualError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleManualSubmit() {
-    const message = asinValidationMessage(manualAsin);
+    const message = asinValidationMessage(manualAsin, messages.asin);
     if (message) {
       setManualError(message);
       return;
@@ -230,7 +235,7 @@ function ReviewItemRow({
       await onManualAsin(normalizeAsin(manualAsin));
       setManualAsin("");
     } catch (err) {
-      setManualError(err instanceof Error ? err.message : "確定に失敗しました");
+      setManualError(err instanceof Error ? err.message : t.errorDecide);
     } finally {
       setSubmitting(false);
     }
@@ -242,7 +247,7 @@ function ReviewItemRow({
     >
       <div>
         <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-          Shopee
+          {t.shopee}
         </p>
         <div className="mt-4 flex gap-4">
           <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-slate-100">
@@ -260,7 +265,9 @@ function ReviewItemRow({
             </h2>
             {item.sold_count != null && (
               <p className="mt-2 text-sm text-slate-500">
-                販売数 {item.sold_count.toLocaleString()}
+                {interpolate(t.soldCount, {
+                  count: item.sold_count.toLocaleString(),
+                })}
               </p>
             )}
             {item.shopee_item_url ? (
@@ -270,7 +277,7 @@ function ReviewItemRow({
                 rel="noopener noreferrer"
                 className="mt-2 inline-block text-sm text-slate-500 underline-offset-2 transition-colors duration-200 hover:text-slate-900 hover:underline"
               >
-                Shopee で開く
+                {t.openShopee}
               </a>
             ) : null}
           </div>
@@ -279,13 +286,11 @@ function ReviewItemRow({
 
       <div>
         <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-          Amazon 候補
+          {t.amazonCandidates}
         </p>
         <ul className="mt-4 space-y-1">
           {item.candidates.length === 0 ? (
-            <li className="py-2 text-sm text-slate-500">
-              候補がありません。ASIN を入力してください。
-            </li>
+            <li className="py-2 text-sm text-slate-500">{t.noCandidates}</li>
           ) : (
             item.candidates.map((c) => (
               <li
@@ -297,7 +302,10 @@ function ReviewItemRow({
                     {c.title}
                   </p>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    {c.asin} · 一致度 {(c.confidence * 100).toFixed(0)}%
+                    {interpolate(t.confidence, {
+                      asin: c.asin,
+                      pct: (c.confidence * 100).toFixed(0),
+                    })}
                   </p>
                 </div>
                 <button
@@ -306,7 +314,7 @@ function ReviewItemRow({
                   onClick={() => onSelect(c.candidate_id)}
                   className="shrink-0 rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
                 >
-                  選択
+                  {t.select}
                 </button>
               </li>
             ))
@@ -318,7 +326,7 @@ function ReviewItemRow({
               htmlFor={`asin-${item.item_id}`}
               className="text-xs font-medium uppercase tracking-wider text-slate-500"
             >
-              手動 ASIN
+              {t.manualAsin}
             </label>
             <div className="mt-3 flex flex-wrap items-end gap-3">
               <input
@@ -341,7 +349,7 @@ function ReviewItemRow({
                 onClick={handleManualSubmit}
                 className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-900 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-40"
               >
-                {submitting ? "送信中…" : "この ASIN で確定"}
+                {submitting ? t.submitting : t.confirmAsin}
               </button>
             </div>
             {manualError && (
@@ -355,10 +363,10 @@ function ReviewItemRow({
             onClick={onReject}
             className="mt-4 text-sm text-slate-500 underline-offset-2 transition-colors duration-200 hover:text-slate-900 hover:underline"
           >
-            該当なし — 却下
+            {t.reject}
           </button>
         ) : (
-          <p className="mt-4 text-sm text-slate-500">確定済み</p>
+          <p className="mt-4 text-sm text-slate-500">{t.decided}</p>
         )}
       </div>
     </article>

@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "@/components/LocaleProvider";
 import type { JobStatus } from "@/lib/types";
 
 const STYLES: Record<JobStatus, string> = {
@@ -12,15 +15,9 @@ const STYLES: Record<JobStatus, string> = {
   EXPORTED: "bg-emerald-50 text-emerald-800",
 };
 
-const LABELS: Partial<Record<JobStatus, string>> = {
-  AWAITING_REVIEW: "レビュー待ち",
-  AI_INFERENCE: "候補マッチング中",
-  SCRAPING: "取得中",
-  EXPORTED: "出力済み",
-};
-
 export function StatusBadge({ status }: { status: JobStatus }) {
-  const label = LABELS[status] ?? status.replace(/_/g, " ");
+  const { messages } = useLocale();
+  const label = messages.status[status] ?? status.replace(/_/g, " ");
   return (
     <span
       className={`inline-flex rounded-md px-2 py-0.5 text-xs font-medium ${STYLES[status]}`}

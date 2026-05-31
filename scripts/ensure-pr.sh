@@ -25,8 +25,7 @@ if ! gh auth status >/dev/null 2>&1; then
 fi
 
 if gh pr view --head "$BRANCH" --json number --jq .number >/dev/null 2>&1; then
-  PR_NUM="$(gh pr view --head "$BRANCH" --json number -q .number)"
-  bash "$ROOT/scripts/sync-pr-checkboxes.sh" "$PR_NUM" || true
+  bash "$ROOT/scripts/sync-pr-body.sh" "$BRANCH" "$BASE" || true
   gh pr view --head "$BRANCH" --web 2>/dev/null || gh pr view --head "$BRANCH"
   exit 0
 fi

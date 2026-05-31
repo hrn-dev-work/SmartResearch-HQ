@@ -33,6 +33,9 @@ git push -u "$REMOTE" HEAD "${@:3}"
 case "$MODE" in
   push)
     echo "Pushed ${BRANCH} -> ${REMOTE}"
+    if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+      bash "$ROOT/scripts/sync-pr-body.sh" "$BRANCH" "$BASE" 2>/dev/null || true
+    fi
     ;;
   pr)
     bash "$ROOT/scripts/ensure-pr.sh" "$BASE"
