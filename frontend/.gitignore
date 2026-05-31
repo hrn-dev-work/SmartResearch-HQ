@@ -42,3 +42,11 @@ next-env.d.ts
 
 # Playwright viewport checks (local)
 .ui-check/
+
+/test-results/
+
+/playwright-report/
+
+/blob-report/
+
+/playwright/.cache/

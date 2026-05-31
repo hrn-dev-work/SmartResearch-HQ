@@ -54,4 +54,10 @@ python3 "$ROOT/scripts/sync-api-types.py" --check
 npm run lint
 NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api/v1 npm run build
 
+echo "== frontend e2e =="
+for required in scripts/run-frontend-e2e.sh frontend/playwright.config.ts frontend/e2e/tests/dashboard-to-review.spec.ts frontend/e2e/README.md; do
+  [[ -f "$ROOT/$required" ]] || { echo "missing $required" >&2; exit 1; }
+done
+SKIP_FRONTEND_BUILD=1 bash "$ROOT/scripts/run-frontend-e2e.sh"
+
 echo "CI checks passed."
