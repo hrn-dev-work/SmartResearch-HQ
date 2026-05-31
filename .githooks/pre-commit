@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Before commit: sync WBS roadmap + README checkboxes and stage doc updates.
+# Before commit: block secrets, then sync WBS roadmap + README checkboxes.
 # Install: bash scripts/install-git-hooks.sh
 
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
 
+bash "$ROOT/scripts/pre-commit-secret-check.sh"
 bash "$ROOT/scripts/sync-wbs-roadmap.sh" --stage || true
