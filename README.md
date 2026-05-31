@@ -100,6 +100,7 @@ One-command redeploy: `bash scripts/portfolio-vercel-deploy.sh redeploy`
 | [Design](docs/design.md) | UI principles |
 | [API specification](docs/api-specification.md) | REST contract |
 | [Deployment guide](docs/deployment-guide.md) | Vercel / Render env vars |
+| [Git hooks guide](docs/git-hooks.md) | Local pre-commit install, troubleshooting |
 
 ---
 
@@ -116,6 +117,14 @@ One-command redeploy: `bash scripts/portfolio-vercel-deploy.sh redeploy`
 
 ```bash
 bash scripts/ci-check.sh   # Ruff + pytest + ESLint + build (mirrors CI)
+
+Optional — install tracked git hooks (secret scan + doc validation on commit):
+
+```bash
+bash scripts/install-git-hooks.sh
+```
+
+See [docs/git-hooks.md](docs/git-hooks.md).
 ```
 
 Production verification (optional): copy `.env.example` → `.env`, then `docker compose up -d postgres redis` with `APP_MODE=production`.
@@ -247,6 +256,7 @@ bash scripts/start-production-local.sh
 | [設計書](docs/design.md) | UI 原則 |
 | [API 仕様](docs/api-specification.md) | REST 契約 |
 | [デプロイ手順](docs/deployment-guide.md) | Vercel / Render の環境変数 |
+| [Git フック](docs/git-hooks.md) | ローカル pre-commit インストール・トラブル |
 
 ---
 
@@ -263,6 +273,14 @@ bash scripts/start-production-local.sh
 
 ```bash
 bash scripts/ci-check.sh   # Ruff + pytest + ESLint + build（CI と同等）
+
+任意 — 追跡フック（コミット時のシークレット検査・ドキュメント検証）:
+
+```bash
+bash scripts/install-git-hooks.sh
+```
+
+詳細: [docs/git-hooks.md](docs/git-hooks.md)。
 ```
 
 Production 検証（任意）: `.env.example` → `.env` をコピーし、`APP_MODE=production` で `docker compose up -d postgres redis`。

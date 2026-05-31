@@ -26,3 +26,4 @@ echo "  pre-commit  -> secret check + sync WBS roadmap + README phase checkboxes
 echo "  post-push   -> sync PR checkboxes (existing PR only; use git-ship pr to create)"
 echo "Ship: bash scripts/git-ship.sh push | pr"
 echo "PR作成まで: bash scripts/git-pr-complete.sh"
+echo "Docs: docs/git-hooks.md"
