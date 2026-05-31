@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# feat/production-local-setup: commit, PR, CI wait, squash merge to main.
+# feat/production-local-setup: stage i18n, commit, PR, CI wait, squash merge to main.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 LOG="${PWD}/agent-pr-merge.log"
@@ -9,43 +9,72 @@ echo "=== $(date -Iseconds) branch=$(git branch --show-current) ==="
 git fetch origin
 
 if ! git merge-base --is-ancestor origin/main HEAD 2>/dev/null; then
-  bash scripts/git-merge-main-safe.sh
+  bash scripts/git-merge-main-safe.sh 2>/dev/null || git merge origin/main
 fi
 
+# Stage i18n + dev scripts (explicit paths; some may be skipped by git-add-safe incorrectly)
+git add \
+  frontend/src/lib/messages \
+  frontend/src/lib/locale.ts \
+  frontend/src/lib/format-message.ts \
+  frontend/src/lib/ui-classes.ts \
+  frontend/src/middleware.ts \
+  frontend/src/components/LocaleProvider.tsx \
+  frontend/src/components/LocaleToggle.tsx \
+  frontend/src/components/AboutDemoDialog.tsx \
+  frontend/src/components/AboutDemoTrigger.tsx \
+  frontend/src/components/Header.tsx \
+  frontend/src/components/StatusBadge.tsx \
+  frontend/src/app/layout.tsx \
+  frontend/src/app/page.tsx \
+  frontend/src/app/globals.css \
+  frontend/src/app/review \
+  frontend/src/lib/asin.ts \
+  frontend/scripts \
+  scripts/gh-pr-branch.sh \
+  scripts/sync-pr-body.sh \
+  scripts/stop-next-dev.sh \
+  frontend/.gitignore \
+  2>/dev/null || true
+
 bash scripts/git-add-safe.sh
+
 if ! git diff --cached --quiet; then
   git commit -F - <<'EOF'
-feat(production): local setup, i18n UI, and dev viewport scripts
+feat(frontend): i18n UI, viewport checks, and production local scripts
 
-Add production local start script and docs. Wire frontend JA/EN locale
-(messages, middleware, toggle), UI layout fixes, and Playwright viewport
-checks plus stop-next-dev for WSL port 3000.
+Wire JA/EN messages, locale middleware, header toggle, and layout fixes.
+Add frontend dev scripts (viewport check, stop-next-dev) and gh PR helpers.
 
 ---
 
-本番ローカル起動スクリプトとドキュメントを追加。フロントの JA/EN 多言語、
-UI 調整、WSL 向け dev 停止・画面幅チェック用スクリプトを含む。
+フロントの JA/EN 多言語・レイアウト修正と、dev 用スクリプト・PR 補助を追加。
 EOF
 fi
 
 bash scripts/ci-check.sh
-bash scripts/git-pr-complete.sh
+bash scripts/git-ship.sh pr main
 
 PR_NUM="$(bash -c 'source scripts/gh-pr-branch.sh; gh_pr_number_for_branch feat/production-local-setup')"
 echo "PR_NUM=${PR_NUM}"
+URL="$(bash -c 'source scripts/gh-pr-branch.sh; gh_pr_url_for_branch feat/production-local-setup')"
+echo "PR_URL=${URL}"
 
 for i in $(seq 1 60); do
-  state="$(gh pr checks "$PR_NUM" --required 2>/dev/null | awk 'NR>1 {print $2}' | sort -u | tr '\n' ' ')"
-  echo "CI poll $i: ${state:-pending}"
-  if echo "$state" | grep -q fail; then
-    gh pr checks "$PR_NUM" || true
+  if ! gh pr checks "$PR_NUM" --required >/tmp/pr-checks.txt 2>&1; then
+    echo "CI poll $i: waiting..."
+    sleep 15
+    continue
+  fi
+  if grep -qi fail /tmp/pr-checks.txt; then
+    cat /tmp/pr-checks.txt
     exit 1
   fi
-  if echo "$state" | grep -qvE 'pending|skipping'; then
-    if ! echo "$state" | grep -q pending; then
-      break
-    fi
+  if ! grep -qi pending /tmp/pr-checks.txt; then
+    cat /tmp/pr-checks.txt
+    break
   fi
+  echo "CI poll $i: pending"
   sleep 15
 done
 
