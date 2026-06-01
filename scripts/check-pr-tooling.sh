@@ -17,6 +17,8 @@ required=(
   scripts/gh-pr-branch.sh
   scripts/pr-ci-checkbox.sh
   scripts/pr-deploy-demo-checkbox.sh
+  scripts/check-bash-script-cycles.sh
+  scripts/git-pr-docs-only.sh
 )
 
 echo "== pr tooling: required scripts =="
@@ -27,6 +29,9 @@ for f in "${required[@]}"; do
   fi
   chmod +x "$f" 2>/dev/null || true
 done
+
+echo "== pr tooling: script dependency cycles =="
+bash "$ROOT/scripts/check-bash-script-cycles.sh"
 
 echo "== pr tooling: forbidden gh api body=@ (runtime only) =="
 bad="$(grep -R --include='*.sh' -nE '[[:space:]]-f[[:space:]]+"?body=@' scripts/ 2>/dev/null \

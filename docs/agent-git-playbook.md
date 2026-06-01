@@ -158,7 +158,8 @@ Pre-push self-check: `bash scripts/check-pr-tooling.sh` (also runs at start of `
 | 本文が `@/tmp/...` | `gh api -f body=@file` | python3 JSON（`gh_api_patch_pr_body`） |
 | `gh pr edit` GraphQL エラー | Projects classic 廃止 | REST（`gh_pr_edit_body_safe`） |
 | `gh-pr-branch.sh` 欠落 | 誤って one-off 削除 | `.gitignore` コメント + `check-pr-tooling.sh` |
-| **bash 大量 / fork 失敗** | `pr-ci-checkbox` が `ci-check` を呼び循環 | `pr-ci-checkbox` から `ci-check` 削除。tooling は `RENDER_PR_BODY_SKIP_CI_CHECKBOX=1` |
+| **bash 大量 / fork 失敗** | `pr-ci-checkbox` が `ci-check` を呼び循環 | `pr-ci-checkbox` から `ci-check` 削除。tooling は `RENDER_PR_BODY_SKIP_CI_CHECKBOX=1`。`check-bash-script-cycles.sh` で再発検知 |
+| **`pgrep -c bash` > 400** | スクリプト循環・暴走 | スクリプトを止める。復旧は **Windows PowerShell** で `wsl --shutdown`（WSL 内の `wsl` は無効） |
 | docs PR が 8 分以上 | フル `ci-check` で npm/pytest | docs のみは `git-pr-docs-only.sh` |
 | PR 重複 | rate limit 中の `ensure-pr` 連打 | 先に `gh pr list --head`、403 は 60 秒待ち |
 | 未コミット docs 消失 | checkout 前に commit なし | 同一ブランチで即 commit |
