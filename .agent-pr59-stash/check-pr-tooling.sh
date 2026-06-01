@@ -15,7 +15,6 @@ required=(
   scripts/sync-pr-body.sh
   scripts/update-pr-body-from-file.sh
   scripts/gh-pr-branch.sh
-  scripts/pr-ci-checkbox.sh
   scripts/pr-deploy-demo-checkbox.sh
 )
 
@@ -38,21 +37,15 @@ if [[ -n "$bad" ]]; then
   exit 1
 fi
 
-echo "== pr tooling: no ci-check cycle via pr-ci-checkbox =="
-if grep -qE 'ci-check\.sh' "$ROOT/scripts/pr-ci-checkbox.sh" 2>/dev/null; then
-  echo "ERROR: pr-ci-checkbox.sh must not invoke ci-check.sh (infinite loop with check-pr-tooling)" >&2
-  exit 1
-fi
-
 echo "== pr tooling: public docs bilingual =="
 bash scripts/validate-public-docs.sh README.md
 
 echo "== pr tooling: PR body manual template =="
-manual_body="$(RENDER_PR_BODY_SKIP_CI_CHECKBOX=1 bash scripts/render-pr-body.sh manual feat/self-check-test)"
+manual_body="$(bash scripts/render-pr-body.sh manual feat/self-check-test)"
 bash scripts/validate-pr-body.sh --stdin <<<"$manual_body"
 
 echo "== pr tooling: PR body auto template =="
-auto_body="$(RENDER_PR_BODY_SKIP_CI_CHECKBOX=1 bash scripts/render-pr-body.sh auto docs/frontend-structure-viz main)"
+auto_body="$(bash scripts/render-pr-body.sh auto docs/frontend-structure-viz main)"
 bash scripts/validate-pr-body.sh --stdin <<<"$auto_body"
 
 echo "PR tooling self-check passed."
