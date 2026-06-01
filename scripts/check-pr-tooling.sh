@@ -39,7 +39,8 @@ if [[ -n "$bad" ]]; then
 fi
 
 echo "== pr tooling: no ci-check cycle via pr-ci-checkbox =="
-if grep -qE 'ci-check\.sh' "$ROOT/scripts/pr-ci-checkbox.sh" 2>/dev/null; then
+# Match runtime invokes only (comments may mention ci-check.sh for documentation).
+if grep -vE '^\s*#' "$ROOT/scripts/pr-ci-checkbox.sh" | grep -qE 'ci-check\.sh'; then
   echo "ERROR: pr-ci-checkbox.sh must not invoke ci-check.sh (infinite loop with check-pr-tooling)" >&2
   exit 1
 fi
