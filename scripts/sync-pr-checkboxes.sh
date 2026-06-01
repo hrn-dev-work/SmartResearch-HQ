@@ -26,20 +26,41 @@ if [[ -z "$PR_NUM" ]]; then
 fi
 
 MARK="$(bash "$ROOT/scripts/pr-ci-checkbox.sh" "$PR_NUM")"
+DEMO_MARK="$(bash "$ROOT/scripts/pr-deploy-demo-checkbox.sh" "$PR_NUM")"
 BODY="$(gh pr view "$PR_NUM" --repo "$REPO" --json body -q .body)"
 
 NEW_BODY="$(python3 -c "
 import re, sys
-mark, body = sys.argv[1], sys.argv[2]
+mark, demo_mark, body = sys.argv[1], sys.argv[2], sys.argv[3]
 
-def sync_line(line):
+def sync_ci_line(line):
     lower = line.lower()
     if 'ci-check.sh' in lower or ('backend' in lower and 'frontend' in lower) or re.search(r'\\bci green\\b', lower):
         return re.sub(r'^([*-]) \\[[ xX]\\]', rf'\\1 [{mark}]', line)
     return line
 
+def sync_demo_line(line):
+    lower = line.lower()
+    if not (
+        'live demo' in lower
+        or 'research flow' in lower
+        or 'デモ url' in lower
+        or 'リサーチフロー' in lower
+    ):
+        return line
+    if demo_mark == 'N/A':
+        return re.sub(r'^([*-]) \\[[^\\]]*\\]', r'\\1 [N/A]', line, count=1)
+    if re.search(r'\\[[xX]\\]', line):
+        return line
+    return re.sub(r'^([*-]) \\[[^\\]]*\\]', r'\\1 [ ]', line, count=1)
+
+def sync_line(line):
+    line = sync_ci_line(line)
+    line = sync_demo_line(line)
+    return line
+
 print('\\n'.join(sync_line(line) for line in body.splitlines()))
-" "$MARK" "$BODY")"
+" "$MARK" "$DEMO_MARK" "$BODY")"
 
 if [[ "$BODY" == "$NEW_BODY" ]]; then
   echo "PR #${PR_NUM}: checkboxes already up to date (CI mark='${MARK}')"
@@ -67,4 +88,4 @@ EOF
   fi
   exit 1
 fi
-echo "PR #${PR_NUM}: synced CI checkboxes (mark='${MARK}')"
+echo "PR #${PR_NUM}: synced CI checkboxes (ci='${MARK}', demo='${DEMO_MARK}')"
