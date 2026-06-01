@@ -39,4 +39,7 @@ git checkout "$DEFAULT_BRANCH"
 git pull --ff-only origin "$DEFAULT_BRANCH" 2>/dev/null || git pull --ff-only || true
 git checkout -b "$BRANCH"
 
+printf '%s\n' "$BRANCH" > .git/agent-expected-branch
+
 echo "Ready on branch: $BRANCH (from $DEFAULT_BRANCH)"
+bash scripts/git-agent-context.sh

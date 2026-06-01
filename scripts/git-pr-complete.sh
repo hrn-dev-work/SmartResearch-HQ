@@ -7,6 +7,12 @@ cd "$(dirname "$0")/.."
 # shellcheck source=gh-pr-branch.sh
 source scripts/gh-pr-branch.sh
 
+if [[ -f scripts/git-agent-context.sh ]]; then
+  bash scripts/git-agent-context.sh --strict
+else
+  echo "WARN: scripts/git-agent-context.sh missing — skipping strict context check" >&2
+fi
+
 BASE="${GIT_PR_BASE:-main}"
 BRANCH="$(git branch --show-current)"
 COMMIT_SUBJECT="${1:-}"
@@ -40,7 +46,15 @@ if [[ -n "$(git status --porcelain)" ]]; then
   fi
 fi
 
-bash scripts/ci-check.sh
+if [[ "${GIT_PR_FAST_DOCS:-}" == "1" ]]; then
+  echo "== fast pre-push (docs/scripts only; full CI runs on GitHub) =="
+  bash scripts/check-pr-tooling.sh
+  bash scripts/validate-public-docs.sh
+  bash scripts/validate-security-workflows.sh
+  bash scripts/secret-audit.sh
+else
+  bash scripts/ci-check.sh
+fi
 
 git push -u origin HEAD
 bash scripts/ensure-pr.sh "$BASE"
