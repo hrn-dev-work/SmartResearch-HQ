@@ -12,7 +12,32 @@ MODE="${1:-manual}"
 BRANCH="${2:-feat/...}"
 BASE="${3:-main}"
 
-CI="$(bash "$ROOT/scripts/pr-ci-checkbox.sh" "$BRANCH" 2>/dev/null || echo " ")"
+# Self-check (check-pr-tooling) must not call pr-ci-checkbox → ci-check → check-pr-tooling loop.
+if [[ "${RENDER_PR_BODY_SKIP_CI_CHECKBOX:-}" == 1 ]]; then
+  CI=" "
+else
+  CI="$(bash "$ROOT/scripts/pr-ci-checkbox.sh" "$BRANCH" 2>/dev/null || echo " ")"
+fi
+
+demo_test_plan_en() {
+  local mark
+  mark="$(bash "$ROOT/scripts/pr-deploy-demo-checkbox.sh" "$BRANCH" "$BASE" 2>/dev/null || echo "N/A")"
+  if [[ "$mark" == "N/A" ]]; then
+    echo '* [N/A] Live demo / research flow — skipped (no deploy changes in this PR)'
+  else
+    echo '* [ ] Live demo loads and research flow works — verify https://smart-research-hq.vercel.app'
+  fi
+}
+
+demo_test_plan_ja() {
+  local mark
+  mark="$(bash "$ROOT/scripts/pr-deploy-demo-checkbox.sh" "$BRANCH" "$BASE" 2>/dev/null || echo "N/A")"
+  if [[ "$mark" == "N/A" ]]; then
+    echo '* [N/A] デモ URL リサーチフロー — 対象外（本 PR はデプロイ変更なし）'
+  else
+    echo '* [ ] デモ URL でリサーチフローが動作すること（デプロイ変更あり）'
+  fi
+}
 
 format_commits() {
   local log
@@ -66,10 +91,11 @@ EOF
 EOF
       return
       ;;
-    chore/docs-crosslink-guardrails)
+    fix/pr-ci-checkbox-cycle)
       cat <<'EOF'
-* Restore `validate-pr-body.sh` and add `check-staged-docs-crosslinks.sh` (WARN after `git-add-safe.sh`)
-* Extend `check-pr-tooling.sh` self-check; document docs bundle checklist in agent-git-playbook
+* Break ci-check ↔ check-pr-tooling ↔ render-pr-body ↔ pr-ci-checkbox infinite loop
+* Remove local `ci-check.sh` fallback from `pr-ci-checkbox.sh`; skip checkbox in tooling self-check
+* Document bash-storm incident in agent-git-playbook
 EOF
       return
       ;;
@@ -129,10 +155,11 @@ EOF
 EOF
       return
       ;;
-    chore/docs-crosslink-guardrails)
+    fix/pr-ci-checkbox-cycle)
       cat <<'EOF'
-* `validate-pr-body.sh` を復旧し `check-staged-docs-crosslinks.sh` を追加（`git-add-safe.sh` 後に WARN）
-* `check-pr-tooling.sh` の自己検査を拡張。agent-git-playbook に docs 束ねチェックリストを追記
+* ci-check と pr-ci-checkbox の循環参照を断ち切り（bash 大量起動の原因）
+* `pr-ci-checkbox` からローカル `ci-check` 呼び出しを削除。tooling は CI チェックボックスをスキップ
+* agent-git-playbook に bash storm インシデントを追記
 EOF
       return
       ;;
@@ -220,10 +247,12 @@ EOF
 }
 
 render_auto() {
-  local commits en_summary ja_summary
+  local commits en_summary ja_summary demo_en demo_ja
   commits="$(format_commits)"
   en_summary="$(infer_en_summary "$BRANCH")"
   ja_summary="$(infer_ja_summary "$BRANCH")"
+  demo_en="$(demo_test_plan_en)"
+  demo_ja="$(demo_test_plan_ja)"
 
   cat <<EOF
 **Summary**
@@ -238,7 +267,7 @@ ${commits}
 
 * [${CI}] \`bash scripts/ci-check.sh\` passes
 * [${CI}] CI backend / frontend green
-* [ ] Live demo loads and research flow works (if deploy changed)
+${demo_en}
 
 **Related**
 
@@ -259,7 +288,7 @@ ${commits}
 
 * [${CI}] \`bash scripts/ci-check.sh\` が通る
 * [${CI}] CI backend / frontend green
-* [ ] デモ URL でリサーチフローが動作（デプロイ変更時）
+${demo_ja}
 
 **関連 (Related)**
 
