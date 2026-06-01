@@ -12,8 +12,14 @@ Canonical CI and workflow guardrails for SmartResearch-HQ. Aligns with OWASP Sec
 | Pre-push (local) | Baseline + lint/test/build | `scripts/ci-check.sh` |
 | Push / PR (CI) | gitleaks + trivy secret | `.github/workflows/ci.yml` → `secret-audit` job |
 | Push / PR (CI) | CodeQL | `.github/workflows/codeql.yml` |
-| Weekly | Dependabot | `.github/dependabot.yml` |
+| Weekly (Monday) | Dependabot (grouped patch/minor per ecosystem; major separate) | `.github/dependabot.yml` |
 | GitHub platform | Secret Scanning + Push Protection | `scripts/enable-github-secret-scanning.sh` |
+
+## Dependabot grouping
+
+- **patch / minor** (npm, pip, GitHub Actions): one combined PR per ecosystem per week.
+- **major**: individual PRs so breaking changes are reviewed separately.
+- **security (CVE)**: grouped per ecosystem when multiple fixes land together; merge after CI green like any other Dependabot PR.
 
 ## Manual verification
 
@@ -76,8 +82,14 @@ SmartResearch-HQ の CI・ワークフロー運用の正本。OWASP Secrets Mana
 | push 前（ローカル） | baseline + lint/test/build | `scripts/ci-check.sh` |
 | push / PR（CI） | gitleaks + trivy secret | `.github/workflows/ci.yml` → `secret-audit` job |
 | push / PR（CI） | CodeQL | `.github/workflows/codeql.yml` |
-| 週次 | Dependabot | `.github/dependabot.yml` |
+| 週次（月曜） | Dependabot（ecosystem ごとに patch/minor を1 PR、major は個別） | `.github/dependabot.yml` |
 | GitHub プラットフォーム | Secret Scanning + Push Protection | `scripts/enable-github-secret-scanning.sh` |
+
+## Dependabot のグループ化
+
+- **patch / minor**（npm・pip・GitHub Actions）: ecosystem ごとに週1本のまとめ PR。
+- **major**: 破壊的変更のため PR は個別。
+- **セキュリティ（CVE）**: 同一 ecosystem で複数ある場合はまとめ PR。CI が green になってからマージ。
 
 ## 手動確認
 

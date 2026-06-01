@@ -42,8 +42,11 @@ gh_api_patch_pr_body() {
   input_file="$(mktemp)"
   BODY="$body" python3 -c "import json, os; print(json.dumps({'body': os.environ['BODY']}))" >"$input_file"
   local api_args=(api --method PATCH --input "$input_file")
-  [[ -n "$repo" ]] && api_args+=(--repo "$repo")
-  api_args+=(repos/{owner}/{repo}/pulls/"$pr_num")
+  if [[ -n "$repo" ]]; then
+    api_args+=(repos/"${repo}"/pulls/"$pr_num")
+  else
+    api_args+=(repos/{owner}/{repo}/pulls/"$pr_num")
+  fi
   url="$(gh "${api_args[@]}" --jq .html_url 2>/dev/null || true)"
   rm -f "$input_file"
   [[ -n "$url" && "$url" != "null" ]] && echo "$url"

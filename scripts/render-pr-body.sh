@@ -12,7 +12,12 @@ MODE="${1:-manual}"
 BRANCH="${2:-feat/...}"
 BASE="${3:-main}"
 
-CI="$(bash "$ROOT/scripts/pr-ci-checkbox.sh" "$BRANCH" 2>/dev/null || echo " ")"
+# Self-check (check-pr-tooling) must not call pr-ci-checkbox → ci-check → check-pr-tooling loop.
+if [[ "${RENDER_PR_BODY_SKIP_CI_CHECKBOX:-}" == 1 ]]; then
+  CI=" "
+else
+  CI="$(bash "$ROOT/scripts/pr-ci-checkbox.sh" "$BRANCH" 2>/dev/null || echo " ")"
+fi
 
 demo_test_plan_en() {
   local mark
@@ -86,6 +91,14 @@ EOF
 EOF
       return
       ;;
+    fix/pr-ci-checkbox-cycle)
+      cat <<'EOF'
+* Break ci-check ↔ check-pr-tooling ↔ render-pr-body ↔ pr-ci-checkbox infinite loop
+* Remove local `ci-check.sh` fallback from `pr-ci-checkbox.sh`; skip checkbox in tooling self-check
+* Document bash-storm incident in agent-git-playbook
+EOF
+      return
+      ;;
     feat/production-local-setup)
       cat <<'EOF'
 * Add production local setup script and documentation
@@ -139,6 +152,14 @@ EOF
       cat <<'EOF'
 * `validate-pr-body.sh` を復旧し `check-staged-docs-crosslinks.sh` を追加（`git-add-safe.sh` 後に WARN）
 * `check-pr-tooling.sh` の自己検査を拡張。agent-git-playbook に docs 束ねチェックリストを追記
+EOF
+      return
+      ;;
+    fix/pr-ci-checkbox-cycle)
+      cat <<'EOF'
+* ci-check と pr-ci-checkbox の循環参照を断ち切り（bash 大量起動の原因）
+* `pr-ci-checkbox` からローカル `ci-check` 呼び出しを削除。tooling は CI チェックボックスをスキップ
+* agent-git-playbook に bash storm インシデントを追記
 EOF
       return
       ;;

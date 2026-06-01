@@ -51,8 +51,8 @@ if [[ -n "$PR_NUM" ]]; then
   '; then
     MARK="x"
   fi
-elif [[ -x "$ROOT/scripts/ci-check.sh" ]] && bash "$ROOT/scripts/ci-check.sh" >/dev/null 2>&1; then
-  MARK="x"
 fi
+# No open PR / no gh: leave checkbox unchecked. Never run ci-check.sh here — that creates a
+# cycle: ci-check → check-pr-tooling → render-pr-body → pr-ci-checkbox → ci-check (bash storm).
 
 echo "$MARK"
