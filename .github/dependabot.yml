@@ -32,6 +32,10 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 3
+    # arq 0.28.x pins redis[hiredis]<6; redis 8.x breaks pip resolve / runtime until queue stack is upgraded.
+    ignore:
+      - dependency-name: redis
+        versions: [">=8.0.0"]
     groups:
       pip-patch-minor:
         applies-to: version-updates
