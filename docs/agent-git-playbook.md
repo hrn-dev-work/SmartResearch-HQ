@@ -27,7 +27,7 @@ For Cursor agents and maintainers. Public clone: use `scripts/git-ship.sh` and t
 | User says | Run |
 |-----------|-----|
 | プッシュまで / push | `bash scripts/git-ship.sh push` |
-| PR作成まで / PR まで | `bash scripts/git-pr-complete.sh` |
+| PR作成まで / PR まで | `bash scripts/agent-git-pr-complete.sh`（中身は `agent-run` + `git-pr-complete`） |
 | merge conflict in progress | `bash scripts/resolve-merge-main-keep-i18n.sh` |
 | behind main | `bash scripts/git-merge-main-safe.sh` (clean tree) |
 | local CI | `bash scripts/ci-check.sh` |
@@ -40,10 +40,10 @@ If the agent reports empty terminal output but your WSL terminal works:
 
 1. **F1** → `WSL: Reopen Folder in WSL`
 2. Cursor Settings → Agents → **Legacy Terminal Tool** ON → restart Cursor
-3. Agent must run: `wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && …'`
+3. Agent must run: `wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && bash scripts/agent-git-pr-complete.sh'` then Read `agent-cmd-output.txt`
 4. Do **not** ask the user to run commands unless step 1–3 fail
 
-See `docs/local/agent-shell-fix.md` on a machine with `docs/local/` checked out.
+See [docs/agent-shell-fix.md](agent-shell-fix.md).
 
 ---
 
@@ -60,12 +60,15 @@ gh pr edit <num> --title "$(bash scripts/render-pr-title.sh)"
 
 ---
 
-## Checklist before merge
+## Checklist before merge (user on GitHub)
+
+Agents stop at **PR URL**; squash merge is **not** run via `gh pr merge`.
 
 - [ ] `bash scripts/ci-check.sh` green
 - [ ] `frontend`: JA / EN toggle smoke-tested
 - [ ] PR body synced (`sync-pr-body.sh`) and valid (`validate-pr-body.sh <pr>`)
 - [ ] `ALLOWED_ORIGINS` / Vercel env documented if deploy changed
+- [ ] `gh pr checks` green on GitHub (agent may report; user clicks Merge)
 
 ---
 
@@ -110,7 +113,7 @@ See doc-conventions.md.
 | Body is `@/tmp/...` on GitHub | `gh api -f body=@file` | `gh_api_patch_pr_body` (python3 JSON) |
 | `gh pr edit` / `gh pr view` GraphQL error | Projects classic deprecation | REST via `gh_pr_edit_body_safe` |
 | `scripts/gh-pr-branch.sh` missing | Mistaken cleanup as one-off script | Listed in `.gitignore` comment + `check-pr-tooling.sh` |
-| Agent shell empty output | Cursor on UNC path | WSL reopen + `wsl.exe bash -lc` + log to file |
+| Agent shell empty output | Piped WSL stdout not captured; UNC workspace | `agent-run.sh` / `agent-git-pr-complete.sh` + Read `agent-cmd-output.txt`; `agent-shell-probe.sh` |
 
 Pre-push self-check: `bash scripts/check-pr-tooling.sh` (also runs at start of `ci-check.sh`).
 
@@ -126,7 +129,7 @@ Pre-push self-check: `bash scripts/check-pr-tooling.sh` (also runs at start of `
 |--------|------|
 | **WSL** で `~/workspace/...` を開く | エージェント Shell / phantom diff 回避 |
 | 大きな commit **前に** `origin/main` をマージ | 後からの README・i18n コンフリクト防止 |
-| **PR作成まで** = `bash scripts/git-pr-complete.sh` | 入口を一本化 |
+| **PR作成まで** = `bash scripts/agent-git-pr-complete.sh` | 入口を一本化 + Shell 空出力時もログで確認 |
 | `git add` に **gitignore ファイルを含めない** | `bash scripts/git-add-safe.sh` を使う |
 | UI 文言は **`messages/ja.ts` と `en.ts`** | 型は `messages/types.ts` |
 | PR 参照は **`gh pr list --head <branch> --state open`** | マージ済み PR が新規作成を阻害しない |
@@ -150,6 +153,7 @@ Pre-push self-check: `bash scripts/check-pr-tooling.sh` (also runs at start of `
 
 | 依頼 | コマンド |
 |------|----------|
+| 文脈確認（エージェント最初） | `bash scripts/git-agent-context.sh`（`pin` / `--strict`） |
 | プッシュまで | `bash scripts/git-ship.sh push` |
 | PR作成まで | `bash scripts/git-pr-complete.sh` |
 | マージ途中 | `bash scripts/resolve-merge-main-keep-i18n.sh` |
@@ -163,8 +167,11 @@ Pre-push self-check: `bash scripts/check-pr-tooling.sh` (also runs at start of `
 3. エージェントは `wsl.exe -d Ubuntu bash -lc '...'` を使う
 4. それでもダメならユーザーに手元ターミナルで `git-pr-complete.sh`（エージェントの代替案内）
 
-## マージ前チェック
+## マージ前チェック（ユーザー・GitHub）
+
+エージェントは **PR作成まで**（`git-pr-complete.sh`）で止め、PR URL と checks を報告する。squash マージはユーザー。
 
 - [ ] `ci-check.sh` 成功
 - [ ] フロント JA/EN 確認
 - [ ] PR 本文同期済み（`sync-pr-body.sh`）かつ `validate-pr-body.sh <pr>` 成功
+- [ ] GitHub 上で required checks green → ユーザーが Merge
