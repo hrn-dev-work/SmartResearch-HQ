@@ -5,6 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 echo "== pr tooling =="
+bash "$ROOT/scripts/check-bash-script-cycles.sh"
 bash "$ROOT/scripts/check-pr-tooling.sh"
 
 echo "== public docs (EN --- JA) =="

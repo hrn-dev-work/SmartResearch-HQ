@@ -1,5 +1,11 @@
 # Dependabot — dependency updates (OWASP A06 / supply chain hygiene)
-# https://docs.github.com/en/code-security/dependabot
+#
+# Grouping policy (balance review load vs. bisectability):
+#   - patch + minor version updates → one weekly PR per ecosystem
+#   - security updates (CVE) → one PR per ecosystem when multiple land together
+#   - major version updates → not grouped (individual PRs for breaking-change review)
+#
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#groups
 
 version: 2
 updates:
@@ -7,16 +13,49 @@ updates:
     directory: /frontend
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      npm-patch-minor:
+        applies-to: version-updates
+        update-types:
+          - patch
+          - minor
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
 
   - package-ecosystem: pip
     directory: /backend
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      pip-patch-minor:
+        applies-to: version-updates
+        update-types:
+          - patch
+          - minor
+      pip-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      actions-patch-minor:
+        applies-to: version-updates
+        update-types:
+          - patch
+          - minor
+      actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"

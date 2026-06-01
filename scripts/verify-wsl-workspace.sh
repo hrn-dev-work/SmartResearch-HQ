@@ -19,6 +19,8 @@ required=(
   docs/agents/engineering-principles.md
   docs/adr/0006-security-guardrails-public-standards.md
   docs/adr/0007-engineering-principles-for-agents.md
+  docs/adr/0008-ai-guardrails-production-readiness.md
+  docs/agents/ai-production-readiness.md
 )
 
 missing=0

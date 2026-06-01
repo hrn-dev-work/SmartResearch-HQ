@@ -22,14 +22,28 @@ if [[ $# -eq 0 ]]; then
   exit 2
 fi
 
+CMD_STR="$*"
+{
+  echo "=== agent-run $(date -Iseconds) ==="
+  echo "cmd: $CMD_STR"
+  echo "pwd: $ROOT"
+  echo "--- output ---"
+} >>"$OUT"
+
 set +e
 (
   cd "$ROOT"
   "$@"
-) > >(tee "$OUT") 2>&1
+) >>"$OUT" 2>&1
 code=$?
 set -e
 
+{
+  echo "--- end output ---"
+  echo "agent-run: exit=$code log=$OUT"
+} >>"$OUT"
+
 echo "$code" > "$EXIT"
-echo "agent-run: exit=$code log=$OUT" | tee -a "$OUT"
+# Short line for Shell capture when pipes/file redirects fail:
+echo "agent-run: exit=$code log=$OUT bytes=$(wc -c <"$OUT" | tr -d ' ')"
 exit "$code"

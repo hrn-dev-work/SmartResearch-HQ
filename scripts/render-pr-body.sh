@@ -12,20 +12,34 @@ MODE="${1:-manual}"
 BRANCH="${2:-feat/...}"
 BASE="${3:-main}"
 
-CI="$(bash "$ROOT/scripts/pr-ci-checkbox.sh" "$BRANCH" 2>/dev/null || echo " ")"
+# Self-check (check-pr-tooling) must not call pr-ci-checkbox → ci-check → check-pr-tooling loop.
+if [[ "${RENDER_PR_BODY_SKIP_CI_CHECKBOX:-}" == 1 ]]; then
+  CI=" "
+else
+  CI="$(bash "$ROOT/scripts/pr-ci-checkbox.sh" "$BRANCH" 2>/dev/null || echo " ")"
+fi
+
+demo_test_plan_en() {
+  local mark
+  mark="$(bash "$ROOT/scripts/pr-deploy-demo-checkbox.sh" "$BRANCH" "$BASE" 2>/dev/null || echo "N/A")"
+  if [[ "$mark" == "N/A" ]]; then
+    echo '* [N/A] Live demo / research flow — skipped (no deploy changes in this PR)'
+  else
+    echo '* [ ] Live demo loads and research flow works — verify https://smart-research-hq.vercel.app'
+  fi
+}
+
+demo_test_plan_ja() {
+  local mark
+  mark="$(bash "$ROOT/scripts/pr-deploy-demo-checkbox.sh" "$BRANCH" "$BASE" 2>/dev/null || echo "N/A")"
+  if [[ "$mark" == "N/A" ]]; then
+    echo '* [N/A] デモ URL リサーチフロー — 対象外（本 PR はデプロイ変更なし）'
+  else
+    echo '* [ ] デモ URL でリサーチフローが動作すること（デプロイ変更あり）'
+  fi
+}
 
 format_commits() {
-  local branch="${1:-}"
-  case "$branch" in
-    chore/security-scanning-docs)
-      cat <<'EOF'
-* `merge main`: sync git-hooks and security docs
-* `chore(security)`: add scanning docs and workflow guardrails
-EOF
-      return
-      ;;
-  esac
-
   local log
   log="$(git log "origin/${BASE}..HEAD" --format=%s 2>/dev/null || git log "${BASE}..HEAD" --format=%s 2>/dev/null || true)"
   if [[ -z "$log" ]]; then
@@ -40,21 +54,6 @@ EOF
       echo "* ${subject}"
     fi
   done <<<"$log"
-}
-
-format_commits_ja() {
-  local branch="$1"
-  case "$branch" in
-    chore/security-scanning-docs)
-      cat <<'EOF'
-* `merge main`: git-hooks と security docs を同期
-* `chore(security)`: スキャン docs と workflow ガードレールを追加
-EOF
-      return
-      ;;
-  esac
-
-  format_commits "$branch"
 }
 
 subject_to_bullet() {
@@ -92,43 +91,11 @@ EOF
 EOF
       return
       ;;
-    chore/security-scanning-docs)
+    fix/pr-ci-checkbox-cycle)
       cat <<'EOF'
-* Add `docs/security-scanning.md` canonical guide (defense in depth, CodeQL guardrails, PR merge checklist)
-* Add `scripts/validate-security-workflows.sh` to guard CodeQL/CI security workflow config
-* Normalize file modes on docs and validator script (100755 → 100644)
-EOF
-      return
-      ;;
-    docs/guardrails-engineering-principles)
-      cat <<'EOF'
-* Add CONTEXT security guardrails, OWASP/IPA §5, and four engineering principles
-* Add ADR 0006/0007 and agent docs (security, engineering-principles, rollout tasks)
-* Link security-scanning.md to agents/security; git-tracked staging bundle for WSL sync
-EOF
-      return
-      ;;
-    docs/adr-0008-ai-production-readiness)
-      cat <<'EOF'
-* Add CONTEXT § AI Guardrails & Production Readiness (deps, SRP, idempotency, observability)
-* Add ADR 0008 Accepted and agent docs (ai-production-readiness, rollout tasks)
-* Extend engineering-principles checklist and verify-wsl-workspace required paths
-EOF
-      return
-      ;;
-    chore/pr-tooling-guardrails)
-      cat <<'EOF'
-* Add bilingual `docs/git-hooks.md` (pre-commit / post-push install guide)
-* Extend `check-pr-tooling.sh` to require validate-pr-body, crosslink script, sync/update PR body helpers
-* Ship `update-pr-body-from-file.sh` for REST-safe PR body updates
-EOF
-      return
-      ;;
-    chore/wsl-cursor-workspace-settings)
-      cat <<'EOF'
-* WSL-first Cursor workspace settings (`git.path`, terminal profile, file watcher polling)
-* Add `verify-wsl-workspace.sh` and document UNC vs WSL desync in agent-shell-fix
-* Fix `check-pr-tooling.sh` false positive on body=@ in echo/comment lines
+* Break ci-check ↔ check-pr-tooling ↔ render-pr-body ↔ pr-ci-checkbox infinite loop
+* Remove local `ci-check.sh` fallback from `pr-ci-checkbox.sh`; skip checkbox in tooling self-check
+* Document bash-storm incident in agent-git-playbook
 EOF
       return
       ;;
@@ -188,35 +155,11 @@ EOF
 EOF
       return
       ;;
-    docs/guardrails-engineering-principles)
+    fix/pr-ci-checkbox-cycle)
       cat <<'EOF'
-* CONTEXT にセキュリティ規約・OWASP/IPA §5・4 原則を追加
-* ADR 0006/0007 と agent docs（security / engineering-principles / rollout）を追加
-* security-scanning から agents/security へリンク。WSL 同期用 staging バンドル
-EOF
-      return
-      ;;
-    docs/adr-0008-ai-production-readiness)
-      cat <<'EOF'
-* CONTEXT に AI ガードレール・実運用要件（依存関係 / SRP / 冪等性 / 可観測性）を追加
-* ADR 0008 Accepted と agent docs（ai-production-readiness / rollout tasks）を追加
-* engineering-principles チェックリストと verify-wsl-workspace の必須パスを拡張
-EOF
-      return
-      ;;
-    chore/pr-tooling-guardrails)
-      cat <<'EOF'
-* 二言語 `docs/git-hooks.md`（pre-commit / post-push 導入ガイド）を追加
-* `check-pr-tooling.sh` を拡張（validate-pr-body / crosslink / sync / update PR body）
-* REST 安全な `update-pr-body-from-file.sh` を同梱
-EOF
-      return
-      ;;
-    chore/wsl-cursor-workspace-settings)
-      cat <<'EOF'
-* Cursor を WSL 優先設定（git.path、ターミナル、file watcher polling）
-* `verify-wsl-workspace.sh` と agent-shell-fix に UNC/WSL 不一致の説明を追加
-* `check-pr-tooling.sh` の body=@ echo 誤検知を修正
+* ci-check と pr-ci-checkbox の循環参照を断ち切り（bash 大量起動の原因）
+* `pr-ci-checkbox` からローカル `ci-check` 呼び出しを削除。tooling は CI チェックボックスをスキップ
+* agent-git-playbook に bash storm インシデントを追記
 EOF
       return
       ;;
@@ -233,14 +176,6 @@ EOF
 * エージェント用デバッグ出力・一回限り merge スクリプトを gitignore
 * 二言語 agent-git-playbook と PR 本文同期（sync-pr-body / gh-pr-branch）を追加
 * main マージ: i18n UI・デプロイ手順・portfolio Mock API 整合を維持
-EOF
-      return
-      ;;
-    chore/security-scanning-docs)
-      cat <<'EOF'
-* セキュリティスキャン正本 `docs/security-scanning.md` を追加（多層防御・CodeQL 再発防止・PR マージ前チェック）
-* CodeQL / CI 設定を検証する `scripts/validate-security-workflows.sh` を追加
-* ドキュメントと検証スクリプトのファイルモードを正規化（100755 → 100644）
 EOF
       return
       ;;
@@ -262,7 +197,9 @@ EOF
     return
   fi
 
-  echo "* （マージ前に日本語 Summary を追記）"
+  infer_en_summary "$branch" | while IFS= read -r line; do
+    echo "$line"
+  done
 }
 
 render_manual() {
@@ -310,11 +247,12 @@ EOF
 }
 
 render_auto() {
-  local commits commits_ja en_summary ja_summary
-  commits="$(format_commits "$BRANCH")"
-  commits_ja="$(format_commits_ja "$BRANCH")"
+  local commits en_summary ja_summary demo_en demo_ja
+  commits="$(format_commits)"
   en_summary="$(infer_en_summary "$BRANCH")"
   ja_summary="$(infer_ja_summary "$BRANCH")"
+  demo_en="$(demo_test_plan_en)"
+  demo_ja="$(demo_test_plan_ja)"
 
   cat <<EOF
 **Summary**
@@ -329,7 +267,7 @@ ${commits}
 
 * [${CI}] \`bash scripts/ci-check.sh\` passes
 * [${CI}] CI backend / frontend green
-* [ ] Live demo loads and research flow works (if deploy changed)
+${demo_en}
 
 **Related**
 
@@ -344,13 +282,13 @@ ${ja_summary}
 
 **コミット (Commits)**
 
-${commits_ja}
+${commits}
 
 **テスト計画 (Test plan)**
 
 * [${CI}] \`bash scripts/ci-check.sh\` が通る
 * [${CI}] CI backend / frontend green
-* [ ] デモ URL でリサーチフローが動作（デプロイ変更時）
+${demo_ja}
 
 **関連 (Related)**
 
