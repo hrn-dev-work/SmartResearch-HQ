@@ -1,6 +1,6 @@
 # Public documentation conventions
 
-Tracked markdown in this repository (README, `docs/*.md`, `frontend/README.md`) follows the same bilingual shape as pull request bodies:
+Tracked markdown in this repository (README, `CONTEXT.md`, `docs/*.md`, `frontend/README.md`) follows the same bilingual shape as pull request bodies:
 
 1. **English** — full content for international readers and agents  
 2. **`---`** — horizontal rule on its own line (language boundary)  
@@ -9,6 +9,8 @@ Tracked markdown in this repository (README, `docs/*.md`, `frontend/README.md`) 
 **Automated check:** `bash scripts/validate-public-docs.sh` (also runs in `ci-check.sh` and pre-commit when public md is staged).
 
 **Not in scope:** `.github/ISSUE_TEMPLATE/*.md` (YAML front matter uses `---` at file top). UI copy lives in `frontend/src/lib/messages/`, not in these files.
+
+**ADR exception:** `docs/adr/*.md` is **English-only** (no `---` Japanese mirror). Rationale and rejected alternatives live in the ADR; operational detail in `docs/agents/`. Validated by `bash scripts/validate-adrs.sh` (see [docs/adr/README.md](adr/README.md)).
 
 **Cursor rule (local):** `.cursor/rules/docs-editing.mdc` points here; this file is the git-tracked canonical copy.
 
@@ -33,6 +35,7 @@ Tracked markdown in this repository (README, `docs/*.md`, `frontend/README.md`) 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | English-only README | No Japanese mirror | Add `# …（日本語）` section after `---` with full parallel sections |
+| English-only CONTEXT.md | No Japanese mirror | Same as README — full JA block after language-boundary `---` |
 | Japanese bullets only at end of README | Old “footer” pattern | Replace with full JA document after `---` |
 | Japanese-only `docs/*.md` | Spec written in JA first | Prepend English block, then `---`, keep existing JA |
 | Rule only in `.cursor/` | `.cursor/` is gitignored | Edit **this file** + `docs/agent-git-playbook.md` |
@@ -42,7 +45,7 @@ Tracked markdown in this repository (README, `docs/*.md`, `frontend/README.md`) 
 
 # 公開ドキュメントの規約
 
-git で追跡する Markdown（README、`docs/*.md`、`frontend/README.md`）は PR 本文と同じ **英語 → `---` → 日本語** です。
+git で追跡する Markdown（README、`CONTEXT.md`、`docs/*.md`、`frontend/README.md`）は PR 本文と同じ **英語 → `---` → 日本語** です。
 
 1. **英語** — 海外向け・エージェント向けの全文  
 2. **`---`** — 単独行の水平線（言語の境界）  
@@ -51,6 +54,8 @@ git で追跡する Markdown（README、`docs/*.md`、`frontend/README.md`）は
 **自動検証:** `bash scripts/validate-public-docs.sh`（`ci-check.sh` および public md を stage した pre-commit でも実行）。
 
 **対象外:** `.github/ISSUE_TEMPLATE/*.md`（先頭の `---` は YAML front matter）。UI 文言は `frontend/src/lib/messages/`。
+
+**ADR の例外:** `docs/adr/*.md` は **英語のみ**（`---` 以降の日本語ミラーなし）。理由と却下案は ADR、運用詳細は `docs/agents/`。検証は `bash scripts/validate-adrs.sh`（[docs/adr/README.md](adr/README.md) 参照）。
 
 **Cursor ルール（ローカル）:** `.cursor/rules/docs-editing.mdc` は本書へのリンク。正本は **このファイル**（git 追跡）。
 
@@ -75,6 +80,7 @@ git で追跡する Markdown（README、`docs/*.md`、`frontend/README.md`）は
 | 症状 | 原因 | 対策 |
 |------|------|------|
 | README が英語のみ | 日本語ミラーなし | `---` の後に `（日本語）` 見出しで全文を追加 |
+| CONTEXT.md が英語のみ | 日本語ミラーなし | README と同様、言語境界の `---` の後に全文ミラー |
 | README 末尾だけ日本語 | 旧フッター形式 | `---` 以降を英語と同構成の全文に差し替え |
 | `docs/*.md` が日本語のみ | 仕様を JA のみで記述 | 先頭に英語ブロック + `---` + 既存 JA |
 | ルールが `.cursor/` のみ | gitignore | **本書** と `agent-git-playbook.md` を更新 |

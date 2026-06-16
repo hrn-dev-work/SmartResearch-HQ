@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT=$(git rev-parse --show-toplevel)
 bash $ROOT/scripts/pre-commit-secret-check.sh
 bash $ROOT/scripts/sync-wbs-roadmap.sh --stage || true
-mapfile -t STAGED_MD < <(git diff --cached --name-only --diff-filter=ACM -- README.md frontend/README.md docs/ 2>/dev/null || true)
+mapfile -t STAGED_MD < <(git diff --cached --name-only --diff-filter=ACM -- README.md CONTEXT.md frontend/README.md docs/ 2>/dev/null || true)
 if [[ ${#STAGED_MD[@]} -gt 0 ]]; then
   bash $ROOT/scripts/validate-public-docs.sh ${STAGED_MD[@]}
 fi

@@ -13,6 +13,7 @@ mapfile -t FILES < <(
   else
     {
       [[ -f README.md ]] && echo README.md
+      [[ -f CONTEXT.md ]] && echo CONTEXT.md
       [[ -f frontend/README.md ]] && echo frontend/README.md
       find docs -maxdepth 1 -name '*.md' -type f 2>/dev/null | grep -v frontend-structure | grep -v production-local-setup | sort
     }
