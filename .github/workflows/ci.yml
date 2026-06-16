@@ -30,6 +30,9 @@ jobs:
       - name: Public markdown bilingual structure
         run: bash scripts/validate-public-docs.sh
 
+      - name: Architecture decision records (ADR)
+        run: bash scripts/validate-adrs.sh
+
       - name: Gitleaks scan (required)
         uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:

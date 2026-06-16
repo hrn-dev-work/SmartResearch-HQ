@@ -11,6 +11,9 @@ bash "$ROOT/scripts/check-pr-tooling.sh"
 echo "== public docs (EN --- JA) =="
 bash "$ROOT/scripts/validate-public-docs.sh"
 
+echo "== ADRs (English-only structure) =="
+bash "$ROOT/scripts/validate-adrs.sh"
+
 bash "$ROOT/scripts/sync-wbs-roadmap.sh" --quiet || true
 
 echo "== security workflow guardrails =="

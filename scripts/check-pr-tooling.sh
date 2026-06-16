@@ -8,6 +8,7 @@ cd "$ROOT"
 
 required=(
   scripts/validate-public-docs.sh
+  scripts/validate-adrs.sh
   scripts/check-staged-branch-scope.sh
   scripts/check-staged-docs-crosslinks.sh
   scripts/validate-pr-body.sh
@@ -52,6 +53,9 @@ fi
 
 echo "== pr tooling: public docs bilingual =="
 bash scripts/validate-public-docs.sh README.md
+
+echo "== pr tooling: ADR structure =="
+bash scripts/validate-adrs.sh
 
 echo "== pr tooling: PR body manual template =="
 manual_body="$(RENDER_PR_BODY_SKIP_CI_CHECKBOX=1 bash scripts/render-pr-body.sh manual feat/self-check-test)"
