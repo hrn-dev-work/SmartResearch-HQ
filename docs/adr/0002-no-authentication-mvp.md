@@ -16,4 +16,10 @@ No authentication or authorization headers in MVP. Restrict exposure via deploym
 - All API routes are open on the deployed URL; do not store secrets in client bundles.
 - Revisit before multi-tenant or PII-heavy workflows.
 
+## Alternatives considered
+
+- **Auth0 (or similar) from day one:** Rejected — slows portfolio path and adds env/secrets before core UX is stable.
+- **HTTP basic auth on the portfolio host:** Rejected — poor public-demo UX and weak fit for hiring reviewers.
+- **Per-client API keys:** Rejected — premature tenant model before multi-user requirements exist.
+
 See [design.md §11 D2](../design.md).

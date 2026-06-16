@@ -26,7 +26,7 @@ Pre-commit steps (in order):
 
 1. \scripts/pre-commit-secret-check.sh\ — blocks likely secrets in staged files  
 2. \scripts/sync-wbs-roadmap.sh --stage\ — keeps roadmap/README phase boxes aligned  
-3. When public markdown is staged: \scripts/validate-public-docs.sh\ (bilingual EN → \---\ → JA)
+3. When public markdown is staged: \scripts/validate-public-docs.sh\ (bilingual EN → \---\ → JA), except \docs/adr/\ (English-only; \scripts/validate-adrs.sh\ instead)
 
 See [doc-conventions.md](doc-conventions.md) for public markdown rules.
 
@@ -47,7 +47,8 @@ Details: [agent-git-playbook.md](agent-git-playbook.md).
 | Hook not running | Run \ash scripts/install-git-hooks.sh\; verify \git config core.hooksPath\ → \.githooks\ |
 | \pre-commit\ fails on docs | Run \ash scripts/validate-public-docs.sh\; add Japanese mirror after \---\ |
 | Phantom file mode diffs on UNC | Installer sets \core.filemode false\; stay in WSL path \~/workspace/...\ |
-| Stuck \index.lock\ | \m -f .git/index.lock\ (no other git process running) |
+| Stuck \index.lock\ | \
+m -f .git/index.lock\ (no other git process running) |
 | Skip hooks (emergency only) | User must request explicitly; do not use \--no-verify\ in agent automation |
 
 ## Uninstall
@@ -85,7 +86,7 @@ pre-commit の順序:
 
 1. \scripts/pre-commit-secret-check.sh\ — ステージ済みファイルのシークレット疑いをブロック  
 2. \scripts/sync-wbs-roadmap.sh --stage\ — ロードマップと README のフェーズチェックを整合  
-3. public Markdown を stage したとき \scripts/validate-public-docs.sh\（英語 → \---\ → 日本語）
+3. public Markdown を stage したとき \scripts/validate-public-docs.sh\（英語 → \---\ → 日本語）。\docs/adr/\ は例外（英語のみ → \scripts/validate-adrs.sh\）
 
 公開 md の規約: [doc-conventions.md](doc-conventions.md)。
 
