@@ -31,7 +31,13 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
   const [itemsLoading, setItemsLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [exportFeedback, setExportFeedback] = useState<
+    | { kind: "success"; exported: number; skipped: number }
+    | { kind: "empty" }
+    | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const {
     job,
@@ -40,7 +46,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
     isPolling,
   } = useJobProgress(jobId);
 
-  const displayError = error ?? jobError;
+  const displayError = error ?? jobError ?? exportError;
 
   useEffect(() => {
     if (!job || isJobInProgress(job.status)) return;
@@ -101,16 +107,21 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
 
   async function handleExport() {
     setExporting(true);
+    setExportError(null);
     try {
       const res = await exportJob(jobId);
-      setMessage(
-        formatMessage(t.exportResult, {
+      if (res.exported_count > 0) {
+        setExportFeedback({
+          kind: "success",
           exported: res.exported_count,
           skipped: res.skipped_count,
-        }),
-      );
+        });
+      } else {
+        setExportFeedback({ kind: "empty" });
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t.errorExport);
+      setExportFeedback(null);
+      setExportError(err instanceof Error ? err.message : t.errorExport);
     } finally {
       setExporting(false);
     }
@@ -174,6 +185,10 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
           )}
         </header>
 
+        {exportFeedback && (
+          <ExportResultPanel feedback={exportFeedback} review={t} />
+        )}
+
         {message && (
           <p className="mt-8 text-pretty border-l-2 border-emerald-500 pl-3 text-sm text-emerald-700">
             {message}
@@ -214,6 +229,55 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
         </section>
       </main>
     </>
+  );
+}
+
+function ExportResultPanel({
+  feedback,
+  review: t,
+}: {
+  feedback:
+    | { kind: "success"; exported: number; skipped: number }
+    | { kind: "empty" };
+  review: Messages["review"];
+}) {
+  const isSuccess = feedback.kind === "success";
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={`mt-6 rounded-md border px-4 py-4 sm:mt-8 ${
+        isSuccess
+          ? "border-emerald-300 bg-emerald-50"
+          : "border-amber-300 bg-amber-50"
+      }`}
+    >
+      <p
+        className={`text-base font-semibold ${
+          isSuccess ? "text-emerald-950" : "text-amber-950"
+        }`}
+      >
+        {isSuccess ? t.exportResultHeading : t.exportResultEmptyHeading}
+      </p>
+      {isSuccess ? (
+        <>
+          <p className="mt-2 text-sm text-emerald-900">
+            {formatMessage(t.exportResultCounts, {
+              exported: feedback.exported,
+              skipped: feedback.skipped,
+            })}
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-emerald-800">
+            {t.exportResultPortfolioNote}
+          </p>
+        </>
+      ) : (
+        <p className="mt-2 text-sm leading-relaxed text-amber-900">
+          {t.exportResultEmptyDetail}
+        </p>
+      )}
+    </div>
   );
 }
 

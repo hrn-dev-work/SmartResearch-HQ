@@ -8,5 +8,8 @@ test("review decide and export", async ({ page, dashboardPage }) => {
   await reviewPage.selectFirstCandidate();
   await expect(reviewPage.statusBanner()).toContainText(/確定:/);
   await reviewPage.exportSpreadsheet();
-  await expect(reviewPage.statusBanner()).toContainText(/件を出力/);
+  await expect(reviewPage.exportFeedback()).toBeVisible();
+  await expect(reviewPage.exportFeedback()).toContainText(
+    /エクスポート完了|Export complete/,
+  );
 });
