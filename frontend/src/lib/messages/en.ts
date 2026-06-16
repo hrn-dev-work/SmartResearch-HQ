@@ -41,7 +41,7 @@ export const en: Messages = {
     back: "← Back",
     title: "Review",
     itemCount: "{count} items",
-    export: "Export to sheet",
+    export: "Export to spreadsheet",
     exporting: "Exporting…",
     loading: "Loading…",
     processing: "{pct}% in progress",
@@ -54,6 +54,13 @@ export const en: Messages = {
     rejected: "Rejected: {title}",
     confirmedAsin: "Confirmed with ASIN {asin}: {title}",
     exportResult: "Exported {exported} ({skipped} skipped)",
+    exportResultHeading: "Export complete",
+    exportResultCounts: "{exported} confirmed · {skipped} skipped",
+    exportResultPortfolioNote:
+      "Portfolio demo only — nothing is written to Google Sheets. Counts are recorded in memory.",
+    exportResultEmptyHeading: "Nothing to export",
+    exportResultEmptyDetail:
+      "Select an Amazon candidate or enter an ASIN first. Rejected or undecided items are skipped.",
     shopee: "Shopee",
     amazonCandidates: "Amazon candidates",
     soldCount: "Sold {count}",

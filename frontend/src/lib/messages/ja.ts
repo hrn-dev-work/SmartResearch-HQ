@@ -53,6 +53,13 @@ export const ja = {
     rejected: "却下: {title}",
     confirmedAsin: "ASIN {asin} で確定: {title}",
     exportResult: "{exported} 件を出力（{skipped} 件スキップ）",
+    exportResultHeading: "エクスポート完了",
+    exportResultCounts: "確定済み {exported} 件 · スキップ {skipped} 件",
+    exportResultPortfolioNote:
+      "デモ（Portfolio）のため Google スプレッドシートには書き込みません。件数のみ記録しました。",
+    exportResultEmptyHeading: "出力対象がありません",
+    exportResultEmptyDetail:
+      "先に Amazon 候補を「選択」するか ASIN を入力してください。却下のみ・未確定の商品はスキップされます。",
     shopee: "Shopee",
     amazonCandidates: "Amazon 候補",
     soldCount: "販売数 {count}",
