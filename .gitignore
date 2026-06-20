@@ -28,7 +28,7 @@ build/
 
 # Logs & runtime
 *.log
-# One-off agent tee logs (legacy; use agent-cmd-output.txt via agent-run.sh)
+# One-off agent tee logs (legacy; use .agent-local/ via agent-local-log.sh)
 _fix-main*.log
 .ship-closeout.log
 .ship-*.log

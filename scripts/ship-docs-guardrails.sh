@@ -24,7 +24,8 @@ BRANCH="docs/guardrails-engineering-principles"
 git checkout -B "$BRANCH"
 
 # Remove agent junk if present
-rm -f .agent-*.sh .agent-*.txt hello-wsl.txt scripts/.wsl-sync-test 2>/dev/null || true
+rm -f hello-wsl.txt scripts/.wsl-sync-test 2>/dev/null || true
+agent_clean_root_junk
 
 bash scripts/git-add-safe.sh
 

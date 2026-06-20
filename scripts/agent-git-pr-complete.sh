@@ -5,7 +5,7 @@
 # From Windows Cursor agent host:
 #   wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && bash scripts/agent-git-pr-complete.sh'
 #
-# After run, Read agent-cmd-output.txt for PR URL and full log.
+# After run, Read .agent-local/latest.log for PR URL and full log.
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

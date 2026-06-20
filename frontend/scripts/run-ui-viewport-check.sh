@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 # UI viewport + JA/EN check. Requires dev server with current i18n code.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$ROOT/frontend"
 BASE_URL="${BASE_URL:-http://127.0.0.1:3000}"
+
+# shellcheck source=../../scripts/agent-local-log.sh
+source "$ROOT/scripts/agent-local-log.sh"
 
 if command -v lsof >/dev/null 2>&1; then
   old_pid="$(lsof -t -i:3000 2>/dev/null | head -1 || true)"
@@ -21,12 +25,16 @@ if ! curl -sf -o /dev/null "$BASE_URL"; then
   done
 fi
 
+UI_LOG="$(agent_local_log_path ui-viewport-check.log)"
+
 rm -rf .ui-check
 node scripts/ui-viewport-check.mjs "$BASE_URL"
 exit_code=$?
 
-echo "EXIT=${exit_code}" | tee ../agent-ui-check.log
-cat .ui-check/report.json | tee -a ../agent-ui-check.log
-ls -la .ui-check/ | tee -a ../agent-ui-check.log
+{
+  echo "EXIT=${exit_code}"
+  cat .ui-check/report.json
+  ls -la .ui-check/
+} >"$UI_LOG"
 
 exit "$exit_code"

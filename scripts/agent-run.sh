@@ -2,14 +2,18 @@
 # Run a command with full logging for Cursor agents (empty Shell output workaround).
 # Usage: bash scripts/agent-run.sh -- bash scripts/portfolio-vercel-deploy.sh redeploy
 #
-# After run, read:
-#   agent-cmd-output.txt  — full stdout/stderr (truncated each run)
-#   agent-cmd-exit.txt    — exit code
+# After run, read (under .agent-local/, truncated each run):
+#   latest.log   — full stdout/stderr
+#   latest.exit  — exit code
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-OUT="$ROOT/agent-cmd-output.txt"
-EXIT="$ROOT/agent-cmd-exit.txt"
+# shellcheck source=agent-local-log.sh
+source "$ROOT/scripts/agent-local-log.sh"
+
+agent_clean_root_junk
+OUT="$(agent_latest_log_path)"
+EXIT="$(agent_latest_exit_path)"
 
 if [[ "${1:-}" != "--" ]]; then
   echo "Usage: bash scripts/agent-run.sh -- <command...>" >&2

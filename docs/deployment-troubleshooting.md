@@ -13,7 +13,7 @@ Symptoms and fixes from the first public deploy (2026-05). See also [deployment-
 | Push docs / deploy notes | `bash scripts/agent-push.sh portfolio-docs-deploy` |
 | Agent runs any script + log file | `bash scripts/agent-run.sh -- bash scripts/...` |
 
-After `agent-run`, read `agent-cmd-output.txt` and `agent-cmd-exit.txt` in repo root. **Agents run these commands** — do not ask the user to paste them.
+After `agent-run`, read `.agent-local/latest.log` and `.agent-local/latest.exit`. **Agents run these commands** — do not ask the user to paste them.
 
 ---
 
@@ -65,7 +65,7 @@ Root URL alone returns `{"detail":"Not Found"}` — that is expected.
 | Issue | Fix |
 |-------|-----|
 | `pull` blocked by `scripts/dev.sh` | File was removed on `origin/main`; `rm -f scripts/dev.sh` then pull, or run `bash scripts/portfolio-vercel-deploy.sh full` |
-| Agent Shell empty output on Windows | Use `bash scripts/agent-run.sh -- …` and read `agent-cmd-output.txt` |
+| Agent Shell empty output on Windows | Use `bash scripts/agent-run.sh -- …` and read `.agent-local/latest.log` |
 | Push from `main` | Use `bash scripts/agent-push.sh portfolio-docs-deploy` or create a branch first |
 
 ---
@@ -93,7 +93,7 @@ Root URL alone returns `{"detail":"Not Found"}` — that is expected.
 | ドキュメントを push | `bash scripts/agent-push.sh portfolio-docs-deploy` |
 | エージェント用（ログファイル出力） | `bash scripts/agent-run.sh -- bash scripts/...` |
 
-`agent-run` 後はリポジトリ直下の `agent-cmd-output.txt` / `agent-cmd-exit.txt` を読む。**エージェントが実行する**（ユーザーにコマンド実行を頼まない）。
+`agent-run` 後は **`.agent-local/latest.log`** / **`.agent-local/latest.exit`** を Read する。**エージェントが実行する**（ユーザーにコマンド実行を頼まない）。
 
 ---
 
@@ -131,7 +131,7 @@ https://smartresearch-api.onrender.com/api/v1/health
 | 事象 | 対処 |
 |------|------|
 | `pull` が `scripts/dev.sh` でブロック | `origin/main` で削除済み。`rm -f scripts/dev.sh` して pull、または `bash scripts/portfolio-vercel-deploy.sh full` |
-| Windows でエージェント Shell が空 | `bash scripts/agent-run.sh -- …` で `agent-cmd-output.txt` を読む |
+| Windows でエージェント Shell が空 | `bash scripts/agent-run.sh -- …` で `.agent-local/latest.log` を Read |
 | `main` から直接 push | `bash scripts/agent-push.sh portfolio-docs-deploy` またはブランチを切る |
 
 ---
