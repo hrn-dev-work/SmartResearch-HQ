@@ -1,0 +1,69 @@
+name: Auto merge after AI approval
+
+# Squash-merge when Cursor Automation (or a human) adds the ai-approved label
+# and required CI checks are green. Branch must be feat/*, docs/*, or chore/*.
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: contains(github.event.pull_request.labels.*.name, 'ai-approved')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Verify branch is in auto-merge scope
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$HEAD_REF" =~ ^(feat|docs|chore)/ ]]; then
+            echo "Branch ${HEAD_REF} is outside feat/*, docs/*, chore/* — skip auto-merge"
+            exit 0
+          fi
+
+      - name: Wait for required checks
+        env:
+          GH_TOKEN: ${{ secrets.GH_PR_SYNC_TOKEN || github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 60); do
+            if gh pr checks "$PR" --required >/tmp/pr-checks.txt 2>&1; then
+              if grep -qi fail /tmp/pr-checks.txt; then
+                echo "Required checks failed — removing ai-approved label"
+                cat /tmp/pr-checks.txt
+                gh pr comment "$PR" --body "$(cat <<'EOF'
+**Auto-merge stopped** — required CI checks failed after the AI approval label was added. Fix CI and re-run the review automation.
+
+---
+
+**自動マージ停止** — AI 承認ラベル付与後に必須 CI が失敗しました。CI を修正し、レビュー自動化を再実行してください。
+EOF
+)"
+                gh pr edit "$PR" --remove-label ai-approved || true
+                exit 1
+              fi
+              if ! grep -qi pending /tmp/pr-checks.txt; then
+                cat /tmp/pr-checks.txt
+                break
+              fi
+            fi
+            echo "CI poll ${i}: waiting..."
+            sleep 15
+          done
+
+      - name: Squash merge
+        env:
+          GH_TOKEN: ${{ secrets.GH_PR_SYNC_TOKEN || github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          gh pr merge "$PR" --squash --delete-branch
+          echo "Squash-merged PR #${PR}"
