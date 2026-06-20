@@ -46,7 +46,7 @@ If the agent reports empty terminal output but your WSL terminal works:
 
 1. **F1** → `WSL: Reopen Folder in WSL`
 2. Cursor Settings → Agents → **Legacy Terminal Tool** ON → restart Cursor
-3. Agent must run: `wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && bash scripts/agent-git-pr-complete.sh'` then Read `agent-cmd-output.txt`
+3. Agent must run: `wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && bash scripts/agent-git-pr-complete.sh'` then Read `.agent-local/latest.log`
 4. Do **not** ask the user to run commands unless step 1–3 fail
 
 See [docs/agent-shell-fix.md](agent-shell-fix.md).
@@ -119,7 +119,7 @@ See doc-conventions.md.
 | Body is `@/tmp/...` on GitHub | `gh api -f body=@file` | `gh_api_patch_pr_body` (python3 JSON) |
 | `gh pr edit` / `gh pr view` GraphQL error | Projects classic deprecation | REST via `gh_pr_edit_body_safe` |
 | `scripts/gh-pr-branch.sh` missing | Mistaken cleanup as one-off script | Listed in `.gitignore` comment + `check-pr-tooling.sh` |
-| Agent shell empty output | Piped WSL stdout not captured; UNC workspace | `agent-run.sh` / `agent-git-pr-complete.sh` + Read `agent-cmd-output.txt`; `agent-shell-probe.sh` |
+| Agent shell empty output | Piped WSL stdout not captured; UNC workspace | `agent-run.sh` / `agent-git-pr-complete.sh` + Read `.agent-local/latest.log`; `agent-shell-probe.sh` |
 | **~3700 bash / fork failed** | **Cycle:** `ci-check` → `check-pr-tooling` → `render-pr-body` → `pr-ci-checkbox` → `ci-check` | Remove `ci-check` from `pr-ci-checkbox.sh`; `RENDER_PR_BODY_SKIP_CI_CHECKBOX=1` in tooling self-check |
 | docs PR took 8+ min locally | Full `ci-check.sh` ran npm/pytest | `git-pr-docs-only.sh` for docs/CONTEXT/ADR/agent paths |
 | Duplicate PRs | `ensure-pr` retried during gh rate limit | `gh pr list --head <branch>` first; one create; 60s backoff on 403 |

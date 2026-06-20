@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # Probe Cursor agent shell capture (WSL). Writes full log; prints a short summary to stdout.
 # Usage: bash scripts/agent-shell-probe.sh
-# After run: Read agent-cmd-output.txt if stdout is empty.
+# After run: Read .agent-local/latest.log if stdout is empty.
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-OUT="$ROOT/agent-cmd-output.txt"
-EXIT="$ROOT/agent-cmd-exit.txt"
+# shellcheck source=agent-local-log.sh
+source "$ROOT/scripts/agent-local-log.sh"
+
+agent_clean_root_junk
+OUT="$(agent_latest_log_path)"
+EXIT="$(agent_latest_exit_path)"
 
 {
   echo "=== agent-shell-probe $(date -Iseconds) ==="
@@ -34,7 +38,7 @@ EXIT="$ROOT/agent-cmd-exit.txt"
   echo ""
   echo "=== recommendation ==="
   echo "Use: bash scripts/agent-run.sh -- bash scripts/git-pr-complete.sh"
-  echo "Then Read: agent-cmd-output.txt and agent-cmd-exit.txt"
+  echo "Then Read: .agent-local/latest.log and .agent-local/latest.exit"
 } >"$OUT" 2>&1
 
 echo 0 >"$EXIT"

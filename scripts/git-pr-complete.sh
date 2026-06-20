@@ -7,6 +7,12 @@ cd "$(dirname "$0")/.."
 # shellcheck source=gh-pr-branch.sh
 source scripts/gh-pr-branch.sh
 
+if [[ -f scripts/agent-local-log.sh ]]; then
+  # shellcheck source=agent-local-log.sh
+  source scripts/agent-local-log.sh
+  agent_clean_root_junk
+fi
+
 if [[ -f scripts/git-agent-context.sh ]]; then
   bash scripts/git-agent-context.sh --strict
 else

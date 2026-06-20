@@ -15,7 +15,7 @@ BRANCH="docs/guardrails-engineering-principles"
 
 echo "=== PR1 ship $(date -Iseconds) ==="
 
-git stash push -m "agent-junk" -- .agent-pr-result.txt .agent-*.sh .agent-*.txt 2>/dev/null || true
+agent_clean_root_junk
 git restore frontend/.gitignore frontend/package.json 2>/dev/null || true
 
 git fetch origin

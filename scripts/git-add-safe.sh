@@ -5,6 +5,12 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+if [[ -f scripts/agent-local-log.sh ]]; then
+  # shellcheck source=agent-local-log.sh
+  source scripts/agent-local-log.sh
+  agent_clean_root_junk
+fi
+
 if [[ $# -gt 0 ]]; then
   for path in "$@"; do
     if git check-ignore -q "$path" 2>/dev/null; then
