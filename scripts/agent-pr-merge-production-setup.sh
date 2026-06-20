@@ -2,7 +2,11 @@
 # feat/production-local-setup: stage i18n, commit, PR, CI wait, squash merge to main.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-LOG="${PWD}/agent-pr-merge.log"
+# shellcheck source=agent-local-log.sh
+source "$(dirname "$0")/agent-local-log.sh"
+
+LOG="$(agent_local_log_path agent-pr-merge-production-setup.log)"
+: >"$LOG"
 exec > >(tee -a "$LOG") 2>&1
 
 echo "=== $(date -Iseconds) branch=$(git branch --show-current) ==="

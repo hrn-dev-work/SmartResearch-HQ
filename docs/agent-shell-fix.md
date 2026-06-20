@@ -67,6 +67,18 @@ Quick check: `bash scripts/verify-wsl-workspace.sh` — lists missing paths and 
 
 **Do not** use PowerShell `git -C \\wsl.localhost\...` for commits or pushes.
 
+### Do not create ad-hoc repo-root log files
+
+When Shell stdout is empty, some agents wrote **one-off** scripts that `tee` to names like `_fix-main.log` or `.ship-closeout.log`. Those scripts were **never committed**; the logs are stale debug output only.
+
+| Wrong (creates clutter) | Right |
+|-------------------------|-------|
+| `LOG="$(pwd)/_fix-main.log"` + `tee` in a new script | `bash scripts/agent-run.sh -- …` |
+| `.ship-closeout.log`, `.ship-*.log`, `*-log.txt` at repo root | `source scripts/agent-local-log.sh` → `.agent-local/name.log` |
+| Append forever to `agent-cmd-output.txt` | `agent-run.sh` truncates each run |
+
+Remove leftovers: `bash scripts/clean-agent-local-artifacts.sh` (`.agent-local/`, legacy root logs, accidental `home/`)
+
 See also: [agent-git-playbook.md](agent-git-playbook.md).
 
 ---
@@ -115,3 +127,15 @@ wsl.exe -d Ubuntu bash -lc 'cd ~/workspace/SmartResearch-HQ && bash scripts/agen
 5. `.git/logs/HEAD` / `agent-cmd-exit.txt` で push/commit を確認
 
 PowerShell の UNC 経由 `git` は使わない。
+
+### リポジトリ直下に ad-hoc ログを作らない
+
+Shell 出力が空のとき、エージェントが `_fix-main.log` や `.ship-closeout.log` へ `tee` する **一時スクリプト** を書いたことがある。スクリプトは **コミットされていない** — ログは古いデバッグ出力だけ。
+
+| 避ける | 使う |
+|--------|------|
+| `LOG="$(pwd)/_fix-main.log"` 等 | `bash scripts/agent-run.sh -- …` |
+| リポ直下の `.ship-*.log`, `*-log.txt` | `source scripts/agent-local-log.sh` → `.agent-local/` |
+| `agent-cmd-output.txt` を無限 append | `agent-run.sh` が実行ごとに truncate |
+
+残っていれば: `bash scripts/clean-agent-local-artifacts.sh`（`.agent-local/`、レガシー直下ログ、誤 `home/`）

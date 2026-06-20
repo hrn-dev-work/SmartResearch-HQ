@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-LOG=merge-result.txt
+# shellcheck source=agent-local-log.sh
+source "$(dirname "$0")/agent-local-log.sh"
+
+LOG="$(agent_local_log_path resolve-readme-merge-push.log)"
+: >"$LOG"
 exec > >(tee -a "$LOG") 2>&1
 
 echo "=== resolve-readme-merge-push $(date -Iseconds) ==="

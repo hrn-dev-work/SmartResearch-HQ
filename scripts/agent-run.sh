@@ -3,7 +3,7 @@
 # Usage: bash scripts/agent-run.sh -- bash scripts/portfolio-vercel-deploy.sh redeploy
 #
 # After run, read:
-#   agent-cmd-output.txt  — full stdout/stderr
+#   agent-cmd-output.txt  — full stdout/stderr (truncated each run)
 #   agent-cmd-exit.txt    — exit code
 
 set -euo pipefail
@@ -23,27 +23,21 @@ if [[ $# -eq 0 ]]; then
 fi
 
 CMD_STR="$*"
+code=0
 {
   echo "=== agent-run $(date -Iseconds) ==="
   echo "cmd: $CMD_STR"
   echo "pwd: $ROOT"
   echo "--- output ---"
-} >>"$OUT"
-
-set +e
-(
   cd "$ROOT"
+  set +e
   "$@"
-) >>"$OUT" 2>&1
-code=$?
-set -e
-
-{
+  code=$?
+  set -e
   echo "--- end output ---"
   echo "agent-run: exit=$code log=$OUT"
-} >>"$OUT"
+} >"$OUT" 2>&1
 
-echo "$code" > "$EXIT"
-# Short line for Shell capture when pipes/file redirects fail:
+echo "$code" >"$EXIT"
 echo "agent-run: exit=$code log=$OUT bytes=$(wc -c <"$OUT" | tr -d ' ')"
 exit "$code"

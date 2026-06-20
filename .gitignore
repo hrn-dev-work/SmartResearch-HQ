@@ -28,12 +28,18 @@ build/
 
 # Logs & runtime
 *.log
+# One-off agent tee logs (legacy; use agent-cmd-output.txt via agent-run.sh)
+_fix-main*.log
+.ship-closeout.log
+.ship-*.log
 playwright-report/
 test-results/
 .coverage
 htmlcov/
 
 # Agent / Cursor debug output (local)
+.agent-local/
+/home/
 merge-result.txt
 tmp-*.txt
 agent-cmd-output.txt
@@ -52,6 +58,13 @@ diff-stat.txt
 *-log.txt
 *-state.txt
 show-*.txt
+.agent-*.log
+.agent-*.txt
+.resolve-*.log
+.sync-pr-log.txt
+dependabot-pr-log.txt
+pr-create-log.txt
+run-log.txt
 
 # Secrets (never commit)
 credentials.json
