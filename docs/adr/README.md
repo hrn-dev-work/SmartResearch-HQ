@@ -12,6 +12,7 @@ Accepted decisions for this repository. Agents: **do not re-litigate** an Accept
 | [0006](./0006-security-guardrails-public-standards.md) | Security guardrails (OWASP / IPA) | Accepted |
 | [0007](./0007-engineering-principles-for-agents.md) | Engineering principles (YAGNI, fail-fast, tests, Why) | Accepted |
 | [0008](./0008-ai-guardrails-production-readiness.md) | AI guardrails and production readiness | Accepted |
+| [0009](./0009-layered-tech-stack-policy.md) | Layered tech stack policy (Must vs Choose) | Accepted |
 
 ## Git tracking
 
@@ -69,6 +70,7 @@ Use branch prefix `docs/adr-...` when the PR is ADR-only.
 ## Agent docs
 
 - [engineering-principles.md](../agents/engineering-principles.md) — expands ADR 0007
+- [tech-stack.md](../agents/tech-stack.md) — expands ADR 0009
 - [ai-production-readiness.md](../agents/ai-production-readiness.md) — expands ADR 0008
 - [security.md](../agents/security.md) — expands ADR 0006
 - [domain.md](../agents/domain.md) — consumer rules and spec precedence

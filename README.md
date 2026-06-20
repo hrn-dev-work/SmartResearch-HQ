@@ -24,6 +24,8 @@ Use the in-app **About this demo** link in the header for a concise system overv
 
 ## Tech stack
 
+Org policy: **[docs/tech-stack-policy.md](docs/tech-stack-policy.md)** (this repo = **Profile B** — FastAPI pipeline). New business SaaS repos use **Profile A** (Laravel).
+
 *   **Frontend:** ![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=next.js&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
 *   **Backend:** ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![Pydantic v2](https://img.shields.io/badge/Pydantic_v2-E92063?style=flat-square)
 *   **Portfolio infra:** ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white) ![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white)
@@ -102,6 +104,7 @@ One-command redeploy: `bash scripts/portfolio-vercel-deploy.sh redeploy`
 | [Design](docs/design.md) | UI principles |
 | [API specification](docs/api-specification.md) | REST contract |
 | [Deployment guide](docs/deployment-guide.md) | Vercel / Render env vars |
+| [Tech stack policy](docs/tech-stack-policy.md) | Org Must/Choose; this repo = Profile B |
 | [Security scanning](docs/security-scanning.md) | CI secret/CodeQL guardrails |
 | [Doc conventions](docs/doc-conventions.md) | English → `---` → Japanese for public md |
 | [Git hooks](docs/git-hooks.md) | Local pre-commit / post-push install |
@@ -183,6 +186,8 @@ FastAPI + Next.js のモノレポは `APP_MODE` で挙動を切り替えます�
 
 ## 技術スタック
 
+組織方針: **[docs/tech-stack-policy.md](docs/tech-stack-policy.md)**（本リポ = **プロファイル B** — FastAPI パイプライン）。新規業務 SaaS は **プロファイル A**（Laravel）。
+
 - **フロント:** Next.js 16、TypeScript、Tailwind CSS
 - **バックエンド:** FastAPI、Pydantic v2
 - **Portfolio インフラ:** Vercel（UI）+ Render（API）— [デプロイ手順](docs/deployment-guide.md)
@@ -261,6 +266,7 @@ bash scripts/start-production-local.sh
 | [設計書](docs/design.md) | UI 原則 |
 | [API 仕様](docs/api-specification.md) | REST 契約 |
 | [デプロイ手順](docs/deployment-guide.md) | Vercel / Render の環境変数 |
+| [技術スタック方針](docs/tech-stack-policy.md) | 組織 Must/Choose、本リポ = プロファイル B |
 | [セキュリティスキャン](docs/security-scanning.md) | CI secret / CodeQL ガードレール |
 | [ドキュメント規約](docs/doc-conventions.md) | 公開 md の英語 → `---` → 日本語 |
 | [Git フック](docs/git-hooks.md) | ローカル pre-commit / post-push の導入 |
