@@ -4,11 +4,16 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+
+# Environment & secrets
 .env
 .env.local
 .env.*.local
+credentials.json
+service-account*.json
+*.pem
 
-# Build / cache
+# Build & cache
 .next/
 out/
 dist/
@@ -18,7 +23,14 @@ build/
 .mypy_cache/
 .ruff_cache/
 
-# IDE
+# Test & coverage
+playwright-report/
+test-results/
+/playwright/.cache/
+.coverage
+htmlcov/
+
+# IDE & OS
 .idea/
 .vscode/*
 !.vscode/extensions.json
@@ -26,83 +38,56 @@ build/
 *.swp
 .DS_Store
 
-# Logs & runtime
+# Logs (general)
 *.log
-# One-off agent tee logs (legacy; use .agent-local/ via agent-local-log.sh)
-_fix-main*.log
-.ship-closeout.log
-.ship-*.log
-playwright-report/
-test-results/
-.coverage
-htmlcov/
 
-# Agent / Cursor debug output (local)
+# Agent / Cursor — local only
+# Prefer .agent-local/ (agent-local-log.sh). Cleanup: scripts/clean-agent-local-artifacts.sh
 .agent-local/
-/home/
-merge-result.txt
-tmp-*.txt
-agent-cmd-output.txt
-combined_output.txt
-.merge-result.txt
-.git-status-tmp.txt
-pytest-out.txt
-stash-pop.txt
-git-st.txt
-commit-check.txt
-branch-state.txt
-rebase-state.txt
-final-status.txt
-diff-detail.txt
-diff-stat.txt
-*-log.txt
-*-state.txt
-show-*.txt
-.agent-*.log
-.agent-*.txt
-.resolve-*.log
-.sync-pr-log.txt
-dependabot-pr-log.txt
-pr-create-log.txt
-run-log.txt
-
-# Secrets (never commit)
-credentials.json
-service-account*.json
-*.pem
-
-# Playwright browsers (local install)
-/playwright/.cache/
-
-# Cursor agent config — local only (rules, skills, hooks; never push to public clone)
 .cursor/
 
-# Generated from local .cursor/skills (scripts/sync-skill-prompt-table.py)
-docs/prompt-templates.md
+# Agent debug dumps at repo root (legacy tee / redirect targets)
+/agent-*.txt
+/agent-*.log
+/.agent-*.txt
+/.agent-*.log
+/.agent-*.sh
+/_fix-main*.log
+/.resolve-*.log
+/.ship-*.log
+/.ship-closeout.log
+/*-log.txt
+/*-state.txt
+/show-*.txt
+/tmp-*.txt
+/combined_output.txt
+/merge-result.txt
+/.merge-result.txt
+/.git-status-tmp.txt
+/.git-commit-msg-tmp.txt
+/pytest-out.txt
+/stash-pop.txt
+/git-st.txt
+/commit-check.txt
+/final-status.txt
+/diff-detail.txt
+/diff-stat.txt
+/.ci-investigation-gh.txt
+/home/
 
-# Git / agent scripts — local only (public clone uses git-ship, ci-check, render-*, ensure-pr)
+# Local-only files (not in public clone; see docs/agent-git-playbook.md)
+docs/prompt-templates.md
 scripts/sync-skill-prompt-table.py
 scripts/git-first-pr.sh
 scripts/git-push-pr.sh
 scripts/update-open-pr-bodies.sh
 scripts/sync-github-labels.py
-
-# Agent / Git playbook — local only (public clone には含めない。裏用)
 AGENTS.md
 docs/agent-setup.md
 docs/git-workflow.md
-
-# Local docs index and notes (see docs/local/README.md on developer machine)
 docs/local/
 frontend/AGENTS.md
 frontend/CLAUDE.md
 
-# Agent debug output (local)
-.ci-investigation-gh.txt
-
-# Portfolio deploy (Vercel CLI + Render) — local logs only (scripts are committed)
+# Portfolio deploy (Vercel CLI + Render)
 .vercel/
-agent-vercel-deploy.log
-agent-cmd-exit.txt
-agent-cmd-output.txt
-.git-commit-msg-tmp.txt
