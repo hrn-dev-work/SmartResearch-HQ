@@ -3,7 +3,11 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-LOG="$ROOT/.ship-docs-guardrails.log"
+# shellcheck source=agent-local-log.sh
+source "$(dirname "$0")/agent-local-log.sh"
+
+LOG="$(agent_local_log_path ship-docs-guardrails.log)"
+: >"$LOG"
 exec > >(tee -a "$LOG") 2>&1
 
 echo "== $(date -Iseconds) ship-docs-guardrails =="

@@ -3,10 +3,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 # shellcheck source=gh-pr-branch.sh
-source scripts/gh-pr-branch.sh
+source "$(dirname "$0")/gh-pr-branch.sh"
+# shellcheck source=agent-local-log.sh
+source "$(dirname "$0")/agent-local-log.sh"
 
-LOG="${PWD}/scripts/ship-wsl-settings.log"
-exec > >(tee "$LOG") 2>&1
+LOG="$(agent_local_log_path ship-wsl-settings.log)"
+: >"$LOG"
+exec > >(tee -a "$LOG") 2>&1
 
 BRANCH="chore/wsl-cursor-workspace-settings"
 

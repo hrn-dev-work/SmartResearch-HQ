@@ -6,18 +6,21 @@
 #   bash scripts/portfolio-vercel-deploy.sh redeploy # frontend only (after first setup)
 #
 # Prerequisites: npx vercel login (once). Render API must be live.
-# Logs: agent-vercel-deploy.log (gitignored)
+# Logs: .agent-local/portfolio-vercel-deploy.log (gitignored)
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-LOG="$ROOT/agent-vercel-deploy.log"
+# shellcheck source=agent-local-log.sh
+source "$(dirname "$0")/agent-local-log.sh"
+LOG="$(agent_local_log_path portfolio-vercel-deploy.log)"
 API_URL="${NEXT_PUBLIC_API_URL:-https://smartresearch-api.onrender.com/api/v1}"
 VERCEL_PROJECT="${VERCEL_PROJECT:-smart-research-hq}"
 PRODUCTION_URL="${PORTFOLIO_PRODUCTION_URL:-https://smart-research-hq.vercel.app}"
 MODE="${1:-full}"
 
-exec > >(tee "$LOG") 2>&1
+: >"$LOG"
+exec > >(tee -a "$LOG") 2>&1
 
 echo "== portfolio vercel deploy mode=$MODE $(date -Iseconds) =="
 

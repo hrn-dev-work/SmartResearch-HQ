@@ -7,6 +7,8 @@ cd "$ROOT"
 
 echo "==> SmartResearch-HQ local bootstrap (WSL/Linux bash)"
 
+bash "$ROOT/scripts/clean-agent-local-artifacts.sh" || true
+
 test -f .env || cp .env.example .env
 test -f frontend/.env.local || cp frontend/.env.local.example frontend/.env.local
 
