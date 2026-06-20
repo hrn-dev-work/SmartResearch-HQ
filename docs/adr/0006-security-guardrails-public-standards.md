@@ -10,7 +10,7 @@ Agents and contributors need explicit security expectations beyond ad-hoc review
 ## Decision
 
 1. Document **Security Guardrails** in `CONTEXT.md` and [docs/agents/security.md](../agents/security.md).
-2. Treat **OWASP Top 10 (latest)** and **IPA「安全なウェブサイトの作り方」** as mandatory design references for new code.
+2. Treat **OWASP Top 10 (latest)** and **IPA secure web development guidelines** as mandatory design references for new code (official link and Japanese title in [security.md](../agents/security.md)).
 3. Treat security-related **linter / CodeQL / secret-audit** findings and TypeScript **`any` / unsafe casts** as merge blockers unless waived in a follow-up ADR with explicit scope.
 4. Track org-level enablement (Dependabot, secret scanning, rate limits) in [security-rollout-tasks.md](../agents/security-rollout-tasks.md).
 5. Keep CI workflow guardrails in [security-scanning.md](../security-scanning.md) (complementary, not duplicate).

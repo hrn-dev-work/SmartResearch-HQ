@@ -16,4 +16,10 @@ Gemini and other LLM quotas are unreliable for production matching volume. Amazo
 - `AI_INFERENCE` state means matching in progress, not Gemini-only (legacy name).
 - Matching failures map to `AI_FAILED` with retry/DLQ per architecture.
 
+## Alternatives considered
+
+- **Gemini-only matching:** Rejected — quota and latency are unreliable at production volume.
+- **Hard-coded Amazon PA-API with no swap path:** Rejected — vendor lock-in; manual fallback must stay first-class.
+- **Manual ASIN entry only:** Rejected — does not scale; automation remains the default path when provider is configured.
+
 See [design.md §11 D5](../design.md) and [architecture.md §4.2](../architecture.md).

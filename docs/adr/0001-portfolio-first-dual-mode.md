@@ -16,4 +16,10 @@ Implement portfolio mode first: mock research can jump to `AWAITING_REVIEW` with
 - Demo badge and `MockResearchService` are first-class, not throwaway.
 - Env-driven mode switch; no separate forked frontend.
 
+## Alternatives considered
+
+- **Separate demo and production repositories:** Rejected — duplicate API/UI maintenance and drift risk.
+- **Production mode first:** Rejected — blocks portfolio deploy, E2E smoke tests, and reviewer access without credentials.
+- **Feature flags only (no `APP_MODE`):** Rejected — weaker boundary for workers, secrets, and mock vs real I/O.
+
 See [design.md §11 D1](../design.md) and [architecture.md §4](../architecture.md).

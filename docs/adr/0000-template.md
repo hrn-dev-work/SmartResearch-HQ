@@ -3,6 +3,8 @@
 - **Status:** Proposed | Accepted | Superseded by ADR-XXXX
 - **Date:** YYYY-MM-DD
 
+English-only. Do not add a `---` Japanese block (see docs/adr/README.md).
+
 ## Context
 
 What problem or constraint forced a decision?

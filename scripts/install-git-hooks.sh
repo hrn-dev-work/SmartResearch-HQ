@@ -13,7 +13,7 @@ chmod +x scripts/ensure-pr.sh scripts/post-workflow.sh scripts/sync-wbs-roadmap.
 chmod +x scripts/sync-pr-checkboxes.sh scripts/sync-pr-body.sh scripts/pr-ci-checkbox.sh scripts/render-pr-body.sh
 chmod +x scripts/render-pr-title.sh scripts/render-commit-msg.sh 2>/dev/null || true
 chmod +x scripts/git-ship.sh scripts/git-start-branch.sh 2>/dev/null || true
-chmod +x scripts/validate-public-docs.sh scripts/check-staged-branch-scope.sh scripts/check-pr-tooling.sh 2>/dev/null || true
+chmod +x scripts/validate-public-docs.sh scripts/validate-adrs.sh scripts/check-staged-branch-scope.sh scripts/check-pr-tooling.sh 2>/dev/null || true
 chmod +x scripts/git-add-safe.sh scripts/git-merge-main-safe.sh scripts/git-pr-complete.sh 2>/dev/null || true
 chmod +x scripts/gh-pr-branch.sh 2>/dev/null || true
 
