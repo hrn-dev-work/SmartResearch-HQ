@@ -1,6 +1,7 @@
 # SmartResearch-HQ
 
-**[Demo App](https://smart-research-hq.vercel.app)** — live portfolio (Vercel + Render, `APP_MODE=portfolio`)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Site-00C7B7?style=for-the-badge&logo=vercel)](https://smart-research-hq.vercel.app)
+[![Author](https://img.shields.io/badge/Author-HRN-0A66C2?style=for-the-badge&logo=github)](https://github.com/hrn-dev-work)
 
 Public markdown conventions: [docs/doc-conventions.md](docs/doc-conventions.md).
 
@@ -23,10 +24,10 @@ Use the in-app **About this demo** link in the header for a concise system overv
 
 ## Tech stack
 
-- **Frontend:** Next.js 16, TypeScript, Tailwind CSS
-- **Backend:** FastAPI, Pydantic v2
-- **Portfolio infra:** Vercel (UI) + Render (API) — see [deployment guide](docs/deployment-guide.md)
-- **Production infra:** PostgreSQL 16, Redis 7, Playwright, Google Sheets API
+*   **Frontend:** ![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=flat-square&logo=next.js&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
+*   **Backend:** ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![Pydantic v2](https://img.shields.io/badge/Pydantic_v2-E92063?style=flat-square)
+*   **Portfolio infra:** ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white) ![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white)
+*   **Production infra:** ![PostgreSQL](https://img.shields.io/badge/PostgreSQL_16-316192?style=flat-square&logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/Redis_7-DC382D?style=flat-square&logo=redis&logoColor=white) ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white)
 
 ---
 
