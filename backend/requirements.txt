@@ -12,5 +12,5 @@ playwright>=1.60.0
 python-dotenv>=1.2.2
 arq>=0.28.0
 paapi5-python-sdk-repack>=1.1.1
-google-api-python-client>=2.160.0
+google-api-python-client>=2.197.0
 google-auth>=2.53.0
