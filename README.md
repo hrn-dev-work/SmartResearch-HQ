@@ -26,9 +26,13 @@ Use the in-app **About this demo** link in the header for a concise system overv
 
 Live demo: [smart-research-hq.vercel.app](https://smart-research-hq.vercel.app)
 
-| Dashboard (shop URL → start research) | Review (candidates + manual ASIN) |
-|---------------------------------------|-----------------------------------|
-| ![Dashboard](docs/images/dashboard.png) | ![Review](docs/images/review.png) |
+**Dashboard** — shop URL → start research
+
+<img src="docs/images/dashboard.png" alt="Dashboard: paste Shopee shop URL and start research" width="720" />
+
+**Review** — Amazon candidates and manual ASIN
+
+<img src="docs/images/review.png" alt="Review: select or reject ASIN candidates" width="720" />
 
 Short walkthrough (dashboard → review): [docs/videos/portfolio-demo.webm](docs/videos/portfolio-demo.webm)
 
@@ -136,6 +140,7 @@ One-command redeploy: `bash scripts/portfolio-vercel-deploy.sh redeploy`
 
 ```bash
 bash scripts/ci-check.sh   # Ruff + pytest + ESLint + build (mirrors CI)
+```
 
 Optional — install tracked git hooks (secret scan + doc validation on commit):
 
@@ -144,7 +149,6 @@ bash scripts/install-git-hooks.sh
 ```
 
 See [docs/git-hooks.md](docs/git-hooks.md).
-```
 
 Production verification (optional): copy `.env.example` → `.env`, then `docker compose up -d postgres redis` with `APP_MODE=production`.
 
@@ -200,9 +204,13 @@ FastAPI + Next.js のモノレポは `APP_MODE` で挙動を切り替えます�
 
 公開デモ: [smart-research-hq.vercel.app](https://smart-research-hq.vercel.app)
 
-| ダッシュボード（ショップ URL → リサーチ開始） | レビュー（候補 + 手動 ASIN） |
-|-----------------------------------------------|------------------------------|
-| ![ダッシュボード](docs/images/dashboard.png) | ![レビュー](docs/images/review.png) |
+**ダッシュボード** — ショップ URL → リサーチ開始
+
+<img src="docs/images/dashboard.png" alt="ダッシュボード: Shopee ショップ URL を貼ってリサーチ開始" width="720" />
+
+**レビュー** — Amazon 候補と手動 ASIN
+
+<img src="docs/images/review.png" alt="レビュー: ASIN 候補の選択または却下" width="720" />
 
 短い操作動画（ダッシュボード → レビュー）: [docs/videos/portfolio-demo.webm](docs/videos/portfolio-demo.webm)
 
