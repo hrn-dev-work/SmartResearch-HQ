@@ -48,6 +48,10 @@ CUSTOM_CHECKS: dict[str, list[str]] = {
         "README.md:docs/images/dashboard.png",
         "README.md:docs/images/review.png",
     ],
+    "4.3": [
+        "docs/videos/portfolio-demo.webm",
+        "README.md:docs/videos/portfolio-demo.webm",
+    ],
     "4.4": [
         "backend/app/core/rate_limit.py:RateLimitMiddleware",
         "backend/app/main.py:RateLimitMiddleware",

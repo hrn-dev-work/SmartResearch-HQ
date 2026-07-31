@@ -30,6 +30,8 @@ Live demo: [smart-research-hq.vercel.app](https://smart-research-hq.vercel.app)
 |---------------------------------------|-----------------------------------|
 | ![Dashboard](docs/images/dashboard.png) | ![Review](docs/images/review.png) |
 
+Short walkthrough (dashboard → review): [docs/videos/portfolio-demo.webm](docs/videos/portfolio-demo.webm)
+
 ---
 
 ## Tech stack
@@ -201,6 +203,8 @@ FastAPI + Next.js のモノレポは `APP_MODE` で挙動を切り替えます�
 | ダッシュボード（ショップ URL → リサーチ開始） | レビュー（候補 + 手動 ASIN） |
 |-----------------------------------------------|------------------------------|
 | ![ダッシュボード](docs/images/dashboard.png) | ![レビュー](docs/images/review.png) |
+
+短い操作動画（ダッシュボード → レビュー）: [docs/videos/portfolio-demo.webm](docs/videos/portfolio-demo.webm)
 
 ---
 
