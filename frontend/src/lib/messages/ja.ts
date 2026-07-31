@@ -3,7 +3,8 @@ import type { JobStatus } from "@/lib/types";
 export const ja = {
   meta: {
     title: "SmartResearch HQ",
-    description: "Shopee 商品と Amazon ASIN の突合。候補はレビューで確定",
+    description:
+      "Shopee の SOLD を Amazon ASIN 候補と突合し、レビューで確定する",
   },
   header: {
     aboutDemo: "デモの説明",
@@ -17,7 +18,7 @@ export const ja = {
   dashboard: {
     title: "Shopee リサーチ",
     description:
-      "Shopee ショップ URL を貼ると SOLD 商品と ASIN 候補を表示。レビュー画面で確定する。",
+      "ショップ URL を貼ると SOLD と Amazon ASIN 候補が出る。手作業の 5–10 分／商品を、レビューで確定する流れに置き換える。",
     shopUrlLabel: "Shopee ショップ URL",
     shopUrlPlaceholder: "https://shopee.sg/shop/...",
     displayNameLabel: "表示名",
@@ -93,27 +94,26 @@ export const ja = {
     title: "このデモについて",
     subtitle: "SmartResearch-HQ — Portfolio モード",
     close: "閉じる",
-    purposeHeading: "システムの目的",
-    purposeBodyBefore: "越境 EC（Shopee 等）における手作業の商品リサーチ・名寄せを、",
-    purposeEmphasis:
-      "スクレイピング + 候補マッチング + Human-in-the-loop",
+    purposeHeading: "何のためのデモか",
+    purposeBodyBefore: "越境 EC のリサーチで、Shopee の SOLD を Amazon ASIN に名寄せする作業は商品あたり ",
+    purposeEmphasis: "手作業だと 5–10 分",
     purposeBodyAfter:
-      "で支援し、レビュー後にスプレッドシートへ出力する業務効率化システムです。",
-    archHeading: "二刀流アーキテクチャ（表 / 裏）",
-    archIntroBefore: "同一コードベースで ",
+      "かかることが多い。このデモは候補提示とレビュー確定までの画面フローを示す（表版は Mock）。",
+    archHeading: "二刀流（表 / 裏）",
+    archIntroBefore: "同じリポジトリで ",
     archIntroMid: " と ",
-    archIntroAfter: " を切り替えます。いま操作しているのは表版です。",
+    archIntroAfter: " を切り替える。いま見ているのは表版。",
     archPortfolio: "Portfolio（表）",
     archProduction: "Production（裏）",
     archBulletMock:
-      "Postgres / Redis 不使用 — インメモリ Mock（APP_MODE=portfolio）",
+      "Postgres / Redis なし — インメモリ Mock（APP_MODE=portfolio）",
     archBulletFixture:
-      "固定フィクスチャで E2E デモが完走（インフラコスト・秘密情報リスクを排除）",
-    prodHeading: "Production モード（参考）",
-    prodIntro: "実運用版では次が稼働する設計です（本デモでは無効）。",
-    prodBulletScrape: "Playwright による Shopee SOLD 商品のスクレイピング",
-    prodBulletQueue: "非同期キュー（Redis + ARQ）によるジョブ処理",
-    prodBulletMatch: "プラガブルな候補マッチング（Amazon PA-API / Gemini 等）",
-    prodBulletSheets: "Google Sheets API による一括エクスポート",
+      "固定フィクスチャでリサーチ → レビュー → エクスポート件数まで完走",
+    prodHeading: "Production（参考・本デモでは無効）",
+    prodIntro: "裏版で動く想定の部品:",
+    prodBulletScrape: "Playwright で Shopee SOLD を取得",
+    prodBulletQueue: "Redis + ARQ の非同期ジョブ",
+    prodBulletMatch: "候補マッチング（既定は Amazon PA-API。Gemini は任意）",
+    prodBulletSheets: "Google Sheets への出力",
   },
 } as const;

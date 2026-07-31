@@ -4,7 +4,7 @@ export const en: Messages = {
   meta: {
     title: "SmartResearch HQ",
     description:
-      "Match Shopee listings to Amazon ASINs. Confirm on the review screen.",
+      "Match Shopee SOLD listings to Amazon ASIN candidates. Confirm on review.",
   },
   header: {
     aboutDemo: "About demo",
@@ -18,7 +18,7 @@ export const en: Messages = {
   dashboard: {
     title: "Shopee research",
     description:
-      "Paste a Shopee shop URL. SOLD items and Amazon ASIN candidates appear on the review screen.",
+      "Paste a shop URL to list SOLD items and Amazon ASIN candidates. Replace roughly 5–10 minutes of manual work per item with a review step.",
     shopUrlLabel: "Shopee shop URL",
     shopUrlPlaceholder: "https://shopee.sg/shop/...",
     displayNameLabel: "Display name",
@@ -94,25 +94,26 @@ export const en: Messages = {
     title: "About this demo",
     subtitle: "SmartResearch-HQ — Portfolio mode",
     close: "Close",
-    purposeHeading: "Purpose",
+    purposeHeading: "What this demo shows",
     purposeBodyBefore:
-      "Speed up cross-border EC research (Shopee, etc.) with ",
-    purposeEmphasis: "scraping + candidate matching + human-in-the-loop",
-    purposeBodyAfter: ", then export reviewed rows to a spreadsheet.",
-    archHeading: "Two-mode architecture (public / ops)",
-    archIntroBefore: "One codebase switches ",
+      "Cross-border research often spends ",
+    purposeEmphasis: "5–10 minutes per item",
+    purposeBodyAfter:
+      " matching Shopee SOLD listings to Amazon ASINs by hand. This demo shows candidate suggestions and human confirmation (portfolio uses mock data).",
+    archHeading: "Two modes (public / ops)",
+    archIntroBefore: "One repo switches ",
     archIntroMid: " and ",
     archIntroAfter: ". You are on the public demo.",
     archPortfolio: "Portfolio (public)",
     archProduction: "Production (ops)",
     archBulletMock: "No Postgres or Redis — in-memory mock (APP_MODE=portfolio)",
     archBulletFixture:
-      "Fixed fixtures run end-to-end without infra cost or secrets",
-    prodHeading: "Production mode (reference)",
-    prodIntro: "Live deployment adds (disabled in this demo):",
-    prodBulletScrape: "Playwright scraping of Shopee SOLD items",
+      "Fixed fixtures cover research → review → export counts",
+    prodHeading: "Production (reference — off in this demo)",
+    prodIntro: "Ops mode is built to add:",
+    prodBulletScrape: "Playwright scrape of Shopee SOLD items",
     prodBulletQueue: "Async jobs via Redis + ARQ",
-    prodBulletMatch: "Pluggable matching (Amazon PA-API, Gemini, etc.)",
-    prodBulletSheets: "Bulk export via Google Sheets API",
+    prodBulletMatch: "Pluggable matching (Amazon PA-API by default; Gemini optional)",
+    prodBulletSheets: "Export via Google Sheets API",
   },
 };
