@@ -65,9 +65,9 @@ arq app.workers.settings.WorkerSettings
 | ID | Task | Deliverable | Estimate |
 |----|------|-------------|----------|
 | 4.1 | Mock API polish | `MockResearchService` | ✅ |
-| 4.2 | README and screenshots | Root README | 1h |
-| 4.3 | Demo video (Loom, etc.) | External | 2h |
-| 4.4 | Vercel deploy + CORS / rate limit | Public URL | 2h |
+| 4.2 | README and screenshots | `docs/images/dashboard.png`, `docs/images/review.png` | ✅ |
+| 4.3 | Demo video (Loom, etc.) | `docs/videos/portfolio-demo.webm` | ✅ |
+| 4.4 | Vercel deploy + CORS / rate limit | `backend/app/core/rate_limit.py`, public URL | ✅ |
 
 ## Milestones
 
@@ -169,9 +169,9 @@ arq app.workers.settings.WorkerSettings
 | ID | タスク | 成果物 | 工数目安 |
 |----|--------|--------|----------|
 | 4.1 | Mock API 完成度向上 | `MockResearchService` | ✅ |
-| 4.2 | README・スクリーンショット | ルート README | 1h |
-| 4.3 | デモ動画（Loom 等） | 外部 | 2h |
-| 4.4 | Vercel デプロイ + CORS / レート制限 | 公開 URL | 2h |
+| 4.2 | README・スクリーンショット | `docs/images/dashboard.png`, `docs/images/review.png` | ✅ |
+| 4.3 | デモ動画（Loom 等） | `docs/videos/portfolio-demo.webm` | ✅ |
+| 4.4 | Vercel デプロイ + CORS / レート制限 | `backend/app/core/rate_limit.py`, 公開 URL | ✅ |
 
 ## マイルストーン
 

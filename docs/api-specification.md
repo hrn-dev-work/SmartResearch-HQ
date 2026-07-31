@@ -22,6 +22,7 @@ Content-Type: `application/json`
 | 400 | Validation |
 | 404 | Not found |
 | 409 | Invalid state transition |
+| 429 | Rate limit exceeded |
 | 503 | External dependency unavailable |
 
 ### Error codes (main)
@@ -32,6 +33,11 @@ Content-Type: `application/json`
 | `AI_FAILED` | Candidate matching failed |
 | `INVALID_ASIN` | Invalid manual ASIN format |
 | `INVALID_STATE` | Invalid job state transition |
+| `RATE_LIMITED` | Too many requests from client IP |
+
+### Rate limit (public API)
+
+In-memory sliding window per client IP (see `ALLOWED_ORIGINS` / deploy guide). Default: **60 requests / 60 seconds**. `GET /health` is exempt (platform health checks). On limit: HTTP **429**, body `code: RATE_LIMITED`, header `Retry-After`. Env: `RATE_LIMIT_REQUESTS`, `RATE_LIMIT_WINDOW_SEC`, `RATE_LIMIT_ENABLED`.
 
 ---
 
@@ -244,6 +250,7 @@ Content-Type: `application/json`
 | 400 | バリデーション |
 | 404 | リソースなし |
 | 409 | 状態遷移不可 |
+| 429 | レート制限超過 |
 | 503 | 外部依存一時不可 |
 
 ### エラーコード（主要）
@@ -254,6 +261,11 @@ Content-Type: `application/json`
 | `AI_FAILED` | 候補マッチング失敗 |
 | `INVALID_ASIN` | 手動 ASIN 形式不正 |
 | `INVALID_STATE` | ジョブ状態遷移不可 |
+| `RATE_LIMITED` | クライアント IP のリクエスト過多 |
+
+### レート制限（公開 API）
+
+クライアント IP ごとのインメモリ・スライディングウィンドウ（デプロイの `ALLOWED_ORIGINS` と併用）。既定: **60 リクエスト / 60 秒**。`GET /health` は対象外（ヘルスチェック用）。超過時: HTTP **429**、本文 `code: RATE_LIMITED`、ヘッダ `Retry-After`。環境変数: `RATE_LIMIT_REQUESTS`, `RATE_LIMIT_WINDOW_SEC`, `RATE_LIMIT_ENABLED`。
 
 ---
 

@@ -42,6 +42,21 @@ CUSTOM_CHECKS: dict[str, list[str]] = {
         "frontend/src/app/review/[jobId]/page.tsx:manualAsin",
     ],
     "4.1": ["backend/app/services/mock/fixtures.py"],
+    "4.2": [
+        "docs/images/dashboard.png",
+        "docs/images/review.png",
+        "README.md:docs/images/dashboard.png",
+        "README.md:docs/images/review.png",
+    ],
+    "4.3": [
+        "docs/videos/portfolio-demo.webm",
+        "README.md:docs/videos/portfolio-demo.webm",
+    ],
+    "4.4": [
+        "backend/app/core/rate_limit.py:RateLimitMiddleware",
+        "backend/app/main.py:RateLimitMiddleware",
+        "README.md:smart-research-hq.vercel.app",
+    ],
 }
 
 

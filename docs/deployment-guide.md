@@ -46,8 +46,11 @@ Use [render.yaml](../render.yaml) or create a **Web Service** manually:
 |----------|----------|---------|-------|
 | `APP_MODE` | Yes | `portfolio` | In-memory Mock; no DB/Redis. |
 | `ALLOWED_ORIGINS` | Yes (after Vercel) | `https://your-app.vercel.app` | Comma-separated frontend origin(s). Localhost is always allowed for dev. |
+| `RATE_LIMIT_REQUESTS` | No | `60` | Max requests per IP per window (in-memory). |
+| `RATE_LIMIT_WINDOW_SEC` | No | `60` | Window length in seconds. |
+| `RATE_LIMIT_ENABLED` | No | `true` | Set `false` only for local load tests. |
 
-**Health check:** `GET /api/v1/health` should return `200`.
+**Health check:** `GET /api/v1/health` should return `200` (exempt from rate limit).
 
 **Free tier:** Render spins down after idle; first request may take ~30s (cold start).
 
@@ -132,8 +135,11 @@ ALLOWED_ORIGINS=https://your-app.vercel.app uvicorn app.main:app --port 8000
 |------|------|-----|------|
 | `APP_MODE` | はい | `portfolio` | インメモリ Mock。DB/Redis 不要 |
 | `ALLOWED_ORIGINS` | Vercel 後 | `https://your-app.vercel.app` | フロントの origin をカンマ区切り。localhost は常に許可 |
+| `RATE_LIMIT_REQUESTS` | 任意 | `60` | IP あたり窓内の最大リクエスト数（インメモリ） |
+| `RATE_LIMIT_WINDOW_SEC` | 任意 | `60` | 窓の秒数 |
+| `RATE_LIMIT_ENABLED` | 任意 | `true` | ローカル負荷試験時のみ `false` |
 
-**ヘルスチェック:** `GET /api/v1/health` が `200`
+**ヘルスチェック:** `GET /api/v1/health` が `200`（レート制限の対象外）
 
 **無料枠:** アイドル後にスリープ。初回アクセスは **約 30 秒**（コールドスタート）のことがある
 

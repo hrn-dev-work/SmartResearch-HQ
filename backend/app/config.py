@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     max_scrape_items: int = 20
     # Comma-separated CORS origins (e.g. Vercel preview + production URLs)
     allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    rate_limit_enabled: bool = True
+    rate_limit_requests: int = 60
+    rate_limit_window_sec: int = 60
 
 
 def cors_origins(settings: Settings | None = None) -> list[str]:
