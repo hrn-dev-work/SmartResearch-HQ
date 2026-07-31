@@ -13,7 +13,13 @@ import { decideReview, exportJob, getReviewItems } from "@/lib/api";
 import { asinValidationMessage, normalizeAsin } from "@/lib/asin";
 import { formatMessage } from "@/lib/format-message";
 import type { Messages } from "@/lib/messages/types";
-import { fieldInputSmClass, pageXClass } from "@/lib/ui-classes";
+import {
+  btnPrimaryClass,
+  btnSecondaryClass,
+  fieldInputSmClass,
+  linkQuietClass,
+  pageXClass,
+} from "@/lib/ui-classes";
 import type { ReviewItem } from "@/lib/types";
 
 export default function ReviewPage() {
@@ -138,21 +144,18 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
       >
         <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 space-y-3">
-            <Link
-              href="/"
-              className="inline-block text-sm text-slate-500 transition-colors duration-200 hover:text-slate-900"
-            >
+            <Link href="/" className={linkQuietClass}>
               {t.back}
             </Link>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+              <h1 className="text-2xl font-semibold tracking-tight text-ink">
                 {t.title}
               </h1>
               {job && (
-                <p className="mt-2 text-pretty text-sm text-slate-500">
+                <p className="mt-2 text-pretty text-sm text-ink-muted">
                   <span className="break-all">{sellerLabel}</span>
                   {job.item_count > 0 && (
-                    <span className="whitespace-nowrap text-slate-400">
+                    <span className="whitespace-nowrap text-ink-muted/70">
                       {" · "}
                       {formatMessage(t.itemCount, {
                         count: job.item_count,
@@ -168,7 +171,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <StatusBadge status={job.status} />
                 {isPolling && (
-                  <span className="whitespace-nowrap text-sm text-slate-500">
+                  <span className="whitespace-nowrap text-sm text-ink-muted">
                     {formatMessage(t.processing, { pct: job.progress_pct })}
                   </span>
                 )}
@@ -177,7 +180,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
                 type="button"
                 onClick={handleExport}
                 disabled={exporting}
-                className="w-full rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 sm:w-auto"
+                className={btnSecondaryClass}
               >
                 {exporting ? t.exporting : t.export}
               </button>
@@ -190,7 +193,7 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
         )}
 
         {message && (
-          <p className="mt-8 text-pretty border-l-2 border-emerald-500 pl-3 text-sm text-emerald-700">
+          <p className="mt-8 text-pretty border-l-2 border-accent pl-3 text-sm text-accent">
             {message}
           </p>
         )}
@@ -203,15 +206,15 @@ function ReviewPageBody({ jobId }: { jobId: string }) {
         <section className="mt-12 sm:mt-16">
           {jobLoading ||
           (itemsLoading && !isJobInProgress(job?.status ?? "PENDING")) ? (
-            <p className="text-sm text-slate-500">{t.loading}</p>
+            <p className="text-sm text-ink-muted">{t.loading}</p>
           ) : job && isJobInProgress(job.status) ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-ink-muted">
               {formatMessage(t.processingHint, { pct: job.progress_pct })}
             </p>
           ) : items.length === 0 ? (
-            <p className="text-sm text-slate-500">{t.empty}</p>
+            <p className="text-sm text-ink-muted">{t.empty}</p>
           ) : (
-            <ul className="divide-y divide-slate-200">
+            <ul className="divide-y divide-rule">
               {items.map((item) => (
                 <li key={item.item_id} className="py-12 first:pt-0">
                   <ReviewItemRow
@@ -247,33 +250,25 @@ function ExportResultPanel({
     <div
       role="status"
       aria-live="polite"
-      className={`mt-6 rounded-md border px-4 py-4 sm:mt-8 ${
-        isSuccess
-          ? "border-emerald-300 bg-emerald-50"
-          : "border-amber-300 bg-amber-50"
-      }`}
+      className="mt-6 border-l-2 border-ink bg-paper/60 px-4 py-4 sm:mt-8"
     >
-      <p
-        className={`text-base font-semibold ${
-          isSuccess ? "text-emerald-950" : "text-amber-950"
-        }`}
-      >
+      <p className="text-base font-semibold text-ink">
         {isSuccess ? t.exportResultHeading : t.exportResultEmptyHeading}
       </p>
       {isSuccess ? (
         <>
-          <p className="mt-2 text-sm text-emerald-900">
+          <p className="mt-2 text-sm tabular-nums text-ink">
             {formatMessage(t.exportResultCounts, {
               exported: feedback.exported,
               skipped: feedback.skipped,
             })}
           </p>
-          <p className="mt-3 text-sm leading-relaxed text-emerald-800">
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
             {t.exportResultPortfolioNote}
           </p>
         </>
       ) : (
-        <p className="mt-2 text-sm leading-relaxed text-amber-900">
+        <p className="mt-2 text-sm leading-relaxed text-ink-muted">
           {t.exportResultEmptyDetail}
         </p>
       )}
@@ -326,9 +321,9 @@ function ReviewItemRow({
       className={`grid gap-8 sm:gap-10 lg:grid-cols-2 ${decided ? "opacity-60" : ""}`}
     >
       <div>
-        <p className="text-xs font-medium text-slate-500">{t.shopee}</p>
+        <p className="text-xs font-medium text-ink-muted">{t.shopee}</p>
         <div className="mt-4 flex gap-4">
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md bg-slate-100">
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-sm bg-paper">
             <Image
               src={item.image_url}
               alt={item.title}
@@ -338,11 +333,11 @@ function ReviewItemRow({
             />
           </div>
           <div className="min-w-0">
-            <h2 className="text-base font-medium leading-snug text-slate-900">
+            <h2 className="text-base font-medium leading-snug text-ink">
               {item.title}
             </h2>
             {item.sold_count != null && (
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-ink-muted">
                 {formatMessage(t.soldCount, {
                   count: item.sold_count.toLocaleString(),
                 })}
@@ -353,7 +348,7 @@ function ReviewItemRow({
                 href={item.shopee_item_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 inline-block text-sm text-slate-500 underline-offset-2 transition-colors duration-200 hover:text-slate-900 hover:underline"
+                className="mt-2 inline-block text-sm text-ink-muted underline-offset-2 transition-colors duration-200 hover:text-ink hover:underline"
               >
                 {t.openShopee}
               </a>
@@ -363,21 +358,21 @@ function ReviewItemRow({
       </div>
 
       <div>
-        <p className="text-xs font-medium text-slate-500">{t.amazonCandidates}</p>
+        <p className="text-xs font-medium text-ink-muted">{t.amazonCandidates}</p>
         <ul className="mt-4 space-y-1">
           {item.candidates.length === 0 ? (
-            <li className="py-2 text-sm text-slate-500">{t.noCandidates}</li>
+            <li className="py-2 text-sm text-ink-muted">{t.noCandidates}</li>
           ) : (
             item.candidates.map((c) => (
               <li
                 key={c.candidate_id}
-                className="flex flex-col gap-3 rounded-md py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:hover:bg-slate-100/80"
+                className="flex flex-col gap-3 rounded-sm py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:hover:bg-paper"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-pretty text-sm font-medium text-slate-900">
+                  <p className="text-pretty text-sm font-medium text-ink">
                     {c.title}
                   </p>
-                  <p className="mt-0.5 whitespace-nowrap text-xs text-slate-500">
+                  <p className="mt-0.5 whitespace-nowrap text-xs tabular-nums text-ink-muted">
                     {formatMessage(t.confidence, {
                       asin: c.asin,
                       pct: (c.confidence * 100).toFixed(0),
@@ -388,7 +383,7 @@ function ReviewItemRow({
                   type="button"
                   disabled={decided}
                   onClick={() => onSelect(c.candidate_id)}
-                  className="w-full shrink-0 rounded-md bg-slate-900 px-3 py-2 text-xs font-medium text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 sm:w-auto sm:py-1.5"
+                  className={`${btnPrimaryClass} shrink-0 px-3 py-2 text-xs sm:w-auto sm:py-1.5`}
                 >
                   {t.select}
                 </button>
@@ -397,10 +392,10 @@ function ReviewItemRow({
           )}
         </ul>
         {!decided && (
-          <div className="mt-8 border-t border-slate-200 pt-6">
+          <div className="mt-8 border-t border-rule pt-6">
             <label
               htmlFor={`asin-${item.item_id}`}
-              className="text-xs font-medium text-slate-500"
+              className="text-xs font-medium text-ink-muted"
             >
               {t.manualAsin}
             </label>
@@ -423,7 +418,7 @@ function ReviewItemRow({
                 type="button"
                 disabled={submitting || manualAsin.length === 0}
                 onClick={handleManualSubmit}
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-900 transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-40 sm:w-auto"
+                className={`${btnSecondaryClass} px-3 py-2 text-xs disabled:opacity-40`}
               >
                 {submitting ? t.submitting : t.confirmAsin}
               </button>
@@ -437,12 +432,12 @@ function ReviewItemRow({
           <button
             type="button"
             onClick={onReject}
-            className="mt-4 text-sm text-slate-500 underline-offset-2 transition-colors duration-200 hover:text-slate-900 hover:underline"
+            className={`mt-4 ${linkQuietClass}`}
           >
             {t.reject}
           </button>
         ) : (
-          <p className="mt-4 text-sm text-slate-500">{t.decided}</p>
+          <p className="mt-4 text-sm text-ink-muted">{t.decided}</p>
         )}
       </div>
     </article>

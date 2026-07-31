@@ -6,7 +6,12 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { useLocale } from "@/components/LocaleProvider";
 import { createResearch } from "@/lib/api";
-import { bodyCopyClass, fieldInputClass, pageXClass } from "@/lib/ui-classes";
+import {
+  bodyCopyClass,
+  btnPrimaryClass,
+  fieldInputClass,
+  pageXClass,
+} from "@/lib/ui-classes";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -38,19 +43,19 @@ export default function DashboardPage() {
       <main
         className={`mx-auto w-full max-w-3xl flex-1 py-10 sm:py-14 ${pageXClass}`}
       >
-        <section className="space-y-3">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+        <section className="border-l-2 border-ink pl-4 sm:pl-5">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
             {t.title}
           </h1>
-          <p className={bodyCopyClass}>{t.description}</p>
+          <p className={`mt-3 ${bodyCopyClass}`}>{t.description}</p>
         </section>
 
-        <section className="mt-10 border-t border-slate-200 pt-10">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <section className="mt-10 border-t border-rule pt-10">
+          <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-2">
               <label
                 htmlFor="shop-url"
-                className="block text-sm font-medium text-slate-900"
+                className="block text-sm font-medium text-ink"
               >
                 {t.shopUrlLabel}
               </label>
@@ -69,11 +74,11 @@ export default function DashboardPage() {
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                 <label
                   htmlFor="shop-name"
-                  className="text-sm font-medium text-slate-900"
+                  className="text-sm font-medium text-ink"
                 >
                   {t.displayNameLabel}
                 </label>
-                <span className="shrink-0 whitespace-nowrap text-sm text-slate-500">
+                <span className="shrink-0 whitespace-nowrap text-sm text-ink-muted">
                   {t.displayNameOptional}
                 </span>
               </div>
@@ -89,24 +94,20 @@ export default function DashboardPage() {
 
             {error && (
               <p
-                className="border-l-2 border-red-500 pl-3 text-sm text-red-600"
+                className="border-l-2 border-red-700 pl-3 text-sm text-red-700"
                 role="alert"
               >
                 {error}
               </p>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="inline-flex w-full items-center justify-center rounded-md bg-slate-900 px-6 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 sm:w-auto"
-            >
+            <button type="submit" disabled={loading} className={btnPrimaryClass}>
               {loading ? t.submitting : t.submit}
             </button>
           </form>
         </section>
 
-        <aside className="mt-14 grid gap-6 border-t border-slate-200 pt-10 sm:grid-cols-3 sm:gap-8">
+        <aside className="mt-14 grid gap-8 border-t border-rule pt-10 sm:grid-cols-3 sm:gap-10">
           <Metric
             label={t.metricManual}
             line={`${t.metricManualValue} ${t.metricManualUnit}`}
@@ -136,9 +137,13 @@ function Metric({
   emphasized?: boolean;
 }) {
   return (
-    <div className={emphasized ? "text-slate-900" : "text-slate-600"}>
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-1.5 text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
+    <div className={emphasized ? "text-accent" : "text-ink-muted"}>
+      <p className="text-sm text-ink-muted">{label}</p>
+      <p
+        className={`mt-1.5 text-lg font-semibold tracking-tight tabular-nums sm:text-xl ${
+          emphasized ? "text-accent" : "text-ink"
+        }`}
+      >
         {line}
       </p>
     </div>

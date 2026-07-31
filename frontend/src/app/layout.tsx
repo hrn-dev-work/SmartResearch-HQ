@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Sans_JP } from "next/font/google";
 import { cookies } from "next/headers";
 
 import { LocaleProvider } from "@/components/LocaleProvider";
@@ -8,14 +8,10 @@ import { LOCALE_COOKIE, normalizeLocale } from "@/lib/locale";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const ibmPlexSansJp = IBM_Plex_Sans_JP({
+  variable: "--font-ibm-plex-sans-jp",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -40,9 +36,9 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${ibmPlexSansJp.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-slate-50 text-slate-900">
+      <body className="flex min-h-full flex-col bg-paper font-sans text-ink">
         <LocaleProvider locale={locale} messages={messages}>
           {children}
         </LocaleProvider>

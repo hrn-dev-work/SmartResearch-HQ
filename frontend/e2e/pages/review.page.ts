@@ -18,7 +18,7 @@ export class ReviewPage extends BasePage {
   }
   static forJob(page: Page, jobId: string) { return new ReviewPage(page, jobId); }
   exportFeedback(): Locator { return this.page.getByRole("status"); }
-  statusBanner(): Locator { return this.page.locator("p.border-l-2.border-emerald-500"); }
+  statusBanner(): Locator { return this.page.locator("p.border-l-2.border-accent"); }
   async expectLoaded(): Promise<void> { await this.title.waitFor({ state: "visible" }); }
   async waitForItemsReady(): Promise<void> {
     await this.page.getByText(/読み込み中|Loading/i).waitFor({ state: "hidden", timeout: 30_000 });
