@@ -38,6 +38,8 @@ H1 = re.compile(r"^#\s+")
 
 def validate(path: Path) -> list[str]:
     rel = path.relative_to(ROOT) if path.is_absolute() else path
+    if path.suffix.lower() != ".md":
+        return []
     if not path.is_file():
         return [f"{rel}: file not found"]
 

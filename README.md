@@ -22,6 +22,16 @@ Use the in-app **About this demo** link in the header for a concise system overv
 
 ---
 
+## Screenshots
+
+Live demo: [smart-research-hq.vercel.app](https://smart-research-hq.vercel.app)
+
+| Dashboard (shop URL → start research) | Review (candidates + manual ASIN) |
+|---------------------------------------|-----------------------------------|
+| ![Dashboard](docs/images/dashboard.png) | ![Review](docs/images/review.png) |
+
+---
+
 ## Tech stack
 
 Org policy: **[docs/tech-stack-policy.md](docs/tech-stack-policy.md)** (this repo = **Profile B** — FastAPI pipeline). New business SaaS repos use **Profile A** (Laravel).
@@ -181,6 +191,16 @@ Private / portfolio use. The portfolio edition omits scraping internals and prop
 FastAPI + Next.js のモノレポは `APP_MODE` で挙動を切り替えます。Portfolio 版はインフラコストとシークレット運用リスクを抑えつつ、リサーチ → レビュー → エクスポートの UI フローをそのまま体験できます。Production 版は非同期ジョブと外部連携を追加し、フロントを分岐させません。
 
 ヘッダーの **「このデモについて」** から、システム概要（JA / EN）を確認できます。
+
+---
+
+## スクリーンショット
+
+公開デモ: [smart-research-hq.vercel.app](https://smart-research-hq.vercel.app)
+
+| ダッシュボード（ショップ URL → リサーチ開始） | レビュー（候補 + 手動 ASIN） |
+|-----------------------------------------------|------------------------------|
+| ![ダッシュボード](docs/images/dashboard.png) | ![レビュー](docs/images/review.png) |
 
 ---
 

@@ -103,7 +103,7 @@ See [api-specification.md](./api-specification.md).
 
 - Frontend: Vercel
 - API: Railway / Fly.io, etc. (architecture §8)
-- Phase 4: production CORS origins, rate limits on public API
+- Phase 4: `ALLOWED_ORIGINS` for CORS; public API rate limit (default 60 req / 60s per IP; `/health` exempt)
 
 ## 11. MVP scope (seven decisions)
 
@@ -252,7 +252,7 @@ Maps to requirements.md §4. **Rationale and design impact** only; requirements 
 
 - フロント: Vercel
 - API: Railway / Fly.io 等（architecture §8）
-- Phase 4: 本番 CORS origin 固定、公開 API のレート制限
+- Phase 4: CORS は `ALLOWED_ORIGINS`。公開 API レート制限（既定 60 回 / 60 秒 / IP。`/health` は除外）
 
 ## 11. MVPスコープ（7つの意思決定）
 
