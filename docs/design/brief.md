@@ -9,6 +9,7 @@
 | Font | IBM Plex Sans JP |
 | Icons | None added (type + rules only) |
 | Signature | Left ink rule on primary sections; hairline dividers |
+| Demo assets | `frontend/public/demo/*.png` → `/demo/...` in Mock fixtures |
 
 Tokens: see `frontend/src/app/globals.css` and [design.md](../design.md) §2.
 
@@ -25,5 +26,6 @@ Tokens: see `frontend/src/app/globals.css` and [design.md](../design.md) §2.
 | フォント | IBM Plex Sans JP |
 | アイコン | 追加なし（文字と罫線のみ） |
 | シグネチャ | 主要セクションの左インク線、ヘアライン区切り |
+| デモ画像 | `frontend/public/demo/*.png` → Mock は `/demo/...` |
 
 トークン: `frontend/src/app/globals.css` と [design.md](../design.md) §2。

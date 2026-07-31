@@ -49,11 +49,11 @@ def seed_demo_job(shopee_url: str, display_name: str | None) -> UUID:
 
     demo_items: list[ReviewItemResponse] = []
     samples = [
-        ("10001", "Wireless Bluetooth Earbuds Pro", "B0DEMO001", 0.91, "demo-earbuds"),
-        ("10002", "USB-C Fast Charging Cable 2m", "B0DEMO002", 0.84, "demo-usbc-cable"),
-        ("10003", "Portable Mini Fan Rechargeable", "B0DEMO003", 0.76, "demo-mini-fan"),
+        ("10001", "Wireless Bluetooth Earbuds Pro", "B0DEMO001", 0.91, "/demo/earbuds.png"),
+        ("10002", "USB-C Fast Charging Cable 2m", "B0DEMO002", 0.84, "/demo/usbc-cable.png"),
+        ("10003", "Portable Mini Fan Rechargeable", "B0DEMO003", 0.76, "/demo/mini-fan.png"),
     ]
-    for shopee_item_id, title, asin, confidence, image_seed in samples:
+    for shopee_item_id, title, asin, confidence, image_url in samples:
         item_id = uuid4()
         cand_id = uuid4()
         demo_items.append(
@@ -61,7 +61,7 @@ def seed_demo_job(shopee_url: str, display_name: str | None) -> UUID:
                 item_id=item_id,
                 shopee_item_id=shopee_item_id,
                 title=title,
-                image_url=f"https://picsum.photos/seed/{image_seed}/400/400",
+                image_url=image_url,
                 shopee_item_url=_demo_item_url(shopee_url, shopee_item_id),
                 sold_count=1200,
                 candidates=[
@@ -91,7 +91,7 @@ def seed_demo_job(shopee_url: str, display_name: str | None) -> UUID:
             item_id=no_match_id,
             shopee_item_id="10004",
             title="Vintage Camera Lens Adapter Ring",
-            image_url="https://picsum.photos/seed/demo-lens-adapter/400/400",
+            image_url="/demo/lens-adapter.png",
             shopee_item_url=_demo_item_url(shopee_url, "10004"),
             sold_count=340,
             candidates=[],

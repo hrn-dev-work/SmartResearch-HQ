@@ -5,7 +5,9 @@
 
 Public markdown conventions: [docs/doc-conventions.md](docs/doc-conventions.md).
 
-Cross-border e-commerce research automation: scrape Shopee SOLD listings, match Amazon ASIN candidates, human review, export to spreadsheet. Built as a production-grade pipeline with a **public-safe demo edition** for hiring and client proposals.
+Cross-border EC research tool: take a Shopee shop URL, list SOLD items, propose Amazon ASIN candidates, confirm on a review screen, optionally export. One monorepo with **Portfolio** (public Mock demo) and **Production** (private scrape / match / Sheets).
+
+Manual matching often takes **5–10 minutes per item**. The UI targets a short review pass instead. Matching is pluggable; default production path is Amazon PA-API title search (Gemini is optional, not required).
 
 ---
 
@@ -16,9 +18,9 @@ Cross-border e-commerce research automation: scrape Shopee SOLD listings, match 
 | **Portfolio** (this demo) | Recruiters, clients, reviewers | In-memory Mock — no Postgres, Redis, or API keys |
 | **Production** (private ops) | Real cross-border EC workflows | Playwright scraping, Redis + ARQ workers, pluggable matching (PA-API / Gemini), Google Sheets |
 
-The same FastAPI + Next.js monorepo switches behavior via `APP_MODE`. The portfolio build removes infrastructure cost and secret-handling risk while preserving the full UI flow (research → review → export). Production adds async job processing and live integrations without forking the frontend.
+`APP_MODE` switches behavior on the same FastAPI + Next.js app. Portfolio keeps the full UI path (research → review → export counts) without secrets. Production adds workers and live integrations.
 
-Use the in-app **About this demo** link in the header for a concise system overview (JA / EN).
+Header link **About this demo** explains the split (JA / EN). Soft Paper UI tokens: [docs/design/brief.md](docs/design/brief.md).
 
 ---
 
@@ -35,6 +37,8 @@ Live demo: [smart-research-hq.vercel.app](https://smart-research-hq.vercel.app)
 <img src="docs/images/review.png" alt="Review: select or reject ASIN candidates" width="720" />
 
 Short walkthrough (dashboard → review): [docs/videos/portfolio-demo.webm](docs/videos/portfolio-demo.webm)
+
+Demo product thumbnails live under `frontend/public/demo/` (served as `/demo/*.png`).
 
 ---
 
@@ -169,7 +173,7 @@ See `.env.example` for production-only variables (PA-API, Gemini, Sheets).
 - [x] Phase 1 — Design, monorepo, docs
 - [x] Phase 2 — Scraping, matching, Sheets, workers
 - [x] Phase 3 — Job polling, manual ASIN UI
-- [x] Phase 4 — Portfolio deploy config, About demo UI, deployment docs
+- [x] Phase 4 — Portfolio deploy, Soft Paper UI, screenshots / demo video
 
 ---
 
@@ -183,7 +187,9 @@ Private / portfolio use. The portfolio edition omits scraping internals and prop
 
 **[デモアプリ](https://smart-research-hq.vercel.app)** — 公開ポートフォリオ（Vercel + Render、`APP_MODE=portfolio`）
 
-越境 EC（Shopee 等）の商品リサーチ・名寄せを自動化します。SOLD 商品の抽出、Amazon ASIN 候補のマッチング、人間によるレビュー、スプレッドシート出力までを一つのパイプラインとして実装しています。採用・提案向けに **公開しても安全なデモ版** と、実運用向けの本番版を同一リポジトリで維持します。
+越境 EC のリサーチツール。Shopee ショップ URL から SOLD を集め、Amazon ASIN 候補を出し、レビューで確定し、必要なら Sheets へ出す。**Portfolio**（公開 Mock）と **Production**（非公開のスクレイプ / マッチ / Sheets）を同一モノレポで持つ。
+
+手作業の名寄せは商品あたり **5–10 分**かかりがち。UI はその作業を短いレビューに寄せる。マッチングは差し替え可能で、本番の既定は Amazon PA-API タイトル検索（Gemini は任意）。
 
 ---
 
@@ -194,9 +200,9 @@ Private / portfolio use. The portfolio edition omits scraping internals and prop
 | **Portfolio**（本デモ） | 採用担当・クライアント・レビュアー | インメモリ Mock — Postgres / Redis / API キー不要 |
 | **Production**（非公開運用） | 実際の越境 EC 業務 | Playwright スクレイピング、Redis + ARQ ワーカー、プラガブルマッチング（PA-API / Gemini）、Google Sheets |
 
-FastAPI + Next.js のモノレポは `APP_MODE` で挙動を切り替えます。Portfolio 版はインフラコストとシークレット運用リスクを抑えつつ、リサーチ → レビュー → エクスポートの UI フローをそのまま体験できます。Production 版は非同期ジョブと外部連携を追加し、フロントを分岐させません。
+`APP_MODE` で同じ FastAPI + Next.js の挙動を切り替える。Portfolio はリサーチ → レビュー → エクスポート件数までを秘密情報なしで見せる。Production はワーカーと外部連携を足す。
 
-ヘッダーの **「このデモについて」** から、システム概要（JA / EN）を確認できます。
+ヘッダーの **「このデモについて」** で表／裏の説明（JA / EN）。UI トークン: [docs/design/brief.md](docs/design/brief.md)（Soft Paper）。
 
 ---
 
@@ -213,6 +219,8 @@ FastAPI + Next.js のモノレポは `APP_MODE` で挙動を切り替えます�
 <img src="docs/images/review.png" alt="レビュー: ASIN 候補の選択または却下" width="720" />
 
 短い操作動画（ダッシュボード → レビュー）: [docs/videos/portfolio-demo.webm](docs/videos/portfolio-demo.webm)
+
+デモ用サムネイルは `frontend/public/demo/`（URL は `/demo/*.png`）。
 
 ---
 
@@ -341,7 +349,7 @@ Production 専用の変数（PA-API、Gemini、Sheets）は `.env.example` を�
 - [x] Phase 1 — 設計、モノレポ、docs
 - [x] Phase 2 — スクレイピング、マッチング、Sheets、ワーカー
 - [x] Phase 3 — ジョブポーリング、手動 ASIN UI
-- [x] Phase 4 — Portfolio デプロイ設定、デモ About UI、デプロイ docs
+- [x] Phase 4 — Portfolio デプロイ、Soft Paper UI、スクショ / デモ動画
 
 ---
 
