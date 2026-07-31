@@ -8,7 +8,7 @@ import { pageXClass } from "@/lib/ui-classes";
 
 export function Header() {
   return (
-    <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-sm">
+    <header className="border-b border-rule bg-surface">
       <div
         className={`mx-auto flex max-w-3xl items-center justify-between gap-3 py-3 sm:gap-4 sm:py-4 ${pageXClass}`}
       >
@@ -16,10 +16,10 @@ export function Header() {
           href="/"
           className="group flex min-w-0 items-center gap-2.5 transition-opacity duration-200 hover:opacity-80 sm:gap-3"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-900 text-xs font-semibold tracking-tight text-white">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-ink text-xs font-semibold tracking-tight text-surface">
             SR
           </span>
-          <span className="truncate text-base font-semibold tracking-tight text-slate-900">
+          <span className="truncate text-base font-semibold tracking-tight text-ink">
             SmartResearch
           </span>
         </Link>

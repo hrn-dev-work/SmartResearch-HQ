@@ -32,22 +32,20 @@ export function AboutDemoDialog({ open, onClose }: AboutDemoDialogProps) {
     <dialog
       ref={dialogRef}
       onClose={onClose}
-      className="fixed inset-0 z-50 m-auto flex w-[min(100%,32rem)] max-h-[min(90vh,36rem)] flex-col overflow-y-auto rounded-md border border-slate-200 bg-white p-0 text-slate-900 backdrop:bg-slate-900/20"
+      className="fixed inset-0 z-50 m-auto flex w-[min(100%,32rem)] max-h-[min(90vh,36rem)] flex-col overflow-y-auto rounded-sm border border-rule bg-surface p-0 text-ink backdrop:bg-ink/25"
     >
-      <div className="border-b border-slate-200 px-5 py-4 sm:px-6 sm:py-5">
+      <div className="border-b border-rule px-5 py-4 sm:px-6 sm:py-5">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+            <h2 className="text-lg font-semibold tracking-tight text-ink">
               {a.title}
             </h2>
-            <p className="mt-1 text-pretty text-sm text-slate-500">
-              {a.subtitle}
-            </p>
+            <p className="mt-1 text-pretty text-sm text-ink-muted">{a.subtitle}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-md px-2 py-1 text-sm text-slate-500 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+            className="shrink-0 rounded-sm px-2 py-1 text-sm text-ink-muted transition-colors duration-200 hover:bg-paper hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/25 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             aria-label={a.close}
           >
             {a.close}
@@ -55,25 +53,23 @@ export function AboutDemoDialog({ open, onClose }: AboutDemoDialogProps) {
         </div>
       </div>
 
-      <div className="space-y-8 px-5 py-6 text-pretty text-sm leading-relaxed text-slate-600 sm:px-6">
+      <div className="space-y-8 px-5 py-6 text-pretty text-sm leading-relaxed text-ink-muted sm:px-6">
         <section className="space-y-2">
-          <h3 className="text-sm font-medium text-slate-900">
-            {a.purposeHeading}
-          </h3>
+          <h3 className="text-sm font-medium text-ink">{a.purposeHeading}</h3>
           <p>
             {a.purposeBodyBefore}
-            <strong className="font-medium text-slate-800">{a.purposeEmphasis}</strong>
+            <strong className="font-medium text-ink">{a.purposeEmphasis}</strong>
             {a.purposeBodyAfter}
           </p>
         </section>
 
         <section className="space-y-2">
-          <h3 className="text-sm font-medium text-slate-900">{a.archHeading}</h3>
+          <h3 className="text-sm font-medium text-ink">{a.archHeading}</h3>
           <p>
             {a.archIntroBefore}
-            <strong className="font-medium text-slate-800">{a.archPortfolio}</strong>
+            <strong className="font-medium text-ink">{a.archPortfolio}</strong>
             {a.archIntroMid}
-            <strong className="font-medium text-slate-800">{a.archProduction}</strong>
+            <strong className="font-medium text-ink">{a.archProduction}</strong>
             {a.archIntroAfter}
           </p>
           <ul className="list-disc space-y-1.5 pl-5">
@@ -83,7 +79,7 @@ export function AboutDemoDialog({ open, onClose }: AboutDemoDialogProps) {
         </section>
 
         <section className="space-y-2">
-          <h3 className="text-sm font-medium text-slate-900">{a.prodHeading}</h3>
+          <h3 className="text-sm font-medium text-ink">{a.prodHeading}</h3>
           <p>{a.prodIntro}</p>
           <ul className="list-disc space-y-1.5 pl-5">
             <li>{a.prodBulletScrape}</li>

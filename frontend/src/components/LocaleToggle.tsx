@@ -18,7 +18,7 @@ export function LocaleToggle() {
 
   return (
     <div
-      className="flex items-center gap-0.5 rounded-md border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium"
+      className="flex items-center gap-0.5 border border-rule bg-paper p-0.5 text-xs font-medium"
       role="group"
       aria-label="Language"
     >
@@ -29,10 +29,10 @@ export function LocaleToggle() {
           aria-pressed={locale === code}
           aria-label={code === "ja" ? t.switchToJa : t.switchToEn}
           onClick={() => onSelect(code)}
-          className={`rounded px-2 py-1 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 ${
+          className={`rounded-sm px-2 py-1 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/25 focus-visible:ring-offset-2 focus-visible:ring-offset-paper ${
             locale === code
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-500 hover:text-slate-900"
+              ? "bg-surface text-ink"
+              : "text-ink-muted hover:text-ink"
           }`}
         >
           {code === "ja" ? t.ja : t.en}

@@ -9,30 +9,35 @@ Canonical: [architecture.md](./architecture.md). Do not change dual-mode (`APP_M
 
 ## 2. UI design principles
 
-### 2.1 De-AI aesthetic
+### 2.1 De-AI aesthetic (Soft Paper)
 
-- Avoid generic card stacks (`border` + `shadow-md` everywhere).
-- Hierarchy via **8px spacing** and **type scale jumps** (e.g. 14 → 16 → 24 → 32px).
-- Content over decoration. Lists and forms: flat white + `border-slate-200` dividers.
+Direction: light editorial tool — warm paper ground, ink type, one terracotta accent. Brief: [design/brief.md](./design/brief.md).
+
+- Avoid card stacks (`border` + `shadow-md`), glass/`backdrop-blur` headers, and default slate SaaS chrome.
+- Hierarchy via **8px spacing** and **type scale** (14 → 16 → 24 → 32px).
+- Lists/forms: hairline `border-rule`, underline-style inputs, left ink rule on primary sections.
+- Font: **IBM Plex Sans JP** (`frontend/src/app/layout.tsx`).
 
 ### 2.2 Color
 
-| Use | Example classes |
-|-----|-------------------|
-| Page background | `bg-slate-50` |
-| Content surface | `bg-white` |
-| Headings | `text-slate-900` |
-| Secondary text | `text-slate-500` |
-| Accent | `text-slate-900` / buttons `bg-slate-900` (no loud colors) |
+| Use | Token / example |
+|-----|-----------------|
+| Page background | `bg-paper` (`#f7f5f0`) |
+| Content surface | `bg-surface` (`#fffef9`) |
+| Headings / ink | `text-ink` (`#2c2825`) |
+| Secondary text | `text-ink-muted` (`#6b6560`) |
+| Rules | `border-rule` (`#e0dbd3`) |
+| Accent (sparingly) | `text-accent` / tool metric (`#b85c38`) |
+| Primary button | `bg-ink` on surface text |
 
 ### 2.3 Interaction
 
 - Clickables: `transition-colors duration-200` (optional `active:scale-[0.98]`).
-- Focus: `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2`.
+- Focus: `focus-visible:ring-2 focus-visible:ring-ink/25 focus-visible:ring-offset-2 focus-visible:ring-offset-paper`.
 
 ### 2.4 Density
 
-- Section spacing `space-y-12` minimum. Target clean SaaS (Vercel / Linear style).
+- Target density **4** (Soft Paper reading rhythm — not marketing-sparse, not terminal-dense).
 
 ### 2.5 Copy (de-AI tone)
 
@@ -157,30 +162,35 @@ Maps to requirements.md §4. **Rationale and design impact** only; requirements 
 
 ## 2. UIデザイン原則
 
-### 2.1 脱AI感
+### 2.1 脱AI感（Soft Paper）
 
-- 安易なカードレイアウト（`border` + `shadow-md` の多用）を避ける。
-- 情報階層は **8px 単位の余白** と **タイポグラフィのジャンプ率**（例: 14 → 16 → 24 → 32px）で表現する。
-- 装飾より内容。一覧・フォームはフラットな白面 + 区切り線（`border-slate-200`）で十分。
+方向: ライトな紙面ツール UI — 暖色の紙地、インク文字、テラコッタ1色。概要: [design/brief.md](./design/brief.md)。
+
+- カード積み上げ・ガラスヘッダー・既定の slate SaaS 見た目を避ける。
+- 階層は **8px 余白** と **タイプスケール**（14 → 16 → 24 → 32px）。
+- 一覧・フォームは `border-rule`、下線入力、主要セクションの左インク線。
+- フォント: **IBM Plex Sans JP**。
 
 ### 2.2 カラー
 
-| 用途 | クラス例 |
-|------|----------|
-| ページ背景 | `bg-slate-50` |
-| コンテンツ面 | `bg-white` |
-| 見出し | `text-slate-900` |
-| 補助文 | `text-slate-500` |
-| アクセント | `text-slate-900` / ボタン `bg-slate-900`（過度なビビッドカラー禁止） |
+| 用途 | トークン / 例 |
+|------|----------------|
+| ページ背景 | `bg-paper`（`#f7f5f0`） |
+| 面 | `bg-surface`（`#fffef9`） |
+| 見出し / インク | `text-ink`（`#2c2825`） |
+| 補助文 | `text-ink-muted`（`#6b6560`） |
+| 罫線 | `border-rule`（`#e0dbd3`） |
+| アクセント（控えめ） | `text-accent` / 本ツール指標（`#b85c38`） |
+| プライマリボタン | `bg-ink` |
 
 ### 2.3 インタラクション
 
-- クリッカブル要素は `transition-colors duration-200`（必要なら `active:scale-[0.98]`）。
-- フォーカス: `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2`。
+- クリッカブル: `transition-colors duration-200`（任意で `active:scale-[0.98]`）。
+- フォーカス: `focus-visible:ring-2 focus-visible:ring-ink/25 focus-visible:ring-offset-2 focus-visible:ring-offset-paper`。
 
 ### 2.4 密度
 
-- セクション間は `space-y-12` 以上を基本。Vercel / Linear 系のクリーンな SaaS を目標。
+- 密度 **4**（Soft Paper。マーケティングほど疎でも、ターミナルほど密でもない）。
 
 ### 2.5 コピー（脱AI文）
 
