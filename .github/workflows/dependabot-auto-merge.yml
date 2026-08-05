@@ -1,0 +1,48 @@
+name: Dependabot auto-merge
+
+# Policy (recommended):
+# - Auto-enable GitHub auto-merge only for Dependabot patch/minor updates
+# - Majors never auto-merge (manual review)
+# - Merge still waits for required status checks (branch protection)
+# - Grouped multi-package PRs: only when update-type is patch or minor
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge (patch / minor only)
+        if: >-
+          steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+          steps.meta.outputs.update-type == 'version-update:semver-minor'
+        env:
+          GH_TOKEN: ${{ secrets.GH_PR_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          set -euo pipefail
+          echo "update-type=${{ steps.meta.outputs.update-type }} dependency=${{ steps.meta.outputs.dependency-names }}"
+          gh pr merge "$PR_URL" --auto --squash
+          echo "Enabled auto-merge (squash) — will merge when required checks pass."
+
+      - name: Skip major / unknown update types
+        if: >-
+          steps.meta.outputs.update-type != 'version-update:semver-patch' &&
+          steps.meta.outputs.update-type != 'version-update:semver-minor'
+        env:
+          UPDATE_TYPE: ${{ steps.meta.outputs.update-type }}
+        run: |
+          echo "Skip auto-merge for update-type=${UPDATE_TYPE:-unknown} (majors and untyped/grouped-as-major stay manual)."
