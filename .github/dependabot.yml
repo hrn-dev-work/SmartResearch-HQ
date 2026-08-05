@@ -32,10 +32,11 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 3
-    # arq 0.28.x pins redis[hiredis]<6; redis 8.x breaks pip resolve / runtime until queue stack is upgraded.
+    # arq 0.28.x depends on redis>=4.2,<6. Ignore redis 6+ until arq stack is upgraded
+    # (Dependabot otherwise opens major bumps like 5.x → 7.x that fail pip resolve / CI).
     ignore:
       - dependency-name: redis
-        versions: [">=8.0.0"]
+        versions: [">=6.0.0"]
     groups:
       pip-patch-minor:
         applies-to: version-updates
