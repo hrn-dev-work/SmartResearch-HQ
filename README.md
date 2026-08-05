@@ -5,6 +5,8 @@
 
 Public markdown conventions: [docs/doc-conventions.md](docs/doc-conventions.md).
 
+Japanese: see below.
+
 Cross-border EC research tool: take a Shopee shop URL, list SOLD items, propose Amazon ASIN candidates, confirm on a review screen, optionally export. One monorepo with **Portfolio** (public Mock demo) and **Production** (private scrape / match / Sheets).
 
 Manual matching often takes **5–10 minutes per item**. The UI targets a short review pass instead. Matching is pluggable; default production path is Amazon PA-API title search (Gemini is optional, not required).
