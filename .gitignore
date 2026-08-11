@@ -91,3 +91,8 @@ frontend/CLAUDE.md
 
 # Portfolio deploy (Vercel CLI + Render)
 .vercel/
+
+# secrets (layer A)
+.env
+.env.*
+!.env.example
