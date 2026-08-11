@@ -20,7 +20,9 @@ risk() { echo "OPEN RISK: $*" >&2; open+=("$*"); fail=1; }
 
 echo "== verify security baseline =="
 
-[[ -f .github/dependabot.yml ]] && ok "dependabot.yml" || bad "missing .github/dependabot.yml"
+[[ ! -f .github/dependabot.yml && ! -f .github/dependabot.yaml ]] \
+  && ok "no dependabot.yml (version-update PRs disabled by policy)" \
+  || risk "dependabot.yml present — policy default is OFF (set ENABLE_DEPENDABOT / remove file)"
 
 # Require job key and/or job name secret-audit (check context), not free-text alone.
 has_secret_audit_job=0

@@ -86,7 +86,8 @@ done < <(
   done
 )
 if [[ ${#source_dirs[@]} -eq 0 ]]; then
-  warn "No common source roots found — rely on gitleaks/Trivy for content scan"
+  # Docs-only / empty trees: not a finding; CI still runs gitleaks + Trivy.
+  echo "OK: no common source roots — content scan deferred to gitleaks/Trivy"
 else
   secret_pattern='(api[_-]?key|secret[_-]?key|access[_-]?key|password|passwd|private[_-]?key|client_secret)\s*[:=]\s*["'\''`][^"'\'']{8,}'
   hardcoded=$(
