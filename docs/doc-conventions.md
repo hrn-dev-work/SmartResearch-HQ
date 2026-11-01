@@ -6,7 +6,7 @@ Public markdown such as `CONTEXT.md`, `docs/*.md`, and `frontend/README.md` foll
 2. **`---`** — horizontal rule on its own line (language boundary)  
 3. **Japanese** — full mirror with the same heading structure (not a short footer)
 
-**Root README exception:** `README.md` contains the full English version; `README.ja.md` contains the full Japanese version. Put `[English](./README.md) | [日本語](./README.ja.md)` immediately below the title in both files. Keep topics, public URLs, and skill tables in sync in the same change. Readers switch languages at the top without scrolling through another language.
+**Root README exception:** `README.md` contains the full Japanese version shown by default; `README.en.md` contains the full English version. Put Japanese-first button-style language links immediately below both titles, pointing to `./README.md` and `./README.en.md`. Highlight the current language. Keep topics, public URLs, and skill tables in sync. `README.ja.md` is a compatibility link to the default Japanese README.
 
 **Automated check:** `bash scripts/validate-public-docs.sh` (also runs in `ci-check.sh` and pre-commit when public md is staged).
 
@@ -38,9 +38,9 @@ For the root README pair, update both language files together and preserve the t
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Root README lacks a Japanese version | Missing language pair | Add the full `README.ja.md` and reciprocal language links |
+| Root README lacks a Japanese version | Missing language pair | Keep full Japanese `README.md` and English `README.en.md` with reciprocal buttons |
 | English-only CONTEXT.md | No Japanese mirror | Add a full JA block after language-boundary `---` |
-| Japanese bullets only at end of README | Old “footer” pattern | Move the full Japanese version to `README.ja.md` |
+| Japanese bullets only at end of README | Old “footer” pattern | Use Japanese `README.md` and English `README.en.md` |
 | Japanese-only `docs/*.md` | Spec written in JA first | Prepend English block, then `---`, keep existing JA |
 | Rule only in `.cursor/` | `.cursor/` is gitignored | Edit **this file** + `docs/agent-git-playbook.md` |
 | Docs PR on `chore/security-*` branch | Wrong branch reused | `git-start-branch.sh docs/<topic>` for docs-only work |
@@ -55,7 +55,7 @@ git で追跡する Markdown（ルートの README 2 ファイルを除く。`CO
 2. **`---`** — 単独行の水平線（言語の境界）  
 3. **日本語** — 見出し構成を揃えた全文（末尾の箇条書きだけにしない）
 
-**ルート README の例外:** `README.md` を英語の全文、`README.ja.md` を日本語の全文とします。両方のタイトル直下に `[English](./README.md) | [日本語](./README.ja.md)` を置きます。扱う話題・公開 URL・スキル表は同じ変更で揃えます。別言語の本文をスクロールせず、冒頭から切り替えられます。
+**ルート README の例外:** `README.md` は最初に表示する日本語の全文、`README.en.md` は英語の全文です。両方のタイトル直下に「日本語 / English」の順でボタン風リンクを置き、`./README.md` と `./README.en.md` に移動できるようにします。現在の言語を強調し、扱う話題・公開 URL・スキル表を同じ変更で揃えます。`README.ja.md` は既存リンクを維持するため、日本語の `README.md` への案内とします。
 
 **自動検証:** `bash scripts/validate-public-docs.sh`（`ci-check.sh` および public md を stage した pre-commit でも実行）。
 
@@ -87,9 +87,9 @@ git で追跡する Markdown（ルートの README 2 ファイルを除く。`CO
 
 | 症状 | 原因 | 対策 |
 |------|------|------|
-| ルート README に日本語版がない | 言語ペアなし | 全文の `README.ja.md` と相互の言語リンクを追加 |
+| ルート README に日本語版がない | 言語ペアなし | 日本語の `README.md` と英語の `README.en.md` に全文と相互のボタンを配置 |
 | CONTEXT.md が英語のみ | 日本語ミラーなし | 言語境界の `---` の後に全文ミラー |
-| README 末尾だけ日本語 | 旧フッター形式 | 英語と同構成の全文を `README.ja.md` に配置 |
+| README 末尾だけ日本語 | 旧フッター形式 | 日本語の全文を `README.md`、英語の全文を `README.en.md` に配置 |
 | `docs/*.md` が日本語のみ | 仕様を JA のみで記述 | 先頭に英語ブロック + `---` + 既存 JA |
 | ルールが `.cursor/` のみ | gitignore | **本書** と `agent-git-playbook.md` を更新 |
 | docs PR が無関係ブランチ | ブランチ流用 | `git-start-branch.sh docs/<topic>` |

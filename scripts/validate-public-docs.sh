@@ -13,7 +13,7 @@ mapfile -t FILES < <(
   else
     {
       echo README.md
-      echo README.ja.md
+      echo README.en.md
       [[ -f frontend/README.md ]] && echo frontend/README.md
       find docs -maxdepth 1 -name '*.md' -type f 2>/dev/null | grep -v frontend-structure | grep -v production-local-setup | sort
     }
@@ -53,10 +53,13 @@ def validate(path: Path) -> list[str]:
         return [f"{rel}: missing # heading"]
 
     # Root READMEs are a language pair, not stacked bilingual documents.
-    if rel.as_posix() in {"README.md", "README.ja.md"}:
-        nav = "[English](./README.md) | [日本語](./README.ja.md)"
+    if rel.as_posix() in {"README.md", "README.en.md"}:
+        navs = {
+            "README.md": '[![日本語](https://img.shields.io/badge/%E6%97%A5%E6%9C%AC%E8%AA%9E-0969da?style=for-the-badge)](./README.md) [![English](https://img.shields.io/badge/English-57606a?style=for-the-badge)](./README.en.md)',
+            "README.en.md": '[![日本語](https://img.shields.io/badge/%E6%97%A5%E6%9C%AC%E8%AA%9E-57606a?style=for-the-badge)](./README.md) [![English](https://img.shields.io/badge/English-0969da?style=for-the-badge)](./README.en.md)',
+        }
         errors = []
-        for name, japanese in (("README.md", False), ("README.ja.md", True)):
+        for name, japanese in (("README.md", True), ("README.en.md", False)):
             paired = ROOT / name
             if not paired.is_file():
                 errors.append(f"{name}: missing language pair")
@@ -66,7 +69,7 @@ def validate(path: Path) -> list[str]:
                 errors.append(f"{name}: must start with a # heading")
             elif bool(JA.search(content[0])) != japanese:
                 errors.append(f"{name}: heading does not match file language")
-            if len(content) < 3 or content[2] != nav:
+            if len(content) < 3 or content[2] != navs[name]:
                 errors.append(f"{name}: language links required below title")
             if sum(line.startswith("## ") for line in content) < 8:
                 errors.append(f"{name}: expected full README, not a redirect stub")
