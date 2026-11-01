@@ -4,7 +4,6 @@ on:
   pull_request:
     branches: [main, phase1, phase2, phase3]
   push:
-    branches: [main, phase1, phase2, phase3]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
