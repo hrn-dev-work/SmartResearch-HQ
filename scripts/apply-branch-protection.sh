@@ -7,8 +7,8 @@
 #   EXTRA_CHECKS="lint test"  extra required check contexts (whitespace-separated)
 #   REQUIRE_REVIEW=1          require 1 approving review (use when ≥2 maintainers)
 #
-# Review count default is 0 (solo): still gets required_status_checks + enforce_admins.
-# Team repos: always set REQUIRE_REVIEW=1.
+# Default: no PR requirement; required checks and force/deletion protection remain.
+# Set REQUIRE_REVIEW=1 only when PR reviews are explicitly requested.
 # Needs: gh (admin), jq.
 
 set -euo pipefail
@@ -63,20 +63,21 @@ if [[ "${REQUIRE_REVIEW:-0}" == "1" ]]; then
   dismiss_stale=true
 fi
 
+reviews_json=null
+if [[ "$reviews_count" -gt 0 ]]; then
+  reviews_json="$(jq -n --argjson reviews "$reviews_count" --argjson dismiss "$dismiss_stale" '{required_approving_review_count: $reviews, dismiss_stale_reviews: $dismiss}')"
+fi
+
 echo "Applying branch protection on $REPO branch=$BRANCH contexts=$contexts_json reviews=$reviews_count"
 
 payload="$(
   jq -n \
     --argjson contexts "$contexts_json" \
-    --argjson reviews "$reviews_count" \
-    --argjson dismiss "$dismiss_stale" \
+    --argjson reviews "$reviews_json" \
     '{
       required_status_checks: { strict: true, contexts: $contexts },
       enforce_admins: true,
-      required_pull_request_reviews: {
-        required_approving_review_count: $reviews,
-        dismiss_stale_reviews: $dismiss
-      },
+      required_pull_request_reviews: $reviews,
       restrictions: null,
       allow_force_pushes: false,
       allow_deletions: false,

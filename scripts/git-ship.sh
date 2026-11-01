@@ -14,7 +14,7 @@ source "$ROOT/scripts/gh-pr-branch.sh"
 
 bash "$ROOT/scripts/git-agent-context.sh" --strict
 
-MODE="${1:-pr}"
+MODE="${1:-push}"
 BASE="${2:-main}"
 BRANCH="$(git branch --show-current)"
 REMOTE="${GIT_PUSH_REMOTE:-origin}"
@@ -44,13 +44,10 @@ git push -u "$REMOTE" HEAD "${@:3}"
 case "$MODE" in
   push)
     echo "Pushed ${BRANCH} -> ${REMOTE}"
-    if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-      bash "$ROOT/scripts/sync-pr-body.sh" "$BRANCH" "$BASE" 2>/dev/null || true
-    fi
     ;;
   pr)
     bash "$ROOT/scripts/ensure-pr.sh" "$BASE"
-    bash "$ROOT/scripts/post-workflow.sh" || true
+    ENABLE_PR_WORKFLOW=1 bash "$ROOT/scripts/post-workflow.sh" || true
     PR_NUM="$(gh_pr_number_for_branch "$BRANCH")"
     URL="$(gh_pr_url_for_branch "$BRANCH")"
     if [[ -n "$PR_NUM" && -n "$URL" ]]; then
