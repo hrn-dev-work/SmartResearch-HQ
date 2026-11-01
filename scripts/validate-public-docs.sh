@@ -12,8 +12,8 @@ mapfile -t FILES < <(
     printf '%s\n' "$@"
   else
     {
-      [[ -f README.md ]] && echo README.md
-      [[ -f README.ja.md ]] && echo README.ja.md
+      echo README.md
+      echo README.ja.md
       [[ -f frontend/README.md ]] && echo frontend/README.md
       find docs -maxdepth 1 -name '*.md' -type f 2>/dev/null | grep -v frontend-structure | grep -v production-local-setup | sort
     }
