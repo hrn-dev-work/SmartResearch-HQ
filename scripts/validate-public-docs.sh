@@ -13,6 +13,7 @@ mapfile -t FILES < <(
   else
     {
       [[ -f README.md ]] && echo README.md
+      [[ -f README.ja.md ]] && echo README.ja.md
       [[ -f frontend/README.md ]] && echo frontend/README.md
       find docs -maxdepth 1 -name '*.md' -type f 2>/dev/null | grep -v frontend-structure | grep -v production-local-setup | sort
     }
@@ -50,6 +51,26 @@ def validate(path: Path) -> list[str]:
     h1_lines = [i for i, line in enumerate(lines) if H1.match(line)]
     if not h1_lines:
         return [f"{rel}: missing # heading"]
+
+    # Root READMEs are a language pair, not stacked bilingual documents.
+    if rel.as_posix() in {"README.md", "README.ja.md"}:
+        nav = "[English](./README.md) | [日本語](./README.ja.md)"
+        errors = []
+        for name, japanese in (("README.md", False), ("README.ja.md", True)):
+            paired = ROOT / name
+            if not paired.is_file():
+                errors.append(f"{name}: missing language pair")
+                continue
+            content = paired.read_text(encoding="utf-8").splitlines()
+            if not content or not H1.match(content[0]):
+                errors.append(f"{name}: must start with a # heading")
+            elif bool(JA.search(content[0])) != japanese:
+                errors.append(f"{name}: heading does not match file language")
+            if len(content) < 3 or content[2] != nav:
+                errors.append(f"{name}: language links required below title")
+            if sum(line.startswith("## ") for line in content) < 8:
+                errors.append(f"{name}: expected full README, not a redirect stub")
+        return errors
 
     first_h1 = h1_lines[0]
     if JA.search(lines[first_h1]):
@@ -91,7 +112,7 @@ if errors:
     for e in errors:
         print(f"  - {e}", file=sys.stderr)
     print("Convention: docs/doc-conventions.md", file=sys.stderr)
-    print("Fix: English sections first, then ---, then full Japanese mirror.", file=sys.stderr)
+    print("Fix: root READMEs use separate EN/JA files with language links; other public docs use English, ---, then Japanese.", file=sys.stderr)
     sys.exit(1)
 
 print(f"Public docs validation OK ({len(paths)} files)")
