@@ -5,8 +5,13 @@ ROOT=$(git rev-parse --show-toplevel)
 bash $ROOT/scripts/pre-commit-secret-check.sh
 bash $ROOT/scripts/sync-wbs-roadmap.sh --stage || true
 
+# Deletions must not let the required root language pair bypass validation.
+if git diff --cached --name-only -- README.md README.en.md | grep -q .; then
+  bash "$ROOT/scripts/validate-public-docs.sh" README.md README.en.md
+fi
+
 mapfile -t STAGED_MD < <(
-  git diff --cached --name-only --diff-filter=ACM -- README.md CONTEXT.md frontend/README.md docs/ 2>/dev/null \
+  git diff --cached --name-only --diff-filter=ACM -- README.md README.en.md CONTEXT.md frontend/README.md docs/ 2>/dev/null \
     | grep -E '\.md$' || true
 )
 
