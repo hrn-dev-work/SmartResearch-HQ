@@ -1,4 +1,4 @@
-# SmartResearch-HQ（日本語）
+# 越境ECリサーチ｜Shopeeの売れ筋からAmazon ASIN候補
 
 [![日本語](https://img.shields.io/badge/%E6%97%A5%E6%9C%AC%E8%AA%9E-0969da?style=for-the-badge)](./README.md) [![English](https://img.shields.io/badge/English-57606a?style=for-the-badge)](./README.en.md)
 
