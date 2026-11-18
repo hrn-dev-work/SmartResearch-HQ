@@ -1,46 +1,123 @@
-# Cross-border research: Shopee sold items to Amazon ASIN candidates
+# SmartResearch-HQ: Find products to consider sourcing
 
 [![日本語](https://img.shields.io/badge/%E6%97%A5%E6%9C%AC%E8%AA%9E-57606a?style=for-the-badge)](./README.md) [![English](https://img.shields.io/badge/English-0969da?style=for-the-badge)](./README.en.md)
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Site-00C7B7?style=for-the-badge&logo=vercel)](https://smart-research-hq.vercel.app)
-[![Author](https://img.shields.io/badge/Author-HRN-0A66C2?style=for-the-badge&logo=github)](https://github.com/hrn-dev-work)
+**Research products on Shopee and find candidates for the same products on Amazon.**  
+The app gathers candidates, a person checks the details, and the confirmed results become a list for sourcing decisions.
 
-Public markdown conventions: [docs/doc-conventions.md](docs/doc-conventions.md).
+**[Try the demo](https://smart-research-hq.vercel.app)** · [Service overview and example (9 slides, Japanese)](https://docs.google.com/presentation/d/19menY9qCy_Skjt85iv5y2VLB4bGUbp6h/edit)
 
-Cross-border EC research tool: take a Shopee shop URL, list SOLD items, propose Amazon ASIN candidates, confirm on a review screen, optionally export. One monorepo with **Portfolio** (public Mock demo) and **Production** (private scrape / match / Sheets).
+> The public demo uses sample data. It does not research live shops or save data to Google Sheets. The presentation may require Google Drive viewing permission.
 
-Manual matching often takes **5–10 minutes per item**. The UI targets a short review pass instead. Matching is pluggable; default production path is Amazon PA-API title search (Gemini is optional, not required).
+## Who is this for?
+
+- Sellers considering which products to source domestically and sell overseas
+- People who find products on Shopee and then search for each one again on Amazon
+- Teams that want to keep research results in a list and hand them over to colleagues
+
+The goal is to reduce product-search work and leave more time for checking costs and deciding what to source. Time savings and sales impact have not been measured.
+
+## How it works
+
+| Step | What the app and the user do |
+|---|---|
+| 1. Choose a shop | Enter a Shopee shop URL. |
+| 2. View candidates | The app displays product information, sold counts, and Amazon product candidates. |
+| 3. Check the product | The user checks model, capacity, color, and quantity before selecting a candidate. Enter a product identifier manually or reject the item if no suitable candidate exists. |
+| 4. Keep the results | Organize confirmed products in a list. Production features can save it to Google Sheets after initial setup. |
+
+Candidates and match scores do not guarantee that two listings represent the same product. The user makes the final check.
+
+## What do the results contain?
+
+The production export saves these fields to Google Sheets.
+
+| Information | Contents |
+|---|---|
+| Shopee product | Product title, page link, item ID, and sold count |
+| Selected Amazon product | Page link and product identifier (ASIN) |
+| Record | Export timestamp |
+
+Open product links from the list to check sourcing prices and shipping costs separately. Another team member can use the same list to continue the research.
+
+## Example: Source on Amazon and sell on Shopee
+
+This is a fictional example. Products, sold counts, and prices are illustrative, not actual research results.
+
+### Find a product to sell overseas
+
+Tanaka wants to source products on Amazon and sell them on Shopee. Unsure what to buy, Tanaka enters the URL of a Shopee household-goods shop.
+
+### Select the same product from the candidates
+
+The results show a 500 mL insulated bottle with 120 units sold, alongside Amazon candidates. Tanaka checks the model, capacity, color, and quantity, then selects the same 500 mL product. A 350 mL candidate is not selected.
+
+Sold count is only one input to the decision. It does not establish future demand.
+
+### Account for shipping and fees
+
+Tanaka opens product links, checks prices, and calculates costs outside the app.
+
+| Item | Illustrative amount (JPY equivalent) |
+|---|---:|
+| Planned selling price | ¥2,500 |
+| Purchase cost | ¥1,100 |
+| Shipping | ¥500 |
+| Selling fees and similar charges | ¥350 |
+| Packaging | ¥150 |
+| Amount remaining after these costs | **¥400** |
+
+This is not final profit: taxes, return losses, fixed costs, and other expenses are excluded. If shipping costs ¥900 instead, the remaining amount is zero, so Tanaka would pass under those conditions.
+
+### Decide whether to source it
+
+After checking stock, selling conditions, and costs, Tanaka considers a small purchase only for suitable products. Actual costs and sales after listing inform whether to buy more.
+
+**The app supports product research, candidate suggestions, and organizing confirmed results.** Profit calculations, purchases, listing, and shipping happen outside the app. Sales and profits are not guaranteed.
+
+## Can it support sites other than Shopee?
+
+The current implementation researches Shopee products and finds Amazon candidates. Changing the research site or the site used to find candidates can be considered through additional development.
+
+Feasibility and scope depend on the requested site and information. This is not a settings-only switch to any website; site capabilities, data access methods, and terms may prevent support.
+
+## Screens and walkthrough
+
+**Enter a shop URL**
+
+<img src="docs/images/dashboard.png" alt="Enter a Shopee shop URL to start research" width="720" />
+
+**Check whether products match and select a candidate**
+
+<img src="docs/images/review.png" alt="Compare a Shopee product with Amazon candidates" width="720" />
+
+[Watch the short walkthrough](docs/videos/portfolio-demo.webm)
+
+Product information and scores in the screenshots are samples. Any task-time figures shown are estimates, not measured improvements.
+
+## Public demo versus production features
+
+| Feature | Public demo (Portfolio) | Production |
+|---|---|---|
+| Product information | Sample data | Retrieved from external sites |
+| Amazon candidates | Sample candidates | Search-service integration |
+| Product confirmation | User selection | User selection |
+| Spreadsheet export | Counts only | Google Sheets integration |
+| Getting started | Try in a browser | Configure and verify external integrations |
+
+Production features are not deployed publicly.
 
 ---
 
-## Why two modes in one codebase
+## For developers: Architecture and modes
 
-| Mode | Audience | Runtime |
-|------|----------|---------|
-| **Portfolio** (this demo) | Recruiters, clients, reviewers | In-memory Mock — no Postgres, Redis, or API keys |
-| **Production** (private ops) | Real cross-border EC workflows | Playwright scraping, Redis + ARQ workers, pluggable matching (PA-API / Gemini), Google Sheets |
+FastAPI and Next.js share one codebase, with behavior selected by `APP_MODE`.
 
-`APP_MODE` switches behavior on the same FastAPI + Next.js app. Portfolio keeps the full UI path (research → review → export counts) without secrets. Production adds workers and live integrations.
+- `portfolio`: In-memory sample data; no PostgreSQL, Redis, or API keys required.
+- `production`: Playwright, Redis + ARQ workers, PostgreSQL, Amazon search, and Google Sheets. Candidate search is pluggable; the default is Amazon PA-API title search. Gemini is optional.
 
-Header link **About this demo** explains the split (JA / EN). Soft Paper UI tokens: [docs/design/brief.md](docs/design/brief.md).
-
----
-
-## Screenshots
-
-Live demo: [smart-research-hq.vercel.app](https://smart-research-hq.vercel.app)
-
-**Dashboard** — shop URL → start research
-
-<img src="docs/images/dashboard.png" alt="Dashboard: paste Shopee shop URL and start research" width="720" />
-
-**Review** — Amazon candidates and manual ASIN
-
-<img src="docs/images/review.png" alt="Review: select or reject ASIN candidates" width="720" />
-
-Short walkthrough (dashboard → review): [docs/videos/portfolio-demo.webm](docs/videos/portfolio-demo.webm)
-
-Demo product thumbnails live under `frontend/public/demo/` (served as `/demo/*.png`).
+UI design: [Soft Paper brief](docs/design/brief.md)  
+Demo product images: `frontend/public/demo/`
 
 ---
 
