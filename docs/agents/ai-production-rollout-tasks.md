@@ -73,29 +73,3 @@ bash scripts/ci-check.sh
 # After A4.1:
 # grep -R "job_id" backend/app/ --include='*.py' | head
 ```
-
----
-
-# AI ガードレールと本番運用準備 — ロールアウトタスク
-
-ADR 0008 を CONTEXT/agent 文書の先を実装するバックログ。
-
-## P0 — ポリシー（ドキュメント）
-
-| ID | Task | Status |
-|----|------|--------|
-| A0.1 | CONTEXT § AI Guardrails マージ | done |
-| A0.2 | ADR 0008 + ai-production-readiness.md | done |
-| A0.3 | Agent README リンク | done |
-
-## P1 — 依存関係管理
-
-| ID | Task | Notes |
-|----|------|-------|
-| A1.1 | 依存提案テンプレを playbook に | 追加前に貼る |
-| A1.2 | deps 変更時 WARN | 最初 non-blocking |
-| A1.3 | major dep pin をレビュー | Dependabot |
-
-## Verification
-
-bash scripts/ci-check.sh
